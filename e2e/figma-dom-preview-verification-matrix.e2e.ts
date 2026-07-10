@@ -11,7 +11,7 @@ const NESTED_SELECTION_PATH = [
 test('verifies default selection and nested click descent in the preview', async ({
   page,
 }) => {
-  await page.goto('/?demo=figma')
+  await page.goto('/figma')
   await selectLayer(page, 'Select layer Workspace page', 'workspacePage')
 
   await expect(selectionGuide(page)).toHaveCount(1)
@@ -33,15 +33,34 @@ test('verifies default selection and nested click descent in the preview', async
       'data-selected',
       'true',
     )
+    await expectSelectedLayer(page, label, nodeId)
     await expect(page.locator('.figma-guide-label')).toContainText(label)
     await expectSelectionMatchesNode(page, nodeId)
   }
+
+  await selectLayer(page, 'Select layer Hero title', 'workspaceHeroTitle')
+  await expectSelectedLayer(page, 'Hero title', 'workspaceHeroTitle')
+  await expectSelectionMatchesNode(page, 'workspaceHeroTitle')
+})
+
+test('preserves authored node identities and DOM semantics across document edits', async ({
+  page,
+}) => {
+  await page.goto('/figma')
+  await selectLayer(page, 'Select layer Workspace page', 'workspacePage')
+
+  const initialNodeIds = await expectStableAuthoredDom(page)
+
+  await page.getByRole('spinbutton', { name: 'CSS padding' }).fill('28')
+  await expect.poll(() => readPaddingTop(page, 'workspacePage')).toBe(28)
+
+  expect(await expectStableAuthoredDom(page)).toEqual(initialNodeIds)
 })
 
 test('verifies measure and X-ray overlays stay state-specific', async ({
   page,
 }) => {
-  await page.goto('/?demo=figma')
+  await page.goto('/figma')
   await selectLayer(page, 'Select layer Workspace page', 'workspacePage')
   await selectLayer(page, 'Select layer Hero panel', 'workspaceHero')
 
@@ -75,7 +94,7 @@ test('verifies measure and X-ray overlays stay state-specific', async ({
 test('verifies flex spacing and flex-child participation controls', async ({
   page,
 }) => {
-  await page.goto('/?demo=figma')
+  await page.goto('/figma')
   await selectLayer(page, 'Select layer Workspace page', 'workspacePage')
   await selectLayer(page, 'Select layer Pipeline list', 'workspacePipelineList')
 
@@ -130,7 +149,7 @@ test('verifies flex spacing and flex-child participation controls', async ({
 test('verifies grid and out-of-flow affordances in the preview', async ({
   page,
 }) => {
-  await page.goto('/?demo=figma')
+  await page.goto('/figma')
   await selectLayer(page, 'Select layer Workspace page', 'workspacePage')
   await selectLayer(page, 'Select layer Content grid', 'workspaceContent')
 
@@ -165,7 +184,7 @@ test('verifies grid and out-of-flow affordances in the preview', async ({
 test('verifies selected overlay tracking through pan and zoom', async ({
   page,
 }) => {
-  await page.goto('/?demo=figma')
+  await page.goto('/figma')
   await selectLayer(page, 'Select layer Workspace page', 'workspacePage')
   await selectLayer(page, 'Select layer Content grid', 'workspaceContent')
   await expectSelectionMatchesNode(page, 'workspaceContent')
@@ -201,6 +220,54 @@ async function selectLayer(
 ) {
   await page.getByRole('button', { name: buttonName }).click()
   await expect(domNode(page, nodeId)).toHaveAttribute('data-selected', 'true')
+}
+
+async function expectSelectedLayer(
+  page: Page,
+  label: string,
+  nodeId: string,
+) {
+  const tree = page.getByRole('tree', { name: 'Layers' })
+  const treeItem = tree.getByRole('treeitem', { name: label, exact: true })
+  const layerButton = page.getByRole('button', {
+    name: `Select layer ${label}`,
+  })
+
+  await expect(treeItem).toHaveAttribute('aria-selected', 'true')
+  await expect(layerButton).toHaveAttribute('data-figma-layer-node-id', nodeId)
+  await expect(layerButton).toHaveAttribute('tabindex', '0')
+  await expect(tree.locator('[role="treeitem"][aria-selected="true"]'))
+    .toHaveCount(1)
+}
+
+async function expectStableAuthoredDom(page: Page) {
+  const nodeIds = await page.locator('[data-dom-edit-node]').evaluateAll(
+    (elements) => elements.map((element) =>
+      element.getAttribute('data-dom-edit-node') ?? ''),
+  )
+
+  expect(nodeIds.length).toBeGreaterThan(0)
+  expect(nodeIds.every(Boolean)).toBe(true)
+  expect(new Set(nodeIds).size).toBe(nodeIds.length)
+
+  for (const [nodeId, tagName] of [
+    ['workspacePage', 'SECTION'],
+    ['workspaceMain', 'MAIN'],
+    ['workspaceHeroTitle', 'H2'],
+    ['workspacePrimaryAction', 'BUTTON'],
+  ] as const) {
+    const node = page.locator(`[data-dom-edit-node="${nodeId}"]`)
+    await expect(node).toHaveCount(1)
+    await expect.poll(() => node.evaluate((element) => element.tagName))
+      .toBe(tagName)
+  }
+
+  return [...nodeIds].sort()
+}
+
+async function readPaddingTop(page: Page, nodeId: string) {
+  return domNode(page, nodeId).evaluate((element) =>
+    Math.round(Number.parseFloat(getComputedStyle(element).paddingTop)))
 }
 
 async function expectSelectionMatchesNode(page: Page, nodeId: string) {

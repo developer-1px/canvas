@@ -203,7 +203,11 @@ describe('Canvas module layer boundaries', () => {
   })
 
 
-  it('keeps json-document ownership inside the host document layer', () => {
+  it('keeps json-document ownership inside document-owning modules', () => {
+    const documentOwnerPrefixes = [
+      'src/canvas/host/document/',
+      'src/canvas/design-document/',
+    ]
     const violations = sourceFiles
       .filter((file) =>
         !file.path.endsWith('.test.ts') &&
@@ -215,7 +219,9 @@ describe('Canvas module layer boundaries', () => {
         reference.target.startsWith('@interactive-os/json-document-'),
       )
       .filter((reference) =>
-        !reference.from.startsWith('src/canvas/host/document/'),
+        !documentOwnerPrefixes.some((prefix) =>
+          reference.from.startsWith(prefix),
+        ),
       )
 
     expect(violations).toEqual([])

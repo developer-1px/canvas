@@ -8,16 +8,27 @@
 - Canvas Affordance Catalog: built-in Affordance group과 default feature toggle matrix를 소유하는 Engine-owned what 계약. Canvas Affordance Config의 타입, 검증 기준, group iteration은 이 catalog에서 유도된다.
 - Canvas Affordance Metadata: built-in tool/command label, status label, keyboard shortcut, toolbar tool order를 소유하고 tool title/shortcut display를 keyboard shortcut에서 파생하는 immutable Engine-owned what 계약.
 - Host App: 엔진을 사용하는 실제 제품. 데이터 모델, 저장, 도메인 명령, 화면 구성을 소유한다.
+- DesignDocument: Figma와 FigJam Authored Content의 유일한 persistent source of truth인 versioned serializable node graph. stable node identity, ordered hierarchy, JSON props/text/layout/style/frame geometry, component/widget reference만 저장하고 React, DOM, CanvasItem, selection, camera, editor overlay state는 저장하지 않는다.
+- Authored Content: DesignDocument가 표현하고 ReactDesignRenderer가 실제 browser DOM으로 투영하는 사용자 디자인 내용. live DOM은 derived runtime output이지 document state가 아니다.
+- Editor Runtime State: selection, camera, active tool/mode, focus, hover, DOM registration/measurement, overlay, guide, marquee, pointer draft와 live preview처럼 편집 세션 동안만 유효한 상태. DesignDocument, authored history payload, document sync에 들어가지 않는다.
+- ReactDesignRenderer: DesignDocument node를 intrinsic element 또는 registered component/widget definition으로 해석해 direct React DOM을 만들고 stable node identity를 DomProjection에 등록하는 renderer. document mutation과 editing policy는 소유하지 않는다.
+- DomProjection: stable design node id와 HTMLElement 사이의 ephemeral runtime 관계, measurement, coordinate projection, observation, hit target을 소유하는 Module. DOM element와 측정값은 DesignDocument에 저장하지 않는다.
+- EditorEngine: Canvas Foundation/Affordance grammar를 DesignDocument read/command Interface와 DomProjection에 적용해 Figma식 selection, transform, text/layout, keyboard effect를 계획하는 Module. committed edit는 하나의 atomic document command로만 만든다.
+- React Component Definition: stable definition id에 React renderer, JSON prop validation/default, creation/edit capability, optional inspector contribution을 결합하는 registered definition. DesignDocument는 definition function 대신 id와 JSON data만 참조한다.
+- React Widget Definition: React Component Definition과 같은 registration contract를 따르면서 freeform collaboration product behavior를 제공하는 definition. widget은 별도 Engine item union이나 renderer switch branch가 아니다.
+- Product Pack: registered definitions, layout preset, tool/command/inspector contribution을 한 제품 의미로 조립하는 installable bundle. Figma pack은 web-design primitives를, FigJam pack은 freeform preset과 first-party widget definitions를 제공한다.
+- Read-only Compatibility Projection: DesignDocument snapshot을 migration 중 legacy consumer가 읽을 수 있는 shape로 단방향 파생하는 temporary package-internal Adapter. mutation, independent state, history, persistence, reverse synchronization을 제공하지 않는다.
+- Legacy CanvasItem Runtime: pre-1.0 CanvasItem storage와 Whiteboard SVG item layer를 사용하는 compatibility runtime. 기존 외부 surface를 위해 남을 수 있지만 canonical Figma/FigJam document/renderer가 아니며 DesignDocument와 dual-write하지 않는다.
 - Core Contract: 특정 Host App, Renderer, React 상태에 묶이지 않는 재사용 부품의 입력과 출력 계약.
 - Canvas Foundation: 특정 Host App, Renderer, React 상태, Whiteboard `CanvasItem` 저장 shape에 묶이지 않는 geometry, scene, selection, gesture, transform, command, patch-planning grammar를 소유하는 재사용 Module 집합.
 - Canvas Foundation Contract: Canvas Foundation이 외부에 노출하는 Adapter 중심 Interface. Host App은 item tree, bounds, editable target, document commit 같은 concrete 의미를 Adapter로 제공하고 Foundation은 `CanvasItem` variant를 import하지 않는다.
 - Canvas Extension: Canvas Foundation Contract를 소비해 reusable affordance나 document/gesture/command planner를 제공하는 Module. Extension은 제품 storage, UI layout, browser IO, persistence를 소유하지 않고 patch/effect descriptor 또는 renderer/command registration을 산출한다.
-- Canvas First-party Whiteboard Extension: sticky note, shape, drawing stroke, connector, comment, stamp처럼 de-facto whiteboard affordance를 Foundation 위에 올리는 내부 Extension bundle. 제품별 custom item module은 아니지만 Whiteboard Host storage와도 동일하지 않다.
+- Canvas First-party Whiteboard Extension: Canvas Foundation/Affordance grammar를 조합해 sticky, shape, drawing, connector, comment, stamp의 widget-family-specific creation, text, attachment planner와 tool metadata를 제공하는 headless internal Extension bundle. 공통 selection, gesture, transform grammar는 Foundation이, persisted widget props와 React rendering은 FigJam React Widget Definition이 소유한다.
 - Canvas Bounds Resize: bounds resize, aspect ratio lock, center resize, handle point, item bounds scaling을 제공하는 Core geometry Module.
 - Canvas Stable Id: persisted kind, presentation key, registry key에 쓰는 lower-kebab 문자열 계약.
 - Entities Contract: 런타임 구현 없이 Core geometry type, whiteboard canvas item type, stable item subtype alias를 노출하는 type-only 계약. Runtime helper는 Core/Host/App seam에 둔다.
 - Engine Public Facade: Host App, Demo App, UI, Renderer Adapter가 Engine을 사용할 때 import하는 안정된 Module 경계.
-- Host Document Controller: Whiteboard `CanvasItem` 문서의 history, selection, clipboard, text search, item commit을 React와 json-document 세부 구현 없이 제공하는 Module.
+- Host Document Controller: Legacy CanvasItem Runtime에서 Whiteboard `CanvasItem` 문서의 history, selection, clipboard, text search, item commit을 React와 json-document 세부 구현 없이 제공하는 Module.
 - Canvas Document Change Patch: CanvasItemsChange별 patch builder table과 Host-owned JSON Patch factory 호출을 소유하는 change-to-patch grammar Module.
 - Canvas Document Patch Tree Diff: before/after Whiteboard item tree를 patch factory가 쓰는 topmost changed entry, changed group entry, removal entry로 변환하고 patch applier가 명시 `CanvasDocumentPatchTreeDiff` contract를 소비하게 하는 Host-owned tree diff Module.
 - Canvas Document Reorder Patch: before/after Whiteboard item tree의 sibling order 차이를 json-document JSON Patch `move` operation으로 변환하는 Host-owned patch Module.
@@ -258,8 +269,14 @@
 - Demo 설명과 장식은 최소화한다.
 - 이 프로젝트는 단일 서비스 앱보다 재사용 가능한 캔버스 부품공장을 우선한다.
 - 당연한 사회적 약속이 되어 있는 캔버스 기능은 내부 모듈이 관리하고, 제품별 커스텀 기능은 외부에서 조립식으로 등록할 수 있어야 한다.
-- sticky note, marker, highlighter, arrow, comment 같은 기본 화이트보드 도구는 제품별 custom item module이 아니라 내부 Affordance로 관리한다.
-- Sticky note tool은 별도 stable entity를 만들지 않고 Canvas Component Library의 `sticky` template을 사용해 component item을 생성한다.
+- Figma와 FigJam의 Authored Content는 하나의 DesignDocument만 persistent source of truth로 사용한다.
+- Authored Content는 ReactDesignRenderer가 실제 browser DOM으로 렌더링한다. DOM/SVG overlay와 widget 내부 SVG는 허용하지만 Canvas/SVG scene, foreignObject, CanvasItem envelope는 canonical authored-content renderer가 아니다.
+- selection, camera, active tool/mode, focus, hover, DOM element/measurement, overlay와 pointer preview는 Editor Runtime State이며 DesignDocument에 저장하지 않는다.
+- committed edit는 DesignDocument의 atomic command/patch/history 경로 하나만 사용한다. migration compatibility는 Read-only Compatibility Projection만 허용하고 두 model을 함께 갱신하지 않는다.
+- FigJam의 sticky, shape, drawing, connector, comment, stamp 같은 authored object는 first-party React Widget Definition Product Pack으로 조립하고, 새 widget 때문에 Engine union, renderer switch, App Shell conditional을 추가하지 않는다.
+- sticky note, marker, highlighter, arrow, comment 같은 기본 화이트보드 interaction grammar는 Canvas First-party Whiteboard Extension이 관리하고 persisted props와 React rendering은 FigJam Product Pack이 관리한다.
+- 아래 Sticky note tool부터 Group item 판정까지의 Canvas Pointer, Host storage, CanvasItem 규칙은 Legacy CanvasItem Runtime의 현재 구현에만 적용하며 canonical Figma/FigJam document model을 정의하지 않는다.
+- Legacy CanvasItem Runtime의 Sticky note tool은 별도 stable entity를 만들지 않고 Canvas Component Library의 `sticky` template을 사용해 component item을 생성한다.
 - marker/highlighter stroke drawing lifecycle의 gesture kind, draft stroke, enabled gate, item commit은 Canvas Pointer Drawing Creation Module이 소유한다.
 - rect/arrow shape creation lifecycle의 gesture kind, draft shape, enabled gate, item commit, post-create tool selection은 Canvas Pointer Shape Creation Module이 소유한다.
 - sticky note creation lifecycle의 gesture kind, component template lookup, enabled gate, immediate item creation, 생성 직후 edit entry는 Canvas Pointer Component Creation Module이 소유한다.
@@ -288,6 +305,7 @@
 - Group item 판정과 recursive children 저장 shape는 Host Canvas Group Item Module이 소유하고 Host tree/document/operation Module은 named predicate를 호출한다.
 - 엔진은 Fabric.js 같은 완성형 객체 모델을 감싸기보다, 커스텀 가능한 Affordance 문법을 작은 Interface로 제공한다.
 - Whiteboard `CanvasItem`과 SVG 렌더링 방식은 재사용 Core Contract에 포함하지 않는다.
+- 아래 Whiteboard CanvasItem/SVG ownership 규칙은 Legacy CanvasItem Runtime에만 적용하며 canonical Figma/FigJam document/renderer를 정의하지 않는다.
 - Core primitive facade는 resize/handle/scale 규칙을 직접 구현하지 않고 Canvas Bounds Resize에 위임한다.
 - Renderer Stage는 Whiteboard `CanvasItem`, Host read model, component library를 import하지 않는다.
 - Whiteboard item SVG 렌더링은 App의 Whiteboard SVG Item Layer Adapter가 소유한다.
