@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   getImportReferences,
+  getSourceFile,
   getSourceIdentifiers,
   getUnboundSourceIdentifiers,
   sourceFiles,
@@ -57,6 +58,17 @@ const forbiddenDesignDocumentGlobalNames = new Set([
 ])
 
 describe('Canvas DesignDocument boundaries', () => {
+  it('keeps the canonical graph private until a public facade decision', () => {
+    const packageEntry = getSourceFile('src/canvas/index.ts')
+    const privateImports = getImportReferences(packageEntry)
+      .filter((reference) =>
+        reference.target === 'src/canvas/design-document' ||
+        reference.target.startsWith('src/canvas/design-document/'),
+      )
+
+    expect(privateImports).toEqual([])
+  })
+
   it('keeps the future canonical graph independent from UI, products, renderers, and the legacy item model', () => {
     const designDocumentFiles = getDesignDocumentProductionFiles()
     const importViolations = designDocumentFiles
