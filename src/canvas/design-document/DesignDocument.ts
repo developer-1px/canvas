@@ -152,6 +152,12 @@ export function createDesignDocument(
     },
     read,
     execute,
+    historyStatus() {
+      return {
+        canRedo: store.history.canRedo,
+        canUndo: store.history.canUndo,
+      }
+    },
     undo: () => restoreHistory('undo'),
     redo: () => restoreHistory('redo'),
     subscribe(listener) {

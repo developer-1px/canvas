@@ -7,6 +7,7 @@ export type {
   DesignDocumentChange,
   DesignDocumentCommand,
   DesignDocumentCommandResult,
+  DesignDocumentHistoryStatus,
   DesignDocumentRead,
   DesignDocumentSnapshot,
   DesignJSONValue,

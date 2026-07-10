@@ -59,6 +59,17 @@ export function measureDomEditNodeOverlayRect<
   state: TState
   viewport?: DomEditViewport
 }): DomEditScaledOverlayRect | null {
+  if (viewport && adapter.measure) {
+    const measurement = adapter.measure(nodeId)
+
+    return measurement
+      ? {
+          ...measurement,
+          scale: getDomEditOverlayScale(viewport.scale),
+        }
+      : null
+  }
+
   if (!shell) {
     return null
   }

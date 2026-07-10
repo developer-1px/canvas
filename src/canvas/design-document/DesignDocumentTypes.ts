@@ -110,10 +110,16 @@ export type DesignDocumentCommandResult =
       readonly reason: string
     }
 
+export type DesignDocumentHistoryStatus = {
+  readonly canRedo: boolean
+  readonly canUndo: boolean
+}
+
 export type DesignDocument = {
   readonly snapshot: DesignDocumentSnapshot
   readonly read: DesignDocumentRead
   execute(command: DesignDocumentCommand): DesignDocumentCommandResult
+  historyStatus(): DesignDocumentHistoryStatus
   undo(): boolean
   redo(): boolean
   subscribe(listener: () => void): () => void

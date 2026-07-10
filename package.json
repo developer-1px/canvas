@@ -37,6 +37,11 @@
       "import": "./dist/package/canvas/core/index.js",
       "default": "./dist/package/canvas/core/index.js"
     },
+    "./editor": {
+      "types": "./dist/package/canvas/editor-engine/index.d.ts",
+      "import": "./dist/package/canvas/editor-engine/index.js",
+      "default": "./dist/package/canvas/editor-engine/index.js"
+    },
     "./foundation": {
       "types": "./dist/package/canvas/foundation/index.d.ts",
       "import": "./dist/package/canvas/foundation/index.js",

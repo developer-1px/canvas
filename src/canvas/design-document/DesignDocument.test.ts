@@ -521,6 +521,43 @@ describe('DesignDocument', () => {
     expect(document.read.node('workspaceHeroTitle')?.text)
       .toBe('Build a workspace that moves with the team.')
   })
+
+  it('reports undo and redo availability without exposing history storage', () => {
+    const document = createDesignDocument(createRepresentativeSnapshot())
+
+    expect(document.historyStatus()).toEqual({
+      canRedo: false,
+      canUndo: false,
+    })
+
+    document.execute({
+      label: 'Update title',
+      changes: [{
+        type: 'update',
+        nodeId: 'workspaceHeroTitle',
+        values: { text: 'A history-aware workspace.' },
+      }],
+    })
+
+    expect(document.historyStatus()).toEqual({
+      canRedo: false,
+      canUndo: true,
+    })
+
+    document.undo()
+
+    expect(document.historyStatus()).toEqual({
+      canRedo: true,
+      canUndo: false,
+    })
+
+    document.redo()
+
+    expect(document.historyStatus()).toEqual({
+      canRedo: false,
+      canUndo: true,
+    })
+  })
 })
 
 function createRepresentativeSnapshot(): DesignDocumentSnapshot {

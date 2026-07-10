@@ -238,6 +238,9 @@ importers:
 
   packages/dom-edit-affordance:
     dependencies:
+      '@interactive-os/canvas':
+        specifier: ^0.1.1
+        version: link:../..
       '@interactive-os/interaction':
         specifier: ^0.1.0
         version: link:../../../apg-patterns/packages/interaction

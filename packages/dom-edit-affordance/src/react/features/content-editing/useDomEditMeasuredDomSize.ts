@@ -47,6 +47,18 @@ export function useDomEditMeasuredDomSize<
 
     const target = adapter.getElement(selectedNodeId)
 
+    if (adapter.measure) {
+      const frame = requestAnimationFrame(() => {
+        const nextSize = adapter.measure?.(selectedNodeId) ?? null
+
+        setMeasurement(nextSize
+          ? { nodeId: selectedNodeId, size: nextSize }
+          : null)
+      })
+
+      return () => cancelAnimationFrame(frame)
+    }
+
     if (!target) {
       const frame = requestAnimationFrame(() => {
         setMeasurement(null)

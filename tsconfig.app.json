@@ -10,6 +10,11 @@
     /* Bundler mode */
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
+    "paths": {
+      "@interactive-os/canvas/editor": [
+        "./src/canvas/editor-engine/index.ts"
+      ]
+    },
     "verbatimModuleSyntax": true,
     "moduleDetection": "force",
     "noEmit": true,

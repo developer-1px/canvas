@@ -12,8 +12,10 @@ import {
 } from '@interactive-os/interaction/runtime'
 import Moveable, {
   type OnDrag,
+  type OnDragEnd,
   type OnDragStart,
   type OnResize,
+  type OnResizeEnd,
   type OnResizeStart,
 } from 'react-moveable'
 import {
@@ -43,12 +45,18 @@ import {
 } from '../../../shared/gesture/DomEditOverlayGesture'
 import type {
   DomEditAutoLayoutField,
+  DomEditDirectManipulationEdit,
+  DomEditDirectManipulationLifecycle,
   DomEditField,
   DomEditModelAdapter,
   DomEditNodeId,
   DomEditNodeState,
   DomEditState,
   DomEditViewport,
+} from '../../../shared/model/DomEditTypes'
+export type {
+  DomEditDirectManipulationEdit,
+  DomEditDirectManipulationLifecycle,
 } from '../../../shared/model/DomEditTypes'
 import { DomEditBoxModelOverlay } from '../box-model-xray/DomEditBoxModelOverlay'
 import { DomEditMarginGhostOverlay } from '../box-model-xray/DomEditMarginGhostOverlay'
@@ -90,6 +98,7 @@ export function DomEditSelectionOverlay<
   state,
   viewport,
   affordanceState: appAffordanceState,
+  directManipulation,
   frameGuides,
   isCanvasPanActive,
   overlayLayers,
@@ -100,6 +109,7 @@ export function DomEditSelectionOverlay<
 }: {
   adapter: DomEditModelAdapter<TNodeId, TState>
   affordanceState: DomEditAffordanceState
+  directManipulation?: DomEditDirectManipulationLifecycle<TNodeId>
   frameGuides?: DomEditFrameGuideConfig<TNodeId> | null
   isCanvasPanActive: boolean
   overlayLayers?: Partial<DomEditOverlayLayerVisibility> | null
@@ -131,6 +141,7 @@ export function DomEditSelectionOverlay<
   const measuredRectRef = useRef<DomEditScaledOverlayRect | null>(null)
   const measuredTargetRef = useRef<HTMLElement | null>(null)
   const moveableRef = useRef<Moveable | null>(null)
+  const ownsMoveablePreviewRef = useRef(false)
 
   useLayoutEffect(() => {
     const frame = requestAnimationFrame(() => {
@@ -208,18 +219,29 @@ export function DomEditSelectionOverlay<
       }
     }
     const handleShortcut = (event: KeyboardEvent) => {
-      if (event.repeat) {
+      if (event.repeat || event.isComposing) {
         return
       }
 
-      const command = resolveDomEditKeyboardCommand(event)
+      const isEscape = event.key === 'Escape'
+      const ownsDirectManipulationEscape = Boolean(directManipulation) &&
+        isEscape &&
+        !DOM_EDIT_TEXT_ENTRY_TARGET_KINDS.has(
+          classifyInteractionKeyTarget(event.target),
+        )
+      const cancelledDirectManipulation =
+        ownsDirectManipulationEscape && directManipulation?.cancel() === true
+      const action: DomEditInteractionAction | undefined =
+        cancelledDirectManipulation || ownsDirectManipulationEscape
+          ? { type: 'dom-edit.overlay.escape' }
+          : resolveDomEditKeyboardCommand(event)?.action
 
-      if (!command) {
+      if (!action) {
         return
       }
 
-      const handled = runDomEditSelectionOverlayCommand({
-        action: command.action,
+      const handledLocally = runDomEditSelectionOverlayCommand({
+        action,
         affordanceState: appAffordanceState,
         onResetDirectManipulation: () => {
           setIsDirectManipulation(false)
@@ -227,7 +249,16 @@ export function DomEditSelectionOverlay<
           setIsTemporaryMeasureMode(false)
         },
         onChangeAffordanceState: onAffordanceStateChange,
-      }) || onCommand?.(command.action) === true
+      })
+      const handledExternally = !cancelledDirectManipulation &&
+        (
+          !handledLocally ||
+          action.type === 'dom-edit.overlay.escape'
+        ) &&
+        onCommand?.(action) === true
+      const handled = cancelledDirectManipulation ||
+        handledLocally ||
+        handledExternally
 
       if (handled) {
         event.preventDefault()
@@ -250,7 +281,16 @@ export function DomEditSelectionOverlay<
       window.removeEventListener('keyup', updateModifierMode)
       window.removeEventListener('blur', stopTemporaryModes)
     }
-  }, [appAffordanceState, onAffordanceStateChange, onCommand])
+  }, [
+    appAffordanceState,
+    directManipulation,
+    onAffordanceStateChange,
+    onCommand,
+  ])
+
+  useEffect(() => () => {
+    directManipulation?.cancel()
+  }, [directManipulation])
 
   useEffect(() => {
     if (
@@ -338,6 +378,10 @@ export function DomEditSelectionOverlay<
       cancelAnimationFrame(frame)
     }
   }, [
+    appAffordanceState,
+    isDirectManipulation,
+    isTemporaryGuideMode,
+    isTemporaryMeasureMode,
     rect?.h,
     rect?.w,
     rect?.x,
@@ -451,16 +495,40 @@ export function DomEditSelectionOverlay<
     xrayHoverTarget.nodeId !== selectedNodeId
     ? xrayHoverTarget
     : null
-  const changeField = (field: DomEditField, value: number) => {
-    onChange(selectedNodeId, field, roundDomEditNumber(value))
-  }
-  const startDirectManipulation = () => {
+  const startDirectManipulation = (kind: 'move' | 'resize') => {
+    ownsMoveablePreviewRef.current =
+      directManipulation?.begin({ kind, nodeId: selectedNodeId }) === true
     setIsDirectManipulation(true)
     onAffordanceStateChange({ mode: 'drag-property', property: 'geometry' })
   }
-  const endDirectManipulation = () => {
+  const endDirectManipulation = (cancelled: boolean) => {
+    if (ownsMoveablePreviewRef.current) {
+      if (cancelled) {
+        directManipulation?.cancel()
+      } else {
+        directManipulation?.commit()
+      }
+    }
+
+    ownsMoveablePreviewRef.current = false
     setIsDirectManipulation(false)
     onAffordanceStateChange({ mode: 'idle' })
+  }
+  const changeDirectManipulation = (
+    edits: readonly DomEditDirectManipulationEdit[],
+  ) => {
+    if (ownsMoveablePreviewRef.current) {
+      directManipulation?.update(edits)
+      return
+    }
+
+    for (const edit of edits) {
+      if (edit.kind === 'number') {
+        onChange(selectedNodeId, edit.field, edit.value)
+      } else {
+        onChangeAutoLayout(selectedNodeId, edit.field, edit.value)
+      }
+    }
   }
   const fixResizedAxes = (
     direction: number[],
@@ -470,7 +538,11 @@ export function DomEditSelectionOverlay<
       session.fixedWidth = true
 
       if (style.widthMode !== 'fixed') {
-        onChangeAutoLayout(selectedNodeId, 'widthMode', 'fixed')
+        changeDirectManipulation([{
+          field: 'widthMode',
+          kind: 'auto-layout',
+          value: 'fixed',
+        }])
       }
     }
 
@@ -478,7 +550,11 @@ export function DomEditSelectionOverlay<
       session.fixedHeight = true
 
       if (style.heightMode !== 'fixed') {
-        onChangeAutoLayout(selectedNodeId, 'heightMode', 'fixed')
+        changeDirectManipulation([{
+          field: 'heightMode',
+          kind: 'auto-layout',
+          value: 'fixed',
+        }])
       }
     }
   }
@@ -528,15 +604,19 @@ export function DomEditSelectionOverlay<
               start: startPosition,
             })
 
-            changeField('x', nextPosition[0])
-            changeField('y', nextPosition[1])
+            changeDirectManipulation([
+              { field: 'x', kind: 'number', value: nextPosition[0] },
+              { field: 'y', kind: 'number', value: nextPosition[1] },
+            ])
           }}
           onDragStart={(event: OnDragStart) => {
-            startDirectManipulation()
+            startDirectManipulation('move')
             event.datas.startPosition = [style.x, style.y]
             event.set([0, 0])
           }}
-          onDragEnd={endDirectManipulation}
+          onDragEnd={(event: OnDragEnd) => {
+            endDirectManipulation(isDomEditCancelledInput(event.inputEvent))
+          }}
           onResize={(event: OnResize) => {
             if (!hasDomEditResizeDelta(event.dist, rect.scale)) {
               return
@@ -553,18 +633,22 @@ export function DomEditSelectionOverlay<
               start: startSize,
             })
 
-            changeField('w', nextSize[0])
-            changeField('h', nextSize[1])
+            changeDirectManipulation([
+              { field: 'w', kind: 'number', value: nextSize[0] },
+              { field: 'h', kind: 'number', value: nextSize[1] },
+            ])
           }}
           onResizeStart={(event: OnResizeStart) => {
-            startDirectManipulation()
+            startDirectManipulation('resize')
             event.datas.startSize = [style.w, style.h]
             if (event.inputEvent?.shiftKey) {
               event.setRatio(event.startRatio)
             }
             event.set([style.w, style.h])
           }}
-          onResizeEnd={endDirectManipulation}
+          onResizeEnd={(event: OnResizeEnd) => {
+            endDirectManipulation(isDomEditCancelledInput(event.inputEvent))
+          }}
         />
       ) : null}
       <DomEditViewportOverlayLayer
@@ -622,6 +706,7 @@ export function DomEditSelectionOverlay<
           <DomEditGridOverlay
             adapter={adapter}
             affordanceState={affordanceState}
+            directManipulation={directManipulation}
             rect={rect}
             selectedNodeId={selectedNodeId}
             shellRef={shellRef}
@@ -636,6 +721,7 @@ export function DomEditSelectionOverlay<
           <DomEditAutoLayoutOverlay
             adapter={adapter}
             affordanceState={affordanceState}
+            directManipulation={directManipulation}
             rect={rect}
             selectedNodeId={selectedNodeId}
             shellRef={shellRef}
@@ -695,14 +781,19 @@ function runDomEditSelectionOverlayCommand({
   return false
 }
 
-function roundDomEditNumber(value: number): number {
-  return Math.round(value * 10) / 10
-}
-
 function hasDomEditResizeDelta(dist: number[], scale: number): boolean {
   const [dx = 0, dy = 0] = dist
 
   return Math.abs(dx / scale) >= 0.5 || Math.abs(dy / scale) >= 0.5
+}
+
+function isDomEditCancelledInput(input: unknown) {
+  return Boolean(
+    input &&
+    typeof input === 'object' &&
+    'type' in input &&
+    (input.type === 'pointercancel' || input.type === 'touchcancel'),
+  )
 }
 
 function DomEditViewportOverlayLayer({

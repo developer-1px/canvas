@@ -1,7 +1,10 @@
 import {
   Eye,
   EyeOff,
+  Inspect,
   Maximize2,
+  MousePointer2,
+  Ruler,
   ZoomIn,
   ZoomOut,
 } from 'lucide-react'
@@ -15,6 +18,15 @@ import {
   type PointerEvent as ReactPointerEvent,
   type WheelEvent as ReactWheelEvent,
 } from 'react'
+import {
+  createEditorEngine,
+  type EditorEngine,
+} from '@interactive-os/canvas/editor'
+import {
+  DomEditEditorInspector,
+  DomEditEditorOverlay,
+  type DomEditAffordanceState,
+} from '@interactive-os/dom-edit-affordance/react'
 import type { Viewport } from '../../../../src/canvas/core'
 import {
   createDomProjection,
@@ -32,6 +44,7 @@ import {
 import {
   createFigmaWorkspaceReactDefinitions,
 } from './FigmaWorkspaceReactDefinitions'
+import { FigmaCloneDirectDomLayers } from './FigmaCloneDirectDomLayers'
 import '../FigmaCloneApp.css'
 
 const FIGMA_WORKSPACE_INTRINSICS = [
@@ -81,33 +94,37 @@ type FigmaDirectDomPanSession = {
 
 export function FigmaCloneDirectDomShadowApp() {
   const panSessionRef = useRef<FigmaDirectDomPanSession | null>(null)
+  const stageRef = useRef<HTMLElement | null>(null)
   const [fallbackMode] = useState(readFigmaDirectDomFallbackMode)
   const [document] = useState(() => createFigmaDirectDomDocument(
     fallbackMode,
   ))
-  const documentSnapshot = useSyncExternalStore(
-    document.subscribe,
-    () => document.snapshot,
-    () => document.snapshot,
-  )
   const [viewportMemory] = useState(createFigmaDirectDomViewportMemory)
   const [stageMemory] = useState(createFigmaDirectDomStageMemory)
   const [viewport, setViewportState] = useState(viewportMemory.read)
   const setStageElement = useCallback((element: HTMLElement | null) => {
+    stageRef.current = element
     stageMemory.write(element)
   }, [stageMemory])
   const [projection] = useState(() => createDomProjection({
     getStageElement: stageMemory.read,
     getViewport: viewportMemory.read,
   }))
-  const projectionRevision = useSyncExternalStore(
-    projection.subscribe,
-    projection.revision,
-    projection.revision,
+  const [editor] = useState(() => createEditorEngine({
+    document,
+    projection,
+  }))
+  const editorSnapshot = useSyncExternalStore(
+    editor.subscribe,
+    editor.snapshot,
+    editor.snapshot,
   )
-  useStrictModeSafeDomProjectionDisposal(projection)
+  const projectionRevision = editorSnapshot.revision
+  useStrictModeSafeEditorRuntimeDisposal(editor, projection)
   const [mounted, setMounted] = useState(true)
   const [panning, setPanning] = useState(false)
+  const [affordanceState, setAffordanceState] =
+    useState<DomEditAffordanceState>({ mode: 'idle' })
   const [focusedNodeId, setFocusedNodeId] =
     useState<FigmaWorkspaceDesignNodeId | null>(null)
   const registry = useMemo(() => createReactDesignDefinitionRegistry({
@@ -118,7 +135,9 @@ export function FigmaCloneDirectDomShadowApp() {
     }),
     intrinsics: FIGMA_WORKSPACE_INTRINSICS,
   }), [fallbackMode])
-  const root = document.read.node('workspacePage')
+  const root = editor.read.node('workspacePage')
+  const canonicalFloatingNote = document.read.node('workspaceFloatingNote')
+  const canonicalHeroActions = document.read.node('workspaceHeroActions')
   const rootMeasurement = projection.measure('workspacePage')
   const registeredNodeCount = projection.registeredNodeIds().length
   const commitViewport = useCallback((nextViewport: Viewport) => {
@@ -215,6 +234,7 @@ export function FigmaCloneDirectDomShadowApp() {
   ) => {
     const explicitlyPans = event.button === 1
     const pansBackground = event.button === 0 &&
+      !isFigmaDirectDomEditorControl(event.target) &&
       projection.hitPath(event.target).length === 0
 
     if (!explicitlyPans && !pansBackground) {
@@ -297,57 +317,137 @@ export function FigmaCloneDirectDomShadowApp() {
   return (
     <main
       className="figma-clone figma-direct-dom"
+      data-affordance-mode={affordanceState.mode}
       data-dom-projection-count={registeredNodeCount}
+      data-editor-revision={editorSnapshot.revision}
       data-figma-direct-dom="true"
+      data-floating-note-x={readFiniteNumber(
+        canonicalFloatingNote?.layout.x,
+      )}
+      data-history-can-redo={editorSnapshot.history.canRedo}
+      data-history-can-undo={editorSnapshot.history.canUndo}
+      data-hero-actions-gap={readFiniteNumber(
+        canonicalHeroActions?.layout.gap,
+      )}
+      data-hero-actions-padding-right={readFiniteNumber(
+        canonicalHeroActions?.layout.paddingRight,
+      )}
+      data-preview-node-id={editorSnapshot.preview?.nodeId ?? undefined}
       data-render-revision={projectionRevision}
-      data-document-node-count={documentSnapshot.nodes.length}
+      data-document-node-count={document.snapshot.nodes.length}
       data-root-client-width={formatOptionalNumber(
         rootMeasurement?.clientBounds.w,
       )}
       data-root-world-width={formatOptionalNumber(
         rootMeasurement?.worldBounds.w,
       )}
+      data-selected-node-id={
+        editorSnapshot.selection.primaryNodeId ?? undefined
+      }
       data-viewport-focus-node-id={focusedNodeId ?? undefined}
       data-viewport-scale={viewport.scale}
       data-viewport-x={viewport.x}
       data-viewport-y={viewport.y}
     >
-      <section
-        ref={setStageElement}
-        aria-label="Direct DOM canvas"
-        className="figma-direct-dom__stage"
-        data-panning={panning ? 'true' : 'false'}
-        role="region"
-        onPointerCancel={finishPointerPan}
-        onPointerDown={handlePointerDown}
-        onPointerMove={handlePointerMove}
-        onPointerUp={finishPointerPan}
-        onWheel={handleWheel}
-      >
+      <FigmaCloneDirectDomLayers
+        editor={editor}
+        snapshot={editorSnapshot}
+      />
+      <section className="figma-canvas-region">
         <div
-          className="figma-direct-dom__world"
-          data-direct-dom-world="true"
-          style={{
-            transform: `translate(${viewport.x}px, ${viewport.y}px) scale(${viewport.scale})`,
-          }}
+          aria-label="Tools"
+          className="figma-canvas-toolbar"
+          role="toolbar"
         >
-          {mounted ? (
-            <div
-              className="figma-direct-dom__frame"
-              style={{
-                minHeight: root?.frame?.height,
-                width: root?.frame?.width,
-              }}
-            >
-              <ReactDesignRenderer
-                projection={projection}
-                read={document.read}
-                registry={registry}
-              />
-            </div>
-          ) : null}
+          <button
+            aria-label="Select tool"
+            aria-pressed={
+              affordanceState.mode !== 'measure' &&
+              affordanceState.mode !== 'xray'
+            }
+            type="button"
+            onClick={() => setAffordanceState({ mode: 'idle' })}
+          >
+            <MousePointer2 aria-hidden="true" size={14} />
+          </button>
+          <button
+            aria-label="Measure tool"
+            aria-pressed={affordanceState.mode === 'measure'}
+            type="button"
+            onClick={() => setAffordanceState((current) =>
+              current.mode === 'measure'
+                ? { mode: 'idle' }
+                : { mode: 'measure' })}
+          >
+            <Ruler aria-hidden="true" size={14} />
+          </button>
+          <button
+            aria-label="Toggle box model X-ray"
+            aria-pressed={affordanceState.mode === 'xray'}
+            type="button"
+            onClick={() => setAffordanceState((current) =>
+              current.mode === 'xray'
+                ? { mode: 'idle' }
+                : { mode: 'xray' })}
+          >
+            <Inspect aria-hidden="true" size={14} />
+          </button>
+        </div>
+        <div
+          ref={setStageElement}
+          aria-label="Direct DOM canvas"
+          className="figma-direct-dom__stage"
+          data-panning={panning ? 'true' : 'false'}
+          role="region"
+          tabIndex={-1}
+          onPointerCancel={finishPointerPan}
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={finishPointerPan}
+          onWheel={handleWheel}
+        >
+          <div
+            className="figma-direct-dom__world"
+            data-direct-dom-world="true"
+            style={{
+              transform: `translate(${viewport.x}px, ${viewport.y}px) scale(${viewport.scale})`,
+            }}
+          >
+            {mounted ? (
+              <div
+                className="figma-direct-dom__frame"
+                style={{
+                  minHeight: root?.frame?.height,
+                  width: root?.frame?.width,
+                }}
+              >
+                <ReactDesignRenderer
+                  projection={projection}
+                  read={editor.read}
+                  registry={registry}
+                />
+              </div>
+            ) : null}
+          </div>
+          <DomEditEditorOverlay
+            affordanceState={affordanceState}
+            editor={editor}
+            isCanvasPanActive={panning}
+            shellRef={stageRef}
+            viewport={viewport}
+            onAffordanceStateChange={setAffordanceState}
+          />
         </div>
       </section>
+
+      <aside className="figma-inspector" aria-label="CSS Inspector">
+        <header>
+          <h1>CSS</h1>
+        </header>
+        <div className="figma-inspector-body">
+          <DomEditEditorInspector editor={editor} />
+        </div>
+      </aside>
 
       <div
         aria-label="Direct DOM viewport controls"
@@ -388,6 +488,20 @@ export function FigmaCloneDirectDomShadowApp() {
           <Maximize2 aria-hidden="true" size={14} />
         </button>
         <button
+          aria-label="Fit selection"
+          disabled={!editorSnapshot.selection.primaryNodeId}
+          type="button"
+          onClick={() => {
+            const nodeId = editorSnapshot.selection.primaryNodeId
+
+            if (nodeId) {
+              fitNode(nodeId as FigmaWorkspaceDesignNodeId)
+            }
+          }}
+        >
+          <Maximize2 aria-hidden="true" size={14} />
+        </button>
+        <button
           aria-label="Fit page"
           type="button"
           onClick={() => fitNode('workspacePage')}
@@ -399,15 +513,16 @@ export function FigmaCloneDirectDomShadowApp() {
   )
 }
 
-function useStrictModeSafeDomProjectionDisposal(
+function useStrictModeSafeEditorRuntimeDisposal(
+  editor: EditorEngine,
   projection: DomProjection,
 ) {
-  const lifetimeRef = useRef({ generation: 0, projection })
+  const lifetimeRef = useRef({ editor, generation: 0, projection })
 
   useEffect(() => {
     const generation = lifetimeRef.current.generation + 1
 
-    lifetimeRef.current = { generation, projection }
+    lifetimeRef.current = { editor, generation, projection }
 
     return () => {
       queueMicrotask(() => {
@@ -415,13 +530,15 @@ function useStrictModeSafeDomProjectionDisposal(
 
         if (
           current.generation === generation ||
+          current.editor !== editor ||
           current.projection !== projection
         ) {
+          editor.dispose()
           projection.dispose()
         }
       })
     }
-  }, [projection])
+  }, [editor, projection])
 }
 
 function createFigmaDirectDomDocument(
@@ -490,4 +607,15 @@ function clampFigmaDirectDomScale(scale: number) {
 
 function formatOptionalNumber(value: number | undefined) {
   return value === undefined ? undefined : value.toFixed(2)
+}
+
+function readFiniteNumber(value: unknown) {
+  return typeof value === 'number' && Number.isFinite(value)
+    ? value
+    : undefined
+}
+
+function isFigmaDirectDomEditorControl(target: EventTarget | null) {
+  return target instanceof Element &&
+    target.closest('.figma-selection-layer') !== null
 }

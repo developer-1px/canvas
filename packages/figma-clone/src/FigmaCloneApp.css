@@ -3090,9 +3090,7 @@
 }
 
 .figma-direct-dom {
-  display: block;
-  min-width: 0;
-  touch-action: none;
+  touch-action: manipulation;
 }
 
 .figma-direct-dom__stage {
@@ -3101,6 +3099,7 @@
   overflow: hidden;
   background: var(--figma-bg);
   cursor: grab;
+  touch-action: none;
 }
 
 .figma-direct-dom__stage[data-panning='true'] {
@@ -3119,10 +3118,6 @@
   position: relative;
   box-sizing: border-box;
   background: #ffffff;
-}
-
-.figma-direct-dom .figma-viewport-controls {
-  right: 12px;
 }
 
 .figma-direct-dom__status {
@@ -3155,7 +3150,6 @@
   }
 
   .figma-direct-dom .figma-viewport-controls {
-    right: var(--demo-space-2);
-    bottom: var(--demo-space-2);
+    bottom: calc(300px + var(--demo-space-2));
   }
 }

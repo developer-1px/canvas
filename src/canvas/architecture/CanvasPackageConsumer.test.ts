@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import * as CanvasPackage from '@interactive-os/canvas'
 import * as CanvasAppAuthoring from '@interactive-os/canvas/app/authoring'
 import * as CanvasAppFacade from '@interactive-os/canvas/app'
+import * as CanvasEditor from '@interactive-os/canvas/editor'
 import * as CanvasPackAiLabs from '@interactive-os/canvas-pack-ai-labs'
 import * as CanvasPackDevtools from '@interactive-os/canvas-pack-devtools'
 import {
@@ -1324,5 +1325,6 @@ describe('Canvas package consumer imports', () => {
       { x: 3, y: 4 },
       { x: 5, y: 2 },
     ]))
+    expect(typeof CanvasEditor.createEditorEngine).toBe('function')
   })
 })

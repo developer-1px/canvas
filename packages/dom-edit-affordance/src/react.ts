@@ -2,7 +2,15 @@ export {
   DomEditInspector,
 } from './react/features/content-editing/DomEditInspector'
 export {
+  DomEditEditorInspector,
+} from './react/editor/DomEditEditorInspector'
+export {
+  DomEditEditorOverlay,
+} from './react/editor/DomEditEditorOverlay'
+export {
   DomEditSelectionOverlay,
+  type DomEditDirectManipulationEdit,
+  type DomEditDirectManipulationLifecycle,
 } from './react/features/node-selection/DomEditSelectionOverlay'
 export {
   CANVAS_DOM_ALIGNMENT_POPOVER_MODEL,
@@ -46,6 +54,7 @@ export type {
   DomEditField,
   DomEditModelAdapter,
   DomEditNodeId,
+  DomEditNodeMeasurement,
   DomEditNodeState,
   DomEditState,
   DomEditViewport,
