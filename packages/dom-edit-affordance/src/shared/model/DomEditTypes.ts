@@ -99,6 +99,37 @@ export type DomEditViewport = {
   y: number
 }
 
+export type DomEditNodeMeasurement = {
+  h: number
+  w: number
+  x: number
+  y: number
+}
+
+export type DomEditDirectManipulationEdit =
+  | {
+      readonly field: DomEditField
+      readonly kind: 'number'
+      readonly value: number
+    }
+  | {
+      readonly field: DomEditAutoLayoutField
+      readonly kind: 'auto-layout'
+      readonly value: DomEditNodeState[DomEditAutoLayoutField]
+    }
+
+export type DomEditDirectManipulationLifecycle<
+  TNodeId extends DomEditNodeId = DomEditNodeId,
+> = {
+  begin(input: {
+    readonly kind: 'gap' | 'move' | 'padding' | 'resize'
+    readonly nodeId: TNodeId
+  }): boolean
+  cancel(): boolean
+  commit(): boolean
+  update(edits: readonly DomEditDirectManipulationEdit[]): boolean
+}
+
 export type DomEditModelAdapter<
   TNodeId extends DomEditNodeId = DomEditNodeId,
   TState extends DomEditState<TNodeId> = DomEditState<TNodeId>,
@@ -107,5 +138,6 @@ export type DomEditModelAdapter<
   getLayoutContext: (nodeId: TNodeId) => DomEditLayoutContext<TNodeId>
   getParentId: (nodeId: TNodeId) => TNodeId | null
   getStyle: (state: TState, nodeId: TNodeId) => DomEditNodeState
+  measure?: (nodeId: TNodeId) => DomEditNodeMeasurement | null
   readNodeId: (element: HTMLElement | null) => TNodeId | null
 }

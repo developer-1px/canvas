@@ -1,0 +1,42 @@
+import type { EditorEngine } from '@interactive-os/canvas/editor'
+
+import { DomEditInspector } from '../features/content-editing/DomEditInspector'
+import {
+  executeDomEditEditorAutoLayoutField,
+  executeDomEditEditorField,
+  executeDomEditEditorText,
+  useDomEditEditorModel,
+} from './DomEditEditorModel'
+
+export function DomEditEditorInspector({
+  editor,
+}: {
+  readonly editor: EditorEngine
+}) {
+  const model = useDomEditEditorModel(editor)
+
+  return (
+    <DomEditInspector
+      adapter={model.adapter}
+      canEditText={(nodeId) => editor.read.node(nodeId)?.text !== null}
+      getText={(nodeId) => editor.read.node(nodeId)?.text ?? ''}
+      selectedNodeId={model.selectedNodeId}
+      state={model.state}
+      viewport={{ scale: 1, x: 0, y: 0 }}
+      onChange={(nodeId, field, value) => {
+        executeDomEditEditorField(editor, nodeId, field, value)
+      }}
+      onChangeAutoLayout={(nodeId, field, value) => {
+        executeDomEditEditorAutoLayoutField(
+          editor,
+          nodeId,
+          field,
+          value,
+        )
+      }}
+      onChangeText={(nodeId, value) => {
+        executeDomEditEditorText(editor, nodeId, value)
+      }}
+    />
+  )
+}

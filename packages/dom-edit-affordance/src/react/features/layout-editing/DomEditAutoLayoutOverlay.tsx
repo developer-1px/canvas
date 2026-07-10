@@ -33,6 +33,8 @@ import {
 import type {
   DomEditAutoLayoutAlign,
   DomEditAutoLayoutField,
+  DomEditDirectManipulationEdit,
+  DomEditDirectManipulationLifecycle,
   DomEditField,
   DomEditModelAdapter,
   DomEditNodeId,
@@ -138,6 +140,7 @@ export function DomEditAutoLayoutOverlay<
   TState extends DomEditState<TNodeId>,
 >({
   adapter,
+  directManipulation,
   rect,
   shellRef,
   state,
@@ -151,6 +154,7 @@ export function DomEditAutoLayoutOverlay<
 }: {
   adapter: DomEditModelAdapter<TNodeId, TState>
   affordanceState: DomEditAffordanceState
+  directManipulation?: DomEditDirectManipulationLifecycle<TNodeId>
   rect: DomEditAutoLayoutRect & { scale: number }
   shellRef: RefObject<HTMLElement | null>
   state: TState
@@ -458,6 +462,10 @@ export function DomEditAutoLayoutOverlay<
     const pointerId = event.pointerId
     const source = event.currentTarget
     let didMove = false
+    const ownsPreview = directManipulation?.begin({
+      kind: kind === 'gap' ? 'gap' : 'padding',
+      nodeId: selectedNodeId,
+    }) === true
 
     source.setPointerCapture(pointerId)
     setActiveDragKind(kind)
@@ -469,6 +477,21 @@ export function DomEditAutoLayoutOverlay<
     })
     event.preventDefault()
     event.stopPropagation()
+
+    const updateSpacing = (
+      edits: readonly DomEditDirectManipulationEdit[],
+    ) => {
+      if (ownsPreview) {
+        directManipulation?.update(edits)
+        return
+      }
+
+      for (const edit of edits) {
+        if (edit.kind === 'number') {
+          onChange(selectedNodeId, edit.field, edit.value)
+        }
+      }
+    }
 
     const handleMove = (moveEvent: globalThis.PointerEvent) => {
       const dx = (moveEvent.clientX - start.clientX) / rect.scale
@@ -486,11 +509,14 @@ export function DomEditAutoLayoutOverlay<
 
       if (kind === 'gap') {
         const delta = style.direction === 'row' ? dx : dy
-        onChange(
-          selectedNodeId,
-          'gap',
-          resolveDomEditSpacingDragValue(start.gap + delta, moveEvent),
-        )
+        updateSpacing([{
+          field: 'gap',
+          kind: 'number',
+          value: resolveDomEditSpacingDragValue(
+            start.gap + delta,
+            moveEvent,
+          ),
+        }])
         return
       }
 
@@ -501,24 +527,36 @@ export function DomEditAutoLayoutOverlay<
       const sides = getDomEditPaddingScopeSides(scope)
 
       if (scope === 'all') {
-        onChange(
-          selectedNodeId,
-          'padding',
-          resolveDomEditSpacingDragValue(start.padding.top + delta, moveEvent),
-        )
+        updateSpacing([{
+          field: 'padding',
+          kind: 'number',
+          value: resolveDomEditSpacingDragValue(
+            start.padding.top + delta,
+            moveEvent,
+          ),
+        }])
+        return
       }
 
-      for (const side of sides) {
-        onChange(
-          selectedNodeId,
-          DOM_EDIT_PADDING_SIDE_FIELDS[side],
-          resolveDomEditSpacingDragValue(start.padding[side] + delta, moveEvent),
-        )
-      }
+      updateSpacing(sides.map((side) => ({
+        field: DOM_EDIT_PADDING_SIDE_FIELDS[side],
+        kind: 'number' as const,
+        value: resolveDomEditSpacingDragValue(
+          start.padding[side] + delta,
+          moveEvent,
+        ),
+      })))
     }
-    const handleEnd = () => {
+    const handleEnd = (endEvent: globalThis.PointerEvent) => {
       if (source.hasPointerCapture(pointerId)) {
         source.releasePointerCapture(pointerId)
+      }
+      if (ownsPreview) {
+        if (endEvent.type === 'pointercancel') {
+          directManipulation?.cancel()
+        } else {
+          directManipulation?.commit()
+        }
       }
       if (!didMove && kind !== 'gap') {
         const side = getDomEditPaddingDragSide(kind)

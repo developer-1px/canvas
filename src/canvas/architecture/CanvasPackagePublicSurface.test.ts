@@ -4,6 +4,7 @@ import * as CanvasPackage from '../index'
 import * as CanvasApp from '../app'
 import * as CanvasAppAuthoring from '../app/authoring'
 import * as CanvasCore from '../core'
+import * as CanvasEditor from '../editor-engine'
 import * as CanvasFoundation from '../foundation'
 import * as CanvasEngine from '../engine'
 import * as CanvasEntities from '../entities'
@@ -15,6 +16,7 @@ describe('Canvas package public surface', () => {
     app: CanvasApp,
     appAuthoring: CanvasAppAuthoring,
     core: CanvasCore,
+    editor: CanvasEditor,
     engine: CanvasEngine,
     entities: CanvasEntities,
     foundation: CanvasFoundation,

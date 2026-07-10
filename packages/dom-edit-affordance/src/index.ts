@@ -57,6 +57,7 @@ export type {
   DomEditModelAdapter,
   DomEditNode,
   DomEditNodeId,
+  DomEditNodeMeasurement,
   DomEditNodeState,
   DomEditPosition,
   DomEditState,

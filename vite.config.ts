@@ -18,6 +18,9 @@ const canvasCoreSourceEntry = fileURLToPath(
 const canvasEngineSourceEntry = fileURLToPath(
   new URL('./src/canvas/engine/index.ts', import.meta.url),
 )
+const canvasEditorSourceEntry = fileURLToPath(
+  new URL('./src/canvas/editor-engine/index.ts', import.meta.url),
+)
 const canvasEntitiesSourceEntry = fileURLToPath(
   new URL('./src/canvas/entities/index.ts', import.meta.url),
 )
@@ -71,6 +74,10 @@ export default defineConfig({
       {
         find: /^@interactive-os\/canvas\/engine$/,
         replacement: canvasEngineSourceEntry,
+      },
+      {
+        find: /^@interactive-os\/canvas\/editor$/,
+        replacement: canvasEditorSourceEntry,
       },
       {
         find: /^@interactive-os\/canvas\/entities$/,

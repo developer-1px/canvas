@@ -19,6 +19,7 @@ import {
   resolveDomEditSpacingDragValue,
 } from '../../../shared/gesture/DomEditOverlayGesture'
 import type {
+  DomEditDirectManipulationLifecycle,
   DomEditField,
   DomEditModelAdapter,
   DomEditNodeId,
@@ -48,6 +49,7 @@ export function DomEditGridOverlay<
 >({
   adapter,
   affordanceState: baseAffordanceState,
+  directManipulation,
   rect,
   selectedNodeId,
   shellRef,
@@ -59,6 +61,7 @@ export function DomEditGridOverlay<
 }: {
   adapter: DomEditModelAdapter<TNodeId, TState>
   affordanceState: DomEditAffordanceState
+  directManipulation?: DomEditDirectManipulationLifecycle<TNodeId>
   rect: GridOverlayRect & { scale: number }
   selectedNodeId: TNodeId
   shellRef: RefObject<HTMLElement | null>
@@ -238,6 +241,10 @@ export function DomEditGridOverlay<
     }
     const pointerId = event.pointerId
     const source = event.currentTarget
+    const ownsPreview = directManipulation?.begin({
+      kind: 'gap',
+      nodeId: selectedNodeId,
+    }) === true
 
     source.setPointerCapture(pointerId)
     setActiveDragAxis(gap.axis)
@@ -249,19 +256,31 @@ export function DomEditGridOverlay<
     const handleMove = (moveEvent: globalThis.PointerEvent) => {
       const dx = (moveEvent.clientX - start.clientX) / rect.scale
       const dy = (moveEvent.clientY - start.clientY) / rect.scale
-
-      onChange(
-        selectedNodeId,
-        'gap',
-        resolveDomEditGridGapDragValue(
-          start.gap + (gap.axis === 'column' ? dx : dy),
-          moveEvent,
-        ),
+      const value = resolveDomEditGridGapDragValue(
+        start.gap + (gap.axis === 'column' ? dx : dy),
+        moveEvent,
       )
+
+      if (ownsPreview) {
+        directManipulation?.update([{
+          field: 'gap',
+          kind: 'number',
+          value,
+        }])
+      } else {
+        onChange(selectedNodeId, 'gap', value)
+      }
     }
-    const handleEnd = () => {
+    const handleEnd = (endEvent: globalThis.PointerEvent) => {
       if (source.hasPointerCapture(pointerId)) {
         source.releasePointerCapture(pointerId)
+      }
+      if (ownsPreview) {
+        if (endEvent.type === 'pointercancel') {
+          directManipulation?.cancel()
+        } else {
+          directManipulation?.commit()
+        }
       }
       setActiveDragAxis(null)
       setIsGapHovered(false)

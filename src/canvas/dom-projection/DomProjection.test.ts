@@ -58,6 +58,31 @@ describe('DomProjection', () => {
     expect(projection.revision()).toBe(4)
   })
 
+  it('returns only the currently registered element for a node id', () => {
+    const projection = createDomProjection({
+      getStageElement: () => null,
+      getViewport: () => ({ scale: 1, x: 0, y: 0 }),
+    })
+    const first = createElement()
+    const replacement = createElement()
+    const cleanupFirst = projection.register('hero', first)
+
+    expect(projection.element('hero')).toBe(first)
+    expect(projection.element('missing')).toBeNull()
+
+    const cleanupReplacement = projection.register('hero', replacement)
+
+    cleanupFirst()
+    expect(projection.element('hero')).toBe(replacement)
+
+    cleanupReplacement()
+    expect(projection.element('hero')).toBeNull()
+
+    projection.register('hero', replacement)
+    projection.dispose()
+    expect(projection.element('hero')).toBeNull()
+  })
+
   it('measures the current DOM rect in client and world coordinates', () => {
     const stage = createElement({ height: 600, left: 100, top: 50, width: 800 })
     let nodeRect = { height: 40, left: 140, top: 110, width: 80 }

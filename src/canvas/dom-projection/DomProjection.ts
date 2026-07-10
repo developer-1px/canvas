@@ -18,6 +18,7 @@ export type DomProjectionMeasurement = {
 
 export type DomProjection = {
   register(nodeId: DesignNodeId, element: HTMLElement): () => void
+  element(nodeId: DesignNodeId): HTMLElement | null
   registeredNodeIds(): readonly DesignNodeId[]
   revision(): number
   subscribe(listener: () => void): () => void
@@ -88,6 +89,13 @@ export function createDomProjection(
       nodeIdsByElement = new WeakMap<object, DesignNodeId>()
       publishChange()
       listeners.clear()
+    },
+    element(nodeId: DesignNodeId) {
+      if (disposed) {
+        return null
+      }
+
+      return registrations.get(nodeId)?.element ?? null
     },
     focus(nodeId: DesignNodeId, focusOptions?: FocusOptions) {
       if (disposed) {

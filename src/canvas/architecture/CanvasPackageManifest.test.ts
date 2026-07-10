@@ -79,6 +79,9 @@ describe('Canvas package manifest', () => {
         './dist/package/canvas/app/authoring/index',
       ),
       './core': createPackageExportEntry('./dist/package/canvas/core/index'),
+      './editor': createPackageExportEntry(
+        './dist/package/canvas/editor-engine/index',
+      ),
       './foundation': createPackageExportEntry(
         './dist/package/canvas/foundation/index',
       ),
@@ -97,7 +100,7 @@ describe('Canvas package manifest', () => {
       .filter(isPackageCodeExportEntry)
       .flatMap((entry) => [entry.types, entry.import, entry.default])
 
-    expect(exportedPaths).toHaveLength(27)
+    expect(exportedPaths).toHaveLength(30)
     expect(exportedPaths.every((path) => path.startsWith('./dist/package/canvas/'))).toBe(true)
     expect(exportedPaths.every((path) => path.endsWith('/index.d.ts') || path.endsWith('/index.js'))).toBe(true)
     expect(
@@ -113,7 +116,7 @@ describe('Canvas package manifest', () => {
         isPackageCodeExportEntry(entry) ? [[subpath, entry] as const] : [],
       )
 
-    expect(exportEntries).toHaveLength(9)
+    expect(exportEntries).toHaveLength(10)
     for (const [, entry] of exportEntries) {
       expect(entry.types).toBe(entry.import.replace(/\.js$/, '.d.ts'))
       expect(entry.import).toBe(entry.default)

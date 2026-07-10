@@ -424,6 +424,9 @@ exports[`Canvas package public surface > snapshots facade runtime value exports 
     "unique",
     "zoomViewport",
   ],
+  "editor": [
+    "createEditorEngine",
+  ],
   "engine": [
     "CANVAS_COMMAND_AFFORDANCES",
     "CANVAS_COMMAND_INSERT_OFFSET",
