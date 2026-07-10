@@ -64,13 +64,13 @@ async function selectLayer(
   nodeId: string,
 ) {
   await page.getByRole('button', { name: buttonName }).click()
-  await expect(page.locator(`[data-figma-dom-node="${nodeId}"]`))
+  await expect(page.locator(`[data-design-node-id="${nodeId}"]`))
     .toHaveAttribute('data-selected', 'true')
   await expect(page.locator('.figma-size-mode-capsule')).toHaveCount(1)
 }
 
 async function expectBadgeBelowSelection(page: Page, nodeId: string) {
-  const selectedBox = await page.locator(`[data-figma-dom-node="${nodeId}"]`)
+  const selectedBox = await page.locator(`[data-design-node-id="${nodeId}"]`)
     .boundingBox()
   const badgeBox = await page.locator('.figma-size-mode-capsule')
     .boundingBox()

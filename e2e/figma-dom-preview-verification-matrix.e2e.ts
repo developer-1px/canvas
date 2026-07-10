@@ -51,7 +51,7 @@ test('preserves authored node identities and DOM semantics across document edits
 
   const initialNodeIds = await expectStableAuthoredDom(page)
 
-  await page.getByRole('spinbutton', { name: 'CSS padding' }).fill('28')
+  await page.getByRole('spinbutton', { name: 'Pad' }).fill('28')
   await expect.poll(() => readPaddingTop(page, 'workspacePage')).toBe(28)
 
   expect(await expectStableAuthoredDom(page)).toEqual(initialNodeIds)
@@ -77,7 +77,7 @@ test('verifies measure and X-ray overlays stay state-specific', async ({
   await expect(page.locator('.figma-guide-distance')).toHaveCount(0)
 
   await selectLayer(page, 'Select layer Main area', 'workspaceMain')
-  await page.getByRole('spinbutton', { name: 'CSS margin' }).fill('12')
+  await page.getByRole('spinbutton', { name: 'Mar' }).fill('12')
   await page.getByRole('button', { name: 'Toggle box model X-ray' }).click()
   await expect(selectedBoxModelLayer(page, 'content')).toHaveCount(1)
   await expect(selectedBoxModelLayer(page, 'border')).toHaveCount(1)
@@ -121,7 +121,7 @@ test('verifies flex spacing and flex-child participation controls', async ({
 
   await selectLayer(page, 'Select layer Main area', 'workspaceMain')
   const initialPaddingHeight = await readBoxHeight(sideHandle(page, 'top'))
-  await page.getByRole('spinbutton', { name: 'CSS padding' }).fill('36')
+  await page.getByRole('spinbutton', { name: 'Pad' }).fill('36')
   await expect.poll(() => readBoxHeight(sideHandle(page, 'top')))
     .toBeGreaterThan(initialPaddingHeight + 2)
 
@@ -196,7 +196,7 @@ test('verifies selected overlay tracking through pan and zoom', async ({
 
   const beforeNode = await getRequiredBox(domNode(page, 'workspaceContent'))
   await page.keyboard.press('h')
-  await expect(page.locator('.canvas-stage')).toHaveAttribute(
+  await expect(page.locator('.figma-direct-dom__stage')).toHaveAttribute(
     'data-mode',
     'pan',
   )
@@ -211,6 +211,8 @@ test('verifies selected overlay tracking through pan and zoom', async ({
   await expectSelectionMatchesNode(page, 'workspaceContent')
   await expectGridLinesMatchNode(page, 'workspaceContent')
   await page.keyboard.press('v')
+  await expect(page.locator('.figma-direct-dom__stage'))
+    .toHaveAttribute('data-mode', 'select')
 })
 
 async function selectLayer(
@@ -241,10 +243,12 @@ async function expectSelectedLayer(
 }
 
 async function expectStableAuthoredDom(page: Page) {
-  const nodeIds = await page.locator('[data-dom-edit-node]').evaluateAll(
-    (elements) => elements.map((element) =>
-      element.getAttribute('data-dom-edit-node') ?? ''),
-  )
+  const nodeIds = await page
+    .locator('[data-design-node-id^="workspace"]')
+    .evaluateAll(
+      (elements) => elements.map((element) =>
+        element.getAttribute('data-design-node-id') ?? ''),
+    )
 
   expect(nodeIds.length).toBeGreaterThan(0)
   expect(nodeIds.every(Boolean)).toBe(true)
@@ -256,7 +260,7 @@ async function expectStableAuthoredDom(page: Page) {
     ['workspaceHeroTitle', 'H2'],
     ['workspacePrimaryAction', 'BUTTON'],
   ] as const) {
-    const node = page.locator(`[data-dom-edit-node="${nodeId}"]`)
+    const node = page.locator(`[data-design-node-id="${nodeId}"]`)
     await expect(node).toHaveCount(1)
     await expect.poll(() => node.evaluate((element) => element.tagName))
       .toBe(tagName)
@@ -333,7 +337,9 @@ async function panCanvas(
   page: Page,
   delta: { x: number; y: number },
 ) {
-  const stageBox = await getRequiredBox(page.locator('.canvas-stage'))
+  const stageBox = await getRequiredBox(
+    page.locator('.figma-direct-dom__stage'),
+  )
   const x = stageBox.x + 120
   const y = stageBox.y + 120
 
@@ -386,7 +392,7 @@ async function getRequiredBox(locator: Locator) {
 }
 
 function domNode(page: Page, nodeId: string) {
-  return page.locator(`[data-figma-dom-node="${nodeId}"]`)
+  return page.locator(`[data-design-node-id="${nodeId}"]`)
 }
 
 function flexChildAlignSelf(page: Page) {

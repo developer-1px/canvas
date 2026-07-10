@@ -8,13 +8,15 @@ test('exposes DOM edit direction controls as a keyboard radiogroup', async ({
   await selectLayer(page, 'Select layer Pipeline list')
 
   const group = page.getByRole('radiogroup', {
-    name: 'Auto layout direction',
+    name: 'Direction',
   })
   const horizontal = group.getByRole('radio', {
-    name: 'Horizontal auto layout',
+    exact: true,
+    name: 'H',
   })
   const vertical = group.getByRole('radio', {
-    name: 'Vertical auto layout',
+    exact: true,
+    name: 'V',
   })
 
   await expect(vertical).toHaveAttribute('aria-checked', 'true')
@@ -39,6 +41,6 @@ async function selectLayer(page: Page, buttonName: string) {
 }
 
 async function readFlexDirection(page: Page, nodeId: string) {
-  return page.locator(`[data-figma-dom-node="${nodeId}"]`)
+  return page.locator(`[data-design-node-id="${nodeId}"]`)
     .evaluate((node) => getComputedStyle(node).flexDirection)
 }

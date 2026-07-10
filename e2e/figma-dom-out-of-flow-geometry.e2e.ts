@@ -120,7 +120,7 @@ function primaryModifier() {
 }
 
 function selectedNode(page: Page, nodeId: string) {
-  return page.locator(`[data-figma-dom-node="${nodeId}"]`)
+  return page.locator(`[data-design-node-id="${nodeId}"]`)
 }
 
 function smartGuide(page: Page) {

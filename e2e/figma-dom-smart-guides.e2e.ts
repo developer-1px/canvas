@@ -10,7 +10,7 @@ test('shows DOM smart guide families around the workspace stat row', async ({
 
   await page.getByRole('button', { name: 'Select layer Pipeline panel' })
     .click()
-  await expect(page.locator('[data-figma-dom-node="workspacePipeline"]'))
+  await expect(page.locator('[data-design-node-id="workspacePipeline"]'))
     .toHaveAttribute('data-selected', 'true')
 
   await page.getByRole('button', { name: 'Measure tool' }).click()
@@ -31,7 +31,7 @@ test('shows DOM smart guide families around the workspace stat row', async ({
     .toBeGreaterThan(0)
 
   await page.getByRole('button', { name: 'Select layer Revenue stat' }).click()
-  await expect(page.locator('[data-figma-dom-node="workspaceStatRevenue"]'))
+  await expect(page.locator('[data-design-node-id="workspaceStatRevenue"]'))
     .toHaveAttribute('data-selected', 'true')
 
   await expect.poll(() =>

@@ -9,13 +9,13 @@ test('keeps selected Figma DOM nodes fitted inside the canvas work area', async 
 
   await page.getByRole('button', { name: 'Select layer Workspace page' })
     .click()
-  await expectSelectedGuideInsideCanvas(page)
+  await expectSelectedGuideInsideCanvas(page, 'workspacePage')
 
   await page.locator('[data-figma-layer-tree-id="section:homePage"]')
     .click()
   await page.getByRole('button', { name: 'Select layer Editorial homepage' })
     .click()
-  await expectSelectedGuideInsideCanvas(page)
+  await expectSelectedGuideInsideCanvas(page, 'homePage')
 })
 
 test('does not render the generic canvas devtools panel in Figma mode', async ({
@@ -56,7 +56,11 @@ test('surfaces Figma component context inside the CSS inspector', async ({
   )
 })
 
-async function expectSelectedGuideInsideCanvas(page: Page) {
+async function expectSelectedGuideInsideCanvas(page: Page, nodeId: string) {
+  const app = page.locator('.figma-clone')
+
+  await expect(app).toHaveAttribute('data-selected-node-id', nodeId)
+  await expect(app).toHaveAttribute('data-viewport-focus-node-id', nodeId)
   await expect.poll(() => readSelectedGuideFit(page)).toEqual({
     bottomInside: true,
     leftInside: true,
@@ -67,10 +71,10 @@ async function expectSelectedGuideInsideCanvas(page: Page) {
 
 async function readSelectedGuideFit(page: Page) {
   return page.evaluate(() => {
-    const canvas = document.querySelector('.figma-canvas-region')
+    const stage = document.querySelector('.figma-direct-dom__stage')
     const selected = document.querySelector('.figma-guide-selected')
 
-    if (!canvas || !selected) {
+    if (!stage || !selected) {
       return {
         bottomInside: false,
         leftInside: false,
@@ -79,14 +83,14 @@ async function readSelectedGuideFit(page: Page) {
       }
     }
 
-    const canvasRect = canvas.getBoundingClientRect()
+    const stageRect = stage.getBoundingClientRect()
     const selectedRect = selected.getBoundingClientRect()
 
     return {
-      bottomInside: selectedRect.bottom <= canvasRect.bottom - 8,
-      leftInside: selectedRect.left >= canvasRect.left + 8,
-      rightInside: selectedRect.right <= canvasRect.right - 8,
-      topInside: selectedRect.top >= canvasRect.top + 8,
+      bottomInside: selectedRect.bottom <= stageRect.bottom - 8,
+      leftInside: selectedRect.left >= stageRect.left + 8,
+      rightInside: selectedRect.right <= stageRect.right - 8,
+      topInside: selectedRect.top >= stageRect.top + 8,
     }
   })
 }

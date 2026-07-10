@@ -57,7 +57,7 @@ async function readJustifyContent(
   page: Page,
   nodeId: string,
 ) {
-  return page.locator(`[data-figma-dom-node="${nodeId}"]`).evaluate((element) =>
+  return page.locator(`[data-design-node-id="${nodeId}"]`).evaluate((element) =>
     getComputedStyle(element).justifyContent)
 }
 

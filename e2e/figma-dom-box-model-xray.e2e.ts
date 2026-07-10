@@ -6,7 +6,7 @@ test('shows box-model X-ray layers for selected and hovered nodes', async ({
   await page.goto('/?demo=figma')
   await selectLayer(page, 'Select layer Workspace page', 'workspacePage')
   await selectLayer(page, 'Select layer Main area', 'workspaceMain')
-  await page.getByRole('spinbutton', { name: 'CSS margin' }).fill('12')
+  await page.getByRole('spinbutton', { name: 'Mar' }).fill('12')
 
   await page.getByRole('button', { name: 'Toggle box model X-ray' }).click()
   await expect(page.locator('.figma-autolayout-padding')).toHaveCount(0)
@@ -18,7 +18,7 @@ test('shows box-model X-ray layers for selected and hovered nodes', async ({
   await expect(selectedValue(page, 'padding')).toContainText('Pad 20')
   await expect(selectedValue(page, 'margin')).toContainText('Margin 12')
 
-  await page.locator('[data-figma-dom-node="workspaceDealOneTitle"]').hover()
+  await page.locator('[data-design-node-id="workspaceDealOneTitle"]').hover()
   await expect(hoverLayer(page, 'content')).toHaveCount(1)
   await expect(hoverLayer(page, 'border')).toHaveCount(1)
   await expect(selectedLayer(page, 'content')).toHaveCount(1)
@@ -69,7 +69,7 @@ async function selectLayer(
   nodeId: string,
 ) {
   await page.getByRole('button', { name: buttonName }).click()
-  await expect(page.locator(`[data-figma-dom-node="${nodeId}"]`))
+  await expect(page.locator(`[data-design-node-id="${nodeId}"]`))
     .toHaveAttribute('data-selected', 'true')
 }
 

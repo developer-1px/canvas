@@ -13,7 +13,7 @@ test('shows selected-to-hover DOM measurement redlines', async ({ page }) => {
   await expectMeasurementColor(page.locator('.figma-guide-distance').first())
   await expectDistanceLabelsFollowPan(page, 'workspaceStatRevenue')
 
-  await page.locator('[data-figma-dom-node="workspaceStatConversion"]').hover()
+  await page.locator('[data-design-node-id="workspaceStatConversion"]').hover()
   await expect.poll(() => page.locator('.figma-guide-distance--gap').count())
     .toBeGreaterThan(0)
   await expect(page.locator('.figma-guide-distance span').first())
@@ -23,7 +23,7 @@ test('shows selected-to-hover DOM measurement redlines', async ({ page }) => {
   await expect(page.locator('.figma-guide-distance')).toHaveCount(0)
 
   await page.keyboard.down('Alt')
-  await page.locator('[data-figma-dom-node="workspaceStatConversion"]').hover()
+  await page.locator('[data-design-node-id="workspaceStatConversion"]').hover()
   await expect.poll(() => page.locator('.figma-guide-distance--gap').count())
     .toBeGreaterThan(0)
   await page.keyboard.up('Alt')
@@ -60,14 +60,15 @@ test('hides DOM measurement redlines while spacing affordances drag', async ({
 })
 
 async function expectDistanceLabelsFollowPan(page: Page, nodeId: string) {
-  const selected = page.locator(`[data-figma-dom-node="${nodeId}"]`)
+  const selected = page.locator(`[data-design-node-id="${nodeId}"]`)
   const beforeSelected = await getRequiredBox(selected)
   const beforeLabel = await getRequiredBox(
     page.locator('.figma-guide-distance span').first(),
   )
 
   await page.keyboard.press('h')
-  await expect(page.locator('.canvas-stage')).toHaveAttribute('data-mode', 'pan')
+  await expect(page.locator('.figma-direct-dom__stage'))
+    .toHaveAttribute('data-mode', 'pan')
   await panCanvas(page, { x: 36, y: 18 })
 
   await expect.poll(async () => {
@@ -86,6 +87,8 @@ async function expectDistanceLabelsFollowPan(page: Page, nodeId: string) {
   expectClose(afterLabel.y - beforeLabel.y, afterSelected.y - beforeSelected.y)
 
   await page.keyboard.press('v')
+  await expect(page.locator('.figma-direct-dom__stage'))
+    .toHaveAttribute('data-mode', 'select')
 }
 
 async function expectMeasurementColor(locator: Locator) {
@@ -98,7 +101,9 @@ async function panCanvas(
   page: Page,
   delta: { x: number; y: number },
 ) {
-  const stageBox = await getRequiredBox(page.locator('.canvas-stage'))
+  const stageBox = await getRequiredBox(
+    page.locator('.figma-direct-dom__stage'),
+  )
   const x = stageBox.x + 120
   const y = stageBox.y + 120
 

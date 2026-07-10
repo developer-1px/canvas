@@ -16,7 +16,7 @@ test('shows grid track lines, line numbers, and hovered track sizes', async ({
   await expectGridLinesMatchSelected(page)
 
   const gridBox = await getRequiredBox(
-    page.locator('[data-figma-dom-node="workspaceContent"]'),
+    page.locator('[data-design-node-id="workspaceContent"]'),
   )
   await page.mouse.move(gridBox.x + 24, gridBox.y + gridBox.height / 2)
   await expect(gridTrackSize(page, 'column')).toHaveCount(1)
@@ -39,13 +39,13 @@ async function selectLayer(
   nodeId: string,
 ) {
   await page.getByRole('button', { name: buttonName }).click()
-  await expect(page.locator(`[data-figma-dom-node="${nodeId}"]`))
+  await expect(page.locator(`[data-design-node-id="${nodeId}"]`))
     .toHaveAttribute('data-selected', 'true')
 }
 
 async function expectGridLinesMatchSelected(page: Page) {
   const gridBox = await getRequiredBox(
-    page.locator('[data-figma-dom-node="workspaceContent"]'),
+    page.locator('[data-design-node-id="workspaceContent"]'),
   )
   const firstColumnLine = await getRequiredBox(
     gridLine(page, 'column').nth(0),
