@@ -19,9 +19,13 @@ describe('CanvasRootRoutes', () => {
       .toBe('engine')
   })
 
-  it('resolves the direct DOM shadow route without advertising it', () => {
+  it('keeps Figma on one product route', () => {
     expect(resolveCanvasRootRoute({ pathname: '/figma-dom', search: '' }))
-      .toBe('figma-dom')
+      .toBe('launcher')
+    expect(resolveCanvasRootRoute({
+      pathname: '/',
+      search: '?demo=figma-dom',
+    })).toBe('launcher')
     expect(CANVAS_APP_LAUNCH_OPTIONS.map((option) => option.href))
       .not.toContain('/figma-dom')
   })

@@ -2,13 +2,12 @@ export type CanvasRootRouteId =
   | 'engine'
   | 'figjam'
   | 'figma'
-  | 'figma-dom'
   | 'launcher'
 
 export type CanvasAppLaunchOption = Readonly<{
   description: string
   href: string
-  id: Exclude<CanvasRootRouteId, 'figma-dom' | 'launcher'>
+  id: Exclude<CanvasRootRouteId, 'launcher'>
   label: string
   meta: readonly string[]
   routeLabel: string
@@ -79,8 +78,6 @@ function normalizeCanvasRootRouteId(value: string | null): CanvasRootRouteId | n
       return 'figjam'
     case 'figma':
       return 'figma'
-    case 'figma-dom':
-      return 'figma-dom'
     default:
       return null
   }

@@ -5,18 +5,17 @@ import {
 
 const EXPECTED_PARENTS = createExpectedParents()
 
-test('renders the canonical workspace as registered direct React DOM', async ({
+test('renders the canonical workspace as registered React DOM on the Figma route', async ({
   page,
 }) => {
-  await page.goto('/figma-dom')
+  await page.goto('/figma')
 
-  const app = page.locator('[data-figma-direct-dom="true"]')
+  const app = figmaApp(page)
   const nodes = page.locator('[data-design-node-id^="workspace"]')
 
   await expect(app).toBeVisible()
   await expect(nodes).toHaveCount(65)
-  await expect(app).toHaveAttribute('data-dom-projection-count', '65')
-  expect(await readDirectDomParents(page)).toEqual(EXPECTED_PARENTS)
+  expect(await readCanonicalDomParents(page)).toEqual(EXPECTED_PARENTS)
 
   await expect(page.locator('svg foreignObject')).toHaveCount(0)
   await expect(page.locator('[data-canvas-item-id]')).toHaveCount(0)
@@ -40,11 +39,13 @@ test('renders the canonical workspace as registered direct React DOM', async ({
   expect(secondRowTag.y).toBeGreaterThan(firstRowTag.y)
 })
 
-test('pans, zooms, and fits registered direct DOM nodes', async ({ page }) => {
-  await page.goto('/figma-dom')
+test('pans, zooms, and fits registered DOM nodes by canonical identity', async ({
+  page,
+}) => {
+  await page.goto('/figma')
 
-  const app = page.locator('[data-figma-direct-dom="true"]')
-  const stage = page.getByRole('region', { name: 'Direct DOM canvas' })
+  const app = figmaApp(page)
+  const stage = page.getByRole('region', { name: 'Canvas' })
   const root = page.locator('[data-design-node-id="workspacePage"]')
   const initialRootWidth = await readElementWidth(root)
   const initialProjectedClientWidth = await readNumericAttribute(
@@ -74,7 +75,7 @@ test('pans, zooms, and fits registered direct DOM nodes', async ({ page }) => {
   const box = await stage.boundingBox()
 
   if (!box) {
-    throw new Error('Missing direct DOM stage bounds')
+    throw new Error('Missing Figma canvas bounds')
   }
 
   const authoredButton = page.locator(
@@ -109,7 +110,8 @@ test('pans, zooms, and fits registered direct DOM nodes', async ({ page }) => {
     await app.getAttribute('data-viewport-x'),
   )).not.toBe(initialViewportX)
 
-  await page.getByRole('button', { name: 'Fit Revenue stat' }).click()
+  await page.getByRole('button', { name: 'Select layer Revenue stat' }).click()
+  await page.getByRole('button', { name: 'Fit selection' }).click()
   await expect(app).toHaveAttribute(
     'data-viewport-focus-node-id',
     'workspaceStatRevenue',
@@ -118,7 +120,8 @@ test('pans, zooms, and fits registered direct DOM nodes', async ({ page }) => {
     stage,
     page.locator('[data-design-node-id="workspaceStatRevenue"]'),
   )
-  await page.getByRole('button', { name: 'Fit page' }).click()
+  await page.getByRole('button', { name: 'Select layer Workspace page' }).click()
+  await page.getByRole('button', { name: 'Fit selection' }).click()
   await expect(app).toHaveAttribute(
     'data-viewport-focus-node-id',
     'workspacePage',
@@ -141,34 +144,6 @@ test('pans, zooms, and fits registered direct DOM nodes', async ({ page }) => {
     app,
     'data-render-revision',
   )).toBeGreaterThan(revisionBeforeResize)
-})
-
-test('refreshes registration on unmount and contains definition failures', async ({
-  page,
-}) => {
-  await page.goto('/figma-dom')
-
-  const app = page.locator('[data-figma-direct-dom="true"]')
-
-  await page.getByRole('button', { name: 'Unmount page' }).click()
-  await expect(app).toHaveAttribute('data-dom-projection-count', '0')
-  await expect(page.locator('[data-design-node-id^="workspace"]'))
-    .toHaveCount(0)
-  await page.getByRole('button', { name: 'Mount page' }).click()
-  await expect(app).toHaveAttribute('data-dom-projection-count', '65')
-
-  await page.goto('/figma-dom?fallback=unknown')
-  await expect(page.locator(
-    '[data-design-render-error="unknown-definition"]',
-  )).toHaveCount(1)
-  await expect(page.locator('[data-design-node-id="workspaceMain"]'))
-    .toBeVisible()
-
-  await page.goto('/figma-dom?fallback=throw')
-  await expect(page.locator('[data-design-render-error="render-failed"]'))
-    .not.toHaveCount(0)
-  await expect(page.locator('[data-design-node-id="workspaceMain"]'))
-    .toBeVisible()
 })
 
 async function readElementWidth(locator: Locator) {
@@ -228,7 +203,7 @@ async function expectCenteredAndContained(
   )).toBeLessThan(2)
 }
 
-async function readDirectDomParents(page: Page) {
+async function readCanonicalDomParents(page: Page) {
   return page.locator('[data-design-node-id^="workspace"]').evaluateAll(
     (elements) => Object.fromEntries(elements.map((element) => {
       const nodeId = element.getAttribute('data-design-node-id') ?? ''
@@ -239,6 +214,10 @@ async function readDirectDomParents(page: Page) {
       return [nodeId, parent?.getAttribute('data-design-node-id') ?? null]
     })),
   )
+}
+
+function figmaApp(page: Page) {
+  return page.locator('.figma-clone')
 }
 
 function createExpectedParents() {

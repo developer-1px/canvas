@@ -8,12 +8,12 @@ const NESTED_SELECTION_PATH = [
   'workspacePipelineList',
 ] as const
 
-test('selects direct DOM nodes through canvas drill, exact hit, Layers, and Escape', async ({
+test('selects canonical DOM nodes through canvas drill, exact hit, Layers, and Escape', async ({
   page,
 }) => {
-  await page.goto('/figma-dom')
+  await page.goto('/figma')
 
-  const app = directDomApp(page)
+  const app = figmaApp(page)
   await expect(app).toHaveAttribute(
     'data-viewport-focus-node-id',
     'workspacePage',
@@ -46,30 +46,38 @@ test('selects direct DOM nodes through canvas drill, exact hit, Layers, and Esca
     designNode(page, 'workspaceHeroActions'),
   )
 
-  await directDomCanvas(page).focus()
+  await figmaCanvas(page).focus()
   await page.keyboard.press('Escape')
   await expectSelectedNode(app, 'workspaceHero')
 
   await selectLayer(page, 'Workspace page', 'workspacePage')
-  await directDomCanvas(page).focus()
+  await figmaCanvas(page).focus()
   await page.keyboard.press('Escape')
   await expect.poll(() => app.getAttribute('data-selected-node-id'))
     .toBeNull()
 })
 
-test('measures direct DOM selection, box, flex, and grid overlays through projection', async ({
+test('measures canonical DOM selection, box, flex, and grid overlays through projection', async ({
   page,
 }) => {
-  await page.goto('/figma-dom')
+  await page.goto('/figma')
 
   await selectLayer(page, 'Hero actions', 'workspaceHeroActions')
+  await page.getByRole('button', { name: 'Measure tool' }).click()
+  await expect(figmaApp(page)).toHaveAttribute(
+    'data-affordance-mode',
+    'measure',
+  )
+  await expect.poll(() => page.locator('.figma-guide-distance').count())
+    .toBeGreaterThan(0)
+  await page.getByRole('button', { name: 'Select tool' }).click()
   await expect(page.locator('.figma-autolayout-gap')).not.toHaveCount(0)
   await expectOverlayMatchesNode(
     selectionGuide(page),
     designNode(page, 'workspaceHeroActions'),
   )
   await page.getByRole('radio', { name: 'Vertical auto layout' }).click()
-  await expectSelectedNode(directDomApp(page), 'workspaceHeroActions')
+  await expectSelectedNode(figmaApp(page), 'workspaceHeroActions')
   await expect.poll(() => readComputedStyle(
     designNode(page, 'workspaceHeroActions'),
     'flexDirection',
@@ -90,7 +98,7 @@ test('measures direct DOM selection, box, flex, and grid overlays through projec
 
   await selectLayer(page, 'Main area', 'workspaceMain')
   await page.getByRole('button', { name: 'Toggle box model X-ray' }).click()
-  await expect(directDomApp(page)).toHaveAttribute(
+  await expect(figmaApp(page)).toHaveAttribute(
     'data-affordance-mode',
     'xray',
   )
@@ -105,10 +113,10 @@ test('measures direct DOM selection, box, flex, and grid overlays through projec
   )).not.toHaveCount(0)
 })
 
-test('edits direct DOM layout and text through one history path', async ({
+test('edits canonical DOM layout and text through one history path', async ({
   page,
 }) => {
-  await page.goto('/figma-dom')
+  await page.goto('/figma')
 
   await selectLayer(page, 'Hero actions', 'workspaceHeroActions')
   await page.getByRole('radiogroup', { name: 'Direction' })
@@ -157,12 +165,12 @@ test('edits direct DOM layout and text through one history path', async ({
     .toContainText('Annual revenue')
 })
 
-test('previews, cancels, commits, undoes, and redoes one atomic DOM drag', async ({
+test('previews, cancels, commits, undoes, and redoes one atomic canonical DOM drag', async ({
   page,
 }) => {
-  await page.goto('/figma-dom')
+  await page.goto('/figma')
 
-  const app = directDomApp(page)
+  const app = figmaApp(page)
   const note = designNode(page, 'workspaceFloatingNote')
 
   await selectLayer(page, 'Floating note', 'workspaceFloatingNote')
@@ -212,12 +220,12 @@ test('previews, cancels, commits, undoes, and redoes one atomic DOM drag', async
   )).toBeLessThanOrEqual(0.01)
 })
 
-test('mounts usable resize handles and commits one direct DOM resize', async ({
+test('mounts usable resize handles and commits one canonical DOM resize', async ({
   page,
 }) => {
-  await page.goto('/figma-dom')
+  await page.goto('/figma')
 
-  const app = directDomApp(page)
+  const app = figmaApp(page)
   const note = designNode(page, 'workspaceFloatingNote')
 
   await selectLayer(page, 'Floating note', 'workspaceFloatingNote')
@@ -258,9 +266,9 @@ test('mounts usable resize handles and commits one direct DOM resize', async ({
 test('previews spacing gestures, cancels cleanly, and commits one history entry', async ({
   page,
 }) => {
-  await page.goto('/figma-dom')
+  await page.goto('/figma')
 
-  const app = directDomApp(page)
+  const app = figmaApp(page)
   const actions = designNode(page, 'workspaceHeroActions')
 
   await selectLayer(page, 'Hero actions', 'workspaceHeroActions')
@@ -345,9 +353,9 @@ test('previews spacing gestures, cancels cleanly, and commits one history entry'
 test('contains editor shortcuts and composition inside the native text editor', async ({
   page,
 }) => {
-  await page.goto('/figma-dom')
+  await page.goto('/figma')
 
-  const app = directDomApp(page)
+  const app = figmaApp(page)
 
   await selectLayer(page, 'Hero actions', 'workspaceHeroActions')
   await page.getByRole('radiogroup', { name: 'Direction' })
@@ -393,7 +401,7 @@ async function selectLayer(
   nodeId: string,
 ) {
   await page.getByRole('button', { name: `Select layer ${label}` }).click()
-  await expectSelectedNode(directDomApp(page), nodeId)
+  await expectSelectedNode(figmaApp(page), nodeId)
 }
 
 async function expectSelectedNode(app: Locator, nodeId: string) {
@@ -512,12 +520,12 @@ function designNode(page: Page, nodeId: string) {
   return page.locator(`[data-design-node-id="${nodeId}"]`)
 }
 
-function directDomApp(page: Page) {
-  return page.locator('[data-figma-direct-dom="true"]')
+function figmaApp(page: Page) {
+  return page.locator('.figma-clone')
 }
 
-function directDomCanvas(page: Page) {
-  return page.getByRole('region', { name: 'Direct DOM canvas' })
+function figmaCanvas(page: Page) {
+  return page.getByRole('region', { name: 'Canvas' })
 }
 
 function expectClose(actual: number, expected: number) {
