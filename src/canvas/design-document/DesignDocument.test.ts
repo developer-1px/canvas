@@ -328,6 +328,52 @@ describe('DesignDocument', () => {
     expect(document.read.node('workspaceNote')).toBeNull()
   })
 
+  it('reorders same-parent nodes atomically and ignores their current slot', () => {
+    const document = createDesignDocument(createRepresentativeSnapshot())
+
+    expect(document.execute({
+      label: 'Keep conversion in place',
+      changes: [{
+        type: 'move',
+        nodeId: 'workspaceStatConversion',
+        parentId: 'workspaceMain',
+        index: 2,
+      }],
+    })).toEqual({ changed: false, ok: true })
+    expect(document.historyStatus()).toEqual({ canRedo: false, canUndo: false })
+
+    expect(document.execute({
+      label: 'Move conversion before revenue',
+      changes: [{
+        type: 'move',
+        nodeId: 'workspaceStatConversion',
+        parentId: 'workspaceMain',
+        index: 1,
+      }],
+    })).toEqual({ changed: true, ok: true })
+    expect(document.read.children('workspaceMain').map((node) => node.id))
+      .toEqual([
+        'workspaceHeroTitle',
+        'workspaceStatConversion',
+        'workspaceStatRevenue',
+      ])
+
+    expect(document.undo()).toBe(true)
+    expect(document.read.children('workspaceMain').map((node) => node.id))
+      .toEqual([
+        'workspaceHeroTitle',
+        'workspaceStatRevenue',
+        'workspaceStatConversion',
+      ])
+    expect(document.redo()).toBe(true)
+    expect(document.read.children('workspaceMain').map((node) => node.id))
+      .toEqual([
+        'workspaceHeroTitle',
+        'workspaceStatConversion',
+        'workspaceStatRevenue',
+      ])
+  })
+
   it('rolls back failed linked changes and preserves identity for no-op commands', () => {
     const document = createDesignDocument(createRepresentativeSnapshot())
     const before = document.snapshot

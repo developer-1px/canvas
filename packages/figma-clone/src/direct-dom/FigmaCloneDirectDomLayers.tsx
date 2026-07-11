@@ -6,12 +6,17 @@ import {
 } from 'lucide-react'
 import {
   useState,
+  type DragEvent as ReactDragEvent,
   type KeyboardEvent,
 } from 'react'
 import type {
   EditorEngine,
   EditorEngineSnapshot,
 } from '@interactive-os/canvas/editor'
+import {
+  moveCanvasItemToTargetPlacement,
+  type CanvasItemTargetPlacement,
+} from '@interactive-os/canvas/foundation'
 import type { DesignNode } from '../../../../src/canvas/design-document'
 
 const FIGMA_LAYER_BUTTON_SELECTOR = '[data-figma-layer-tree-button]'
@@ -24,6 +29,26 @@ type VisibleLayerNode = {
 type VisibleLayerRoot = {
   readonly node: VisibleLayerNode
   readonly rootId: string
+}
+
+type LayerDropTarget = {
+  readonly nodeId: string
+  readonly placement: CanvasItemTargetPlacement
+}
+
+type LayerReorderAnnouncement = {
+  readonly id: number
+  readonly text: string
+}
+
+type LayerReorderControls = {
+  readonly dropTarget: LayerDropTarget | null
+  dragEnd(): void
+  dragLeave(event: ReactDragEvent<HTMLButtonElement>, nodeId: string): void
+  dragOver(event: ReactDragEvent<HTMLButtonElement>, nodeId: string): void
+  dragStart(event: ReactDragEvent<HTMLButtonElement>, nodeId: string): void
+  drop(event: ReactDragEvent<HTMLButtonElement>, nodeId: string): void
+  keyboard(nodeId: string, direction: CanvasItemTargetPlacement): void
 }
 
 export function FigmaCloneDirectDomLayers({
@@ -42,6 +67,10 @@ export function FigmaCloneDirectDomLayers({
     () => new Set(initialSectionRootId ? [initialSectionRootId] : []),
   )
   const [expandedNodeIds, setExpandedNodeIds] = useState(() => new Set<string>())
+  const [draggedNodeId, setDraggedNodeId] = useState<string | null>(null)
+  const [dropTarget, setDropTarget] = useState<LayerDropTarget | null>(null)
+  const [reorderAnnouncement, setReorderAnnouncement] =
+    useState<LayerReorderAnnouncement>({ id: 0, text: '' })
   const normalizedQuery = normalizeLayerQuery(query)
   const visibleRoots = getVisibleRoots(editor, normalizedQuery)
   const selectedNodeId = snapshot.selection.primaryNodeId
@@ -83,9 +112,106 @@ export function FigmaCloneDirectDomLayers({
     setExpandedSectionRootIds((current) =>
       withSetValue(current, rootId, !expanded))
   }
+  const clearLayerDrag = () => {
+    setDraggedNodeId(null)
+    setDropTarget(null)
+  }
+  const announceLayerReorder = (text: string) => {
+    setReorderAnnouncement((current) => ({
+      id: current.id + 1,
+      text,
+    }))
+  }
+  const reorderControls: LayerReorderControls | undefined = normalizedQuery
+    ? undefined
+    : {
+        dropTarget,
+        dragEnd: clearLayerDrag,
+        dragLeave: (event, nodeId) => {
+          if (
+            event.relatedTarget instanceof Node &&
+            event.currentTarget.contains(event.relatedTarget)
+          ) {
+            return
+          }
+
+          setDropTarget((current) => current?.nodeId === nodeId ? null : current)
+        },
+        dragOver: (event, nodeId) => {
+          if (!draggedNodeId) {
+            return
+          }
+
+          const placement = getLayerDropPlacement(event)
+          const plan = planLayerSiblingMove(
+            editor,
+            draggedNodeId,
+            nodeId,
+            placement,
+          )
+
+          if (!plan) {
+            setDropTarget(null)
+            return
+          }
+
+          event.preventDefault()
+          event.dataTransfer.dropEffect = 'move'
+          setDropTarget((current) =>
+            current?.nodeId === nodeId && current.placement === placement
+              ? current
+              : { nodeId, placement })
+        },
+        dragStart: (event, nodeId) => {
+          event.dataTransfer.effectAllowed = 'move'
+          event.dataTransfer.setData('text/plain', nodeId)
+          event.currentTarget.focus()
+          editor.commands.execute({ type: 'selection.replace', nodeId })
+          setDraggedNodeId(nodeId)
+          setDropTarget(null)
+        },
+        drop: (event, nodeId) => {
+          if (draggedNodeId) {
+            const placement = getLayerDropPlacement(event)
+            const plan = planLayerSiblingMove(
+              editor,
+              draggedNodeId,
+              nodeId,
+              placement,
+            )
+
+            if (plan) {
+              event.preventDefault()
+              const result = commitLayerSiblingMove(editor, plan)
+
+              if (result) {
+                announceLayerReorder(result.announcement)
+              }
+            }
+          }
+
+          clearLayerDrag()
+        },
+        keyboard: (nodeId, direction) => {
+          const result = reorderLayerSibling(editor, nodeId, direction)
+
+          if (result) {
+            announceLayerReorder(result.announcement)
+          }
+
+        },
+      }
 
   return (
     <aside className="figma-layers" aria-label="Layers">
+      <p
+        aria-atomic="true"
+        aria-live="polite"
+        className="figma-layer-announcement"
+        role="status"
+      >
+        <span key={reorderAnnouncement.id}>{reorderAnnouncement.text}</span>
+      </p>
       <header>
         <Layers aria-hidden="true" size={14} />
         <h1>Layers</h1>
@@ -186,6 +312,7 @@ export function FigmaCloneDirectDomLayers({
                     setSize={1}
                     tabbableTreeId={tabbableTreeId}
                     onCollapseToSection={() => selectSection(root.rootId)}
+                    reorderControls={reorderControls}
                     onSelectNode={selectNode}
                     onToggleNode={toggleNode}
                   />
@@ -263,6 +390,7 @@ function FigmaNodeLayer({
   posInSet,
   rootId,
   rootActive,
+  reorderControls,
   selectedNodeId,
   setSize,
   tabbableTreeId,
@@ -279,6 +407,7 @@ function FigmaNodeLayer({
   readonly posInSet: number
   readonly rootId: string
   readonly rootActive: boolean
+  readonly reorderControls?: LayerReorderControls
   readonly selectedNodeId: string | null
   readonly setSize: number
   readonly tabbableTreeId: string | null
@@ -301,6 +430,11 @@ function FigmaNodeLayer({
     node.node.id !== rootId || activeSectionRootId !== rootId
   )
   const treeId = `node:${node.node.id}`
+  const reorderable = depth > 0 && Boolean(reorderControls)
+  const dropPlacement = dropTargetForNode(
+    reorderControls?.dropTarget ?? null,
+    node.node.id,
+  )
 
   return (
     <div
@@ -314,8 +448,12 @@ function FigmaNodeLayer({
     >
       <button
         aria-label={`Select layer ${node.node.label}`}
+        aria-keyshortcuts={reorderable
+          ? 'Alt+ArrowUp Alt+ArrowDown'
+          : undefined}
         className={layerRowClassName('node', selected)}
         data-figma-layer-depth={depth}
+        data-figma-layer-drop-placement={dropPlacement ?? undefined}
         data-figma-layer-expanded={expanded}
         data-figma-layer-has-children={hasChildren}
         data-figma-layer-kind="node"
@@ -324,13 +462,33 @@ function FigmaNodeLayer({
         data-figma-layer-root-id={rootId}
         data-figma-layer-tree-button
         data-figma-layer-tree-id={treeId}
+        draggable={reorderable}
         style={{ paddingLeft: 24 + depth * 12 }}
         tabIndex={tabbableTreeId === treeId ? 0 : -1}
         type="button"
         onClick={() => onSelectNode(node.node.id, rootId, hasChildren)}
+        onDragEnd={reorderable ? reorderControls?.dragEnd : undefined}
+        onDragLeave={reorderable
+          ? (event) => reorderControls?.dragLeave(event, node.node.id)
+          : undefined}
+        onDragOver={reorderable
+          ? (event) => reorderControls?.dragOver(event, node.node.id)
+          : undefined}
+        onDragStart={reorderable
+          ? (event) => reorderControls?.dragStart(event, node.node.id)
+          : undefined}
+        onDrop={reorderable
+          ? (event) => reorderControls?.drop(event, node.node.id)
+          : undefined}
         onKeyDown={(event) => handleLayerTreeKeyDown(event, {
           collapse: depth === 0 ? onCollapseToSection : undefined,
           expand: () => onSelectNode(node.node.id, rootId, hasChildren),
+          reorder: reorderable
+            ? (direction) => reorderControls?.keyboard(
+                node.node.id,
+                direction,
+              )
+            : undefined,
         })}
       >
         {hasChildren ? (
@@ -356,6 +514,7 @@ function FigmaNodeLayer({
               posInSet={index + 1}
               rootId={rootId}
               rootActive={rootActive}
+              reorderControls={reorderControls}
               selectedNodeId={selectedNodeId}
               setSize={node.children.length}
               tabbableTreeId={tabbableTreeId}
@@ -495,8 +654,23 @@ function handleLayerTreeKeyDown(
   actions: {
     readonly collapse?: () => void
     readonly expand?: () => void
+    readonly reorder?: (direction: CanvasItemTargetPlacement) => void
   },
 ) {
+  if (
+    actions.reorder &&
+    event.altKey &&
+    !event.ctrlKey &&
+    !event.metaKey &&
+    (event.key === 'ArrowDown' || event.key === 'ArrowUp')
+  ) {
+    event.preventDefault()
+    actions.reorder(
+      event.key === 'ArrowUp' ? 'before' : 'after',
+    )
+    return
+  }
+
   if (event.altKey || event.ctrlKey || event.metaKey) {
     return
   }
@@ -572,6 +746,130 @@ function handleLayerTreeKeyDown(
   if (parentIndex >= 0) {
     focusLayerButton(buttons, parentIndex)
   }
+}
+
+function reorderLayerSibling(
+  editor: EditorEngine,
+  nodeId: string,
+  direction: CanvasItemTargetPlacement,
+): LayerSiblingMoveResult | null {
+  const ancestry = editor.read.ancestry(nodeId)
+  const parent = ancestry.at(-2)
+
+  if (!parent) {
+    return null
+  }
+
+  const siblings = editor.read.children(parent.id)
+  const currentIndex = siblings.findIndex((node) => node.id === nodeId)
+  const target = siblings[currentIndex + (direction === 'before' ? -1 : 1)]
+
+  if (currentIndex < 0 || !target) {
+    return null
+  }
+
+  const plan = planLayerSiblingMove(
+    editor,
+    nodeId,
+    target.id,
+    direction,
+  )
+
+  return plan ? commitLayerSiblingMove(editor, plan) : null
+}
+
+type LayerSiblingMovePlan = {
+  readonly index: number
+  readonly nodeId: string
+  readonly nodeLabel: string
+  readonly parentId: string
+  readonly siblingCount: number
+}
+
+function planLayerSiblingMove(
+  editor: EditorEngine,
+  nodeId: string,
+  targetNodeId: string,
+  placement: CanvasItemTargetPlacement,
+): LayerSiblingMovePlan | null {
+  if (nodeId === targetNodeId) {
+    return null
+  }
+
+  const parent = editor.read.ancestry(nodeId).at(-2)
+  const targetParent = editor.read.ancestry(targetNodeId).at(-2)
+
+  if (!parent || parent.id !== targetParent?.id) {
+    return null
+  }
+
+  const siblings = editor.read.children(parent.id)
+  const result = moveCanvasItemToTargetPlacement({
+    getItemId: (node) => node.id,
+    itemId: nodeId,
+    items: siblings,
+    placement,
+    targetItemId: targetNodeId,
+  })
+
+  if (!result) {
+    return null
+  }
+
+  return {
+    index: result.toIndex,
+    nodeId,
+    nodeLabel: result.items[result.toIndex].label,
+    parentId: parent.id,
+    siblingCount: siblings.length,
+  }
+}
+
+type LayerSiblingMoveResult = {
+  readonly announcement: string
+}
+
+function commitLayerSiblingMove(
+  editor: EditorEngine,
+  plan: LayerSiblingMovePlan,
+): LayerSiblingMoveResult | null {
+  const result = editor.commands.execute({
+    type: 'document.apply',
+    label: `Reorder ${plan.nodeLabel}`,
+    changes: [{
+      type: 'move',
+      nodeId: plan.nodeId,
+      parentId: plan.parentId,
+      index: plan.index,
+    }],
+  })
+
+  if (!result.ok || !result.changed) {
+    return null
+  }
+
+  editor.commands.execute({
+    type: 'selection.replace',
+    nodeId: plan.nodeId,
+  })
+  return {
+    announcement: `${plan.nodeLabel} moved to position ${plan.index + 1} of ${plan.siblingCount}.`,
+  }
+}
+
+function getLayerDropPlacement(
+  event: ReactDragEvent<HTMLButtonElement>,
+): CanvasItemTargetPlacement {
+  const rect = event.currentTarget.getBoundingClientRect()
+
+  return event.clientY - rect.top < rect.height / 2 ? 'before' : 'after'
+}
+
+function dropTargetForNode(
+  dropTarget: LayerDropTarget | null,
+  nodeId: string,
+) {
+  return dropTarget?.nodeId === nodeId ? dropTarget.placement : null
 }
 
 function getLayerButtons(button: HTMLButtonElement) {
