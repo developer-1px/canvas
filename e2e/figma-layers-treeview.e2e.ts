@@ -1,4 +1,4 @@
-import { expect, test, type Locator } from '@playwright/test'
+import { expect, test, type Locator, type Page } from '@playwright/test'
 
 test('exposes figma clone layers as a keyboard treeview', async ({
   page,
@@ -82,6 +82,93 @@ test('keeps Space available for focused editor controls', async ({ page }) => {
     exact: true,
     name: 'Workspace page',
   })).toHaveAttribute('aria-selected', 'true')
+})
+
+test('reorders canonical sibling layers through drag, keyboard, and history', async ({
+  page,
+}) => {
+  await page.goto('/?demo=figma')
+
+  const app = page.locator('.figma-clone')
+  const workspaceButton = page.getByRole('button', {
+    name: 'Select layer Workspace page',
+  })
+
+  await workspaceButton.click()
+
+  const revenue = layerButton(page, 'workspaceStatRevenue')
+  const tickets = layerButton(page, 'workspaceStatTickets')
+  const initialOrder = [
+    'workspaceStatRevenue',
+    'workspaceStatConversion',
+    'workspaceStatTickets',
+  ]
+  const draggedOrder = [
+    'workspaceStatTickets',
+    'workspaceStatRevenue',
+    'workspaceStatConversion',
+  ]
+
+  await expect.poll(() => readLayerChildIds(page, 'workspaceStats'))
+    .toEqual(initialOrder)
+  await expect.poll(() => readDomChildIds(page, 'workspaceStats'))
+    .toEqual(initialOrder)
+
+  await tickets.dragTo(revenue, { targetPosition: { x: 12, y: 2 } })
+
+  await expect.poll(() => readLayerChildIds(page, 'workspaceStats'))
+    .toEqual(draggedOrder)
+  await expect.poll(() => readDomChildIds(page, 'workspaceStats'))
+    .toEqual(draggedOrder)
+  await expect(tickets.locator('xpath=..'))
+    .toHaveAttribute('aria-posinset', '1')
+  await expect(tickets).toBeFocused()
+  await expect(app).toHaveAttribute(
+    'data-selected-node-id',
+    'workspaceStatTickets',
+  )
+  await expect(app).toHaveAttribute('data-history-can-undo', 'true')
+
+  await page.keyboard.press(`${primaryModifier()}+Z`)
+  await expect.poll(() => readLayerChildIds(page, 'workspaceStats'))
+    .toEqual(initialOrder)
+  await expect.poll(() => readDomChildIds(page, 'workspaceStats'))
+    .toEqual(initialOrder)
+  await expect(app).toHaveAttribute('data-history-can-undo', 'false')
+  await expect(app).toHaveAttribute('data-history-can-redo', 'true')
+
+  await page.keyboard.press(`${primaryModifier()}+Shift+Z`)
+  await expect.poll(() => readLayerChildIds(page, 'workspaceStats'))
+    .toEqual(draggedOrder)
+  await expect.poll(() => readDomChildIds(page, 'workspaceStats'))
+    .toEqual(draggedOrder)
+  await expect(app).toHaveAttribute('data-history-can-undo', 'true')
+  await expect(app).toHaveAttribute('data-history-can-redo', 'false')
+
+  await expect(revenue).toHaveAttribute(
+    'aria-keyshortcuts',
+    'Alt+ArrowUp Alt+ArrowDown',
+  )
+  await revenue.focus()
+  await page.keyboard.press('Alt+ArrowDown')
+
+  const keyboardOrder = [
+    'workspaceStatTickets',
+    'workspaceStatConversion',
+    'workspaceStatRevenue',
+  ]
+
+  await expect.poll(() => readLayerChildIds(page, 'workspaceStats'))
+    .toEqual(keyboardOrder)
+  await expect.poll(() => readDomChildIds(page, 'workspaceStats'))
+    .toEqual(keyboardOrder)
+  await expect(revenue).toBeFocused()
+  await expect(app).toHaveAttribute(
+    'data-selected-node-id',
+    'workspaceStatRevenue',
+  )
+  await expect(page.getByRole('status'))
+    .toHaveText('Revenue stat moved to position 3 of 3.')
 })
 
 test('filters figma clone layers for component management', async ({
@@ -235,4 +322,26 @@ async function expectContained(container: Locator, target: Locator) {
     .toBeLessThanOrEqual(containerBox!.x + containerBox!.width + 1)
   expect(targetBox!.y + targetBox!.height)
     .toBeLessThanOrEqual(containerBox!.y + containerBox!.height + 1)
+}
+
+function layerButton(page: Page, nodeId: string) {
+  return page.locator(`[data-figma-layer-node-id="${nodeId}"]`)
+}
+
+async function readLayerChildIds(page: Page, parentId: string) {
+  return page.locator(
+    `[data-figma-layer-parent-tree-id="node:${parentId}"]`,
+  ).evaluateAll((rows) => rows.map((row) =>
+    row.getAttribute('data-figma-layer-node-id')))
+}
+
+async function readDomChildIds(page: Page, parentId: string) {
+  return page.locator(
+    `[data-design-node-id="${parentId}"] > [data-design-node-id]`,
+  ).evaluateAll((nodes) => nodes.map((node) =>
+    node.getAttribute('data-design-node-id')))
+}
+
+function primaryModifier() {
+  return process.platform === 'darwin' ? 'Meta' : 'Control'
 }

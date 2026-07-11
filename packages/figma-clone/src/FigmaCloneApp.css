@@ -152,6 +152,18 @@
   overflow: auto;
 }
 
+.figma-layer-announcement {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 .figma-layer-tree {
   margin-top: var(--demo-space-1);
 }
@@ -174,6 +186,18 @@
 
 .figma-layer-row:hover {
   background: #f4f5f6;
+}
+
+.figma-layer-row[draggable='true'] {
+  cursor: grab;
+}
+
+.figma-layer-row[data-figma-layer-drop-placement='before'] {
+  box-shadow: inset 0 2px 0 var(--figma-blue);
+}
+
+.figma-layer-row[data-figma-layer-drop-placement='after'] {
+  box-shadow: inset 0 -2px 0 var(--figma-blue);
 }
 
 .figma-layer-row--selected {
