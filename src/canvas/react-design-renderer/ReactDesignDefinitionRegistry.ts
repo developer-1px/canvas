@@ -1,6 +1,7 @@
 import type React from 'react'
 
 import type {
+  DesignDocumentRead,
   DesignNode,
   DesignNodeDefinition,
   DesignNodeId,
@@ -24,6 +25,7 @@ export type ReactDesignRootProps = Omit<
 export type ReactDesignDefinitionRenderProps = {
   readonly node: DesignNode
   readonly children: React.ReactNode
+  readonly read: DesignDocumentRead
   readonly rootProps: ReactDesignRootProps
 }
 

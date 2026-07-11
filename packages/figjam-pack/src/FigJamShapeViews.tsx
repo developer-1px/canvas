@@ -13,6 +13,7 @@ import {
 } from './FigJamShapeContract'
 
 export function FigJamShape({
+  node,
   props,
   rootProps,
 }: ReactDesignWidgetRenderProps<FigJamShapeProps>) {
@@ -33,6 +34,7 @@ export function FigJamShape({
       >
         <ShapeGeometry shape={props.shape} />
       </svg>
+      <span className="figjam-shape__label">{node.text}</span>
     </div>
   )
 }

@@ -3,6 +3,7 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 
 import {
+  createDesignDocument,
   createReactDesignWidgetPack,
   defineReactDesignWidget,
   type DesignNode,
@@ -52,6 +53,7 @@ describe('ReactDesignWidgetPack', () => {
       createElement(pack.definitions[0].render, {
         node,
         children: null,
+        read: createRead(node),
         rootProps: {
           ref: () => undefined,
           'data-design-node-id': 'badge-2',
@@ -76,6 +78,7 @@ describe('ReactDesignWidgetPack', () => {
       {
         node: { ...node, props: { tone: 'danger' } },
         children: null,
+        read: createRead(node),
         rootProps: {
           ref: () => undefined,
           'data-design-node-id': node.id,
@@ -385,4 +388,12 @@ function createBadgeNode({
 
 function neverNode(): never {
   throw new Error('expected widget creation to succeed')
+}
+
+function createRead(node: DesignNode) {
+  return createDesignDocument({
+    schemaVersion: 1,
+    roots: [node.id],
+    nodes: [node],
+  }).read
 }

@@ -65,3 +65,12 @@ export type {
   ReactDesignWidgetRenderProps,
   ReactDesignWidgetTextEditCapability,
 } from './ReactDesignWidgetPack'
+
+export {
+  useReactDesignEditorRuntime,
+} from './ReactDesignEditorRuntime'
+export type {
+  ReactDesignEditorRuntime,
+  ReactDesignEditorViewportOptions,
+  UseReactDesignEditorRuntimeOptions,
+} from './ReactDesignEditorRuntime'

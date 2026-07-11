@@ -200,6 +200,29 @@ describe('DomEditEditor bridge', () => {
 
     fixture.dispose()
   })
+
+  it('lets a product own canvas selection while retaining editor overlays', async () => {
+    const fixture = createEditorFixture()
+
+    container = document.createElement('div')
+    document.body.append(container)
+    root = createRoot(container)
+
+    await act(async () => root?.render(
+      <DomEditEditorOverlay
+        canvasSelection={false}
+        editor={fixture.editor}
+        isCanvasPanActive={false}
+        shellRef={{ current: fixture.stage }}
+        viewport={{ scale: 1, x: 0, y: 0 }}
+      />,
+    ))
+    await click(fixture.copyElement)
+
+    expect(fixture.editor.snapshot().selection.primaryNodeId).toBeNull()
+
+    fixture.dispose()
+  })
 })
 
 function createEditorFixture() {

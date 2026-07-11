@@ -12,6 +12,12 @@ import {
   FigJamShapeFallback,
   FigJamShapeInspector,
 } from './FigJamShapeViews'
+import {
+  cloneDesignProps,
+  createFigJamAbsoluteWidgetNode,
+  type FigJamPlacementInput,
+  type FigJamSizeInput,
+} from './FigJamWidgetPrimitives'
 
 export {
   FIGJAM_SHAPE_COLORS,
@@ -26,6 +32,14 @@ export {
 
 export const FIGJAM_SHAPE_DEFINITION_ID = 'figjam.shape'
 
+export type CreateFigJamShapeNodeInput = FigJamPlacementInput &
+  FigJamSizeInput & {
+    readonly fill?: FigJamShapeProps['fill']
+    readonly shape?: FigJamShapeProps['shape']
+    readonly stroke?: FigJamShapeProps['stroke']
+    readonly text?: string
+  }
+
 export const FIGJAM_SHAPE_DEFINITION =
   defineReactDesignWidget<FigJamShapeProps>({
     id: FIGJAM_SHAPE_DEFINITION_ID,
@@ -34,30 +48,9 @@ export const FIGJAM_SHAPE_DEFINITION =
       defaults: FIGJAM_SHAPE_DEFAULT_PROPS,
       safeParse: parseFigJamShapeProps,
     },
-    create: ({ nodeId, x, y }) => ({
-      id: nodeId,
-      label: 'Shape',
-      definition: {
-        id: FIGJAM_SHAPE_DEFINITION_ID,
-        kind: 'widget',
-      },
-      children: [],
-      props: FIGJAM_SHAPE_DEFAULT_PROPS,
-      text: null,
-      layout: {
-        x,
-        y,
-        w: 160,
-        h: 120,
-        widthMode: 'fixed',
-        heightMode: 'fixed',
-      },
-      style: {},
-      frame: null,
-      component: null,
-    }),
+    create: ({ nodeId, x, y }) => createFigJamShapeNode({ nodeId, x, y }),
     capabilities: {
-      textEdit: false,
+      textEdit: { source: 'node-text', multiline: true },
       transform: {
         move: true,
         resize: true,
@@ -67,3 +60,38 @@ export const FIGJAM_SHAPE_DEFINITION =
     fallback: FigJamShapeFallback,
     Inspector: FigJamShapeInspector,
   })
+
+export function createFigJamShapeNode({
+  fill = FIGJAM_SHAPE_DEFAULT_PROPS.fill,
+  height = 120,
+  nodeId,
+  shape = FIGJAM_SHAPE_DEFAULT_PROPS.shape,
+  stroke = FIGJAM_SHAPE_DEFAULT_PROPS.stroke,
+  text = 'Shape',
+  width = 160,
+  x,
+  y,
+}: CreateFigJamShapeNodeInput) {
+  const parsed = parseFigJamShapeProps({
+    fill,
+    position: 'absolute',
+    shape,
+    stroke,
+  })
+
+  if (!parsed.ok) {
+    throw new Error(parsed.reason)
+  }
+
+  return createFigJamAbsoluteWidgetNode({
+    definitionId: FIGJAM_SHAPE_DEFINITION_ID,
+    height,
+    label: 'Shape',
+    nodeId,
+    props: cloneDesignProps(parsed.value),
+    text,
+    width,
+    x,
+    y,
+  })
+}

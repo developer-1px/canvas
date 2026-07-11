@@ -110,6 +110,7 @@
     "@interactive-os/canvas-pack-ai-labs": "workspace:*",
     "@interactive-os/canvas-pack-devtools": "workspace:*",
     "@interactive-os/dom-edit-affordance": "workspace:*",
+    "@interactive-os/figjam-clone": "workspace:*",
     "@interactive-os/figjam-pack": "workspace:*",
     "@playwright/test": "^1.60.0",
     "@types/node": "^24.12.3",

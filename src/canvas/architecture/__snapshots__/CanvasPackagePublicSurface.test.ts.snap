@@ -750,6 +750,7 @@ exports[`Canvas package public surface > snapshots facade runtime value exports 
     "createReactDesignWidgetPack",
     "defineReactDesignWidget",
     "restoreDesignDocument",
+    "useReactDesignEditorRuntime",
   ],
   "renderer": [
     "CANVAS_SVG_ARROW_MARKER_ID",

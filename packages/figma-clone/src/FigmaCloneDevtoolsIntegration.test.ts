@@ -16,8 +16,9 @@ describe('Figma clone editor chrome', () => {
   })
 
   it('renders canonical React DOM editing without a Canvas stage slot', () => {
-    expect(source).toContain('createEditorEngine')
-    expect(source).toContain('createDomProjection')
+    expect(source).toContain('useReactDesignEditorRuntime')
+    expect(source).not.toContain('createEditorEngine')
+    expect(source).not.toContain('createDomProjection')
     expect(source).toContain('<ReactDesignRenderer')
     expect(source).toContain('<DomEditEditorOverlay')
     expect(source).toContain('<FigmaCloneInspector')

@@ -3,7 +3,7 @@ import { resolveCanvasRootRoute } from './CanvasRootRoutes'
 import { CanvasEngineDemoApp } from './CanvasEngineDemoApp'
 import { DEMO_CANVAS_APP_ASSEMBLY_INPUT } from './CanvasDemoAssembly'
 import { FigmaCloneApp } from '../../packages/figma-clone/src'
-import { FigJamWidgetPackFixtureApp } from './FigJamWidgetPackFixtureApp'
+import { FigJamCloneApp } from '../../packages/figjam-clone/src'
 
 export function CanvasRoot() {
   const route = typeof window === 'undefined'
@@ -17,15 +17,14 @@ export function CanvasRoot() {
     return <FigmaCloneApp />
   }
 
-  if (route === 'figjam-widgets') {
-    return <FigJamWidgetPackFixtureApp />
+  if (route === 'figjam') {
+    return <FigJamCloneApp />
   }
 
-  if (route === 'engine' || route === 'figjam') {
+  if (route === 'engine') {
     return (
       <CanvasEngineDemoApp
         assemblyInput={DEMO_CANVAS_APP_ASSEMBLY_INPUT}
-        variant={route}
       />
     )
   }

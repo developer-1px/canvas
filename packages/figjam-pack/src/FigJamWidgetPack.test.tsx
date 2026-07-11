@@ -4,27 +4,43 @@ import { act, createElement } from 'react'
 import { createRoot } from 'react-dom/client'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'
-import type { DesignNode } from '@interactive-os/canvas/react-design'
+import {
+  createDesignDocument,
+  type DesignNode,
+} from '@interactive-os/canvas/react-design'
 
 import {
   FIGJAM_SHAPE_DEFINITION,
   FIGJAM_SHAPE_DEFINITION_ID,
   FIGJAM_SHAPE_DEFAULT_PROPS,
+  FIGJAM_CHECKLIST_DEFINITION,
+  FIGJAM_CHECKLIST_DEFAULT_PROPS,
   FIGJAM_STICKY_NOTE_DEFINITION,
   FIGJAM_STICKY_NOTE_DEFINITION_ID,
   FIGJAM_WIDGET_PACK,
+  createFigJamChecklistNode,
 } from './index'
 
 ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean })
   .IS_REACT_ACT_ENVIRONMENT = true
 
 describe('FigJam widget pack', () => {
-  it('registers stable sticky-note and shape definitions through one pack', () => {
+  it('registers every stable first-party widget definition through one pack', () => {
     expect(FIGJAM_STICKY_NOTE_DEFINITION_ID).toBe('figjam.sticky-note')
     expect(FIGJAM_SHAPE_DEFINITION_ID).toBe('figjam.shape')
     expect(FIGJAM_WIDGET_PACK.definitions.map(({ id }) => id)).toEqual([
       FIGJAM_STICKY_NOTE_DEFINITION_ID,
       FIGJAM_SHAPE_DEFINITION_ID,
+      'figjam.text',
+      'figjam.drawing',
+      'figjam.connector',
+      'figjam.comment',
+      'figjam.stamp',
+      'figjam.image',
+      'figjam.checklist',
+      'figjam.kanban',
+      'figjam.table',
+      'figjam.link-preview',
     ])
     expect(FIGJAM_WIDGET_PACK.resolve(FIGJAM_STICKY_NOTE_DEFINITION_ID))
       .toBe(FIGJAM_STICKY_NOTE_DEFINITION)
@@ -73,7 +89,7 @@ describe('FigJam widget pack', () => {
         fill: 'blue',
         stroke: 'blue',
       },
-      text: null,
+      text: 'Shape',
       layout: {
         x: 320,
         y: 72,
@@ -112,13 +128,13 @@ describe('FigJam widget pack', () => {
     })
   })
 
-  it('keeps sticky text editing distinct from the bounded shape capability', () => {
+  it('keeps both authored labels on the common node-text edit capability', () => {
     expect(FIGJAM_STICKY_NOTE_DEFINITION.capabilities).toEqual({
       textEdit: { source: 'node-text', multiline: true },
       transform: { move: true, resize: true },
     })
     expect(FIGJAM_SHAPE_DEFINITION.capabilities).toEqual({
-      textEdit: false,
+      textEdit: { source: 'node-text', multiline: true },
       transform: { move: true, resize: true },
     })
     expect(FIGJAM_WIDGET_PACK.parseProps(
@@ -249,6 +265,54 @@ describe('FigJam widget pack', () => {
 
     await act(async () => root.unmount())
   })
+
+  it('uses native checklist inputs and commits Inspector item updates', async () => {
+    const checklist = createFigJamChecklistNode({
+      nodeId: 'checklist-inspector',
+      x: 0,
+      y: 0,
+    })
+    const Inspector = FIGJAM_CHECKLIST_DEFINITION.Inspector
+    const editProp = vi.fn()
+
+    if (!Inspector) {
+      throw new Error('Expected the checklist Inspector contribution')
+    }
+
+    const container = document.createElement('div')
+    const root = createRoot(container)
+
+    await act(async () => root.render(createElement(Inspector, {
+      node: checklist,
+      props: FIGJAM_CHECKLIST_DEFAULT_PROPS,
+      editProp,
+    })))
+
+    const owner = container.querySelector<HTMLInputElement>(
+      'input[aria-label="Toggle Owner"]',
+    )
+
+    expect(owner?.type).toBe('checkbox')
+    expect(owner?.checked).toBe(false)
+
+    await act(async () => {
+      if (!owner) {
+        throw new Error('Expected Owner checklist input')
+      }
+
+      owner.click()
+    })
+
+    expect(editProp).toHaveBeenCalledWith(
+      'items',
+      expect.arrayContaining([
+        expect.objectContaining({ id: 'owner', checked: true }),
+      ]),
+      'Toggle checklist item',
+    )
+
+    await act(async () => root.unmount())
+  })
 })
 
 function expectCreated(result: ReturnType<typeof FIGJAM_WIDGET_PACK.create>) {
@@ -270,9 +334,16 @@ function renderWidget(node: DesignNode) {
     throw new Error(`Missing render definition: ${node.definition.id}`)
   }
 
+  const document = createDesignDocument({
+    schemaVersion: 1,
+    roots: [node.id],
+    nodes: [node],
+  })
+
   return renderToStaticMarkup(createElement(definition.render, {
     node,
     children: null,
+    read: document.read,
     rootProps: {
       ref: () => undefined,
       'data-design-node-id': node.id,

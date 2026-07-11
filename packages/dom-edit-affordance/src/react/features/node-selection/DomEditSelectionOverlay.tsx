@@ -93,6 +93,7 @@ export function DomEditSelectionOverlay<
   TState extends DomEditState<TNodeId>,
 >({
   adapter,
+  draggable = true,
   shellRef,
   selectedNodeId,
   state,
@@ -106,10 +107,12 @@ export function DomEditSelectionOverlay<
   onChange,
   onChangeAutoLayout,
   onCommand,
+  resizable = true,
 }: {
   adapter: DomEditModelAdapter<TNodeId, TState>
   affordanceState: DomEditAffordanceState
   directManipulation?: DomEditDirectManipulationLifecycle<TNodeId>
+  draggable?: boolean
   frameGuides?: DomEditFrameGuideConfig<TNodeId> | null
   isCanvasPanActive: boolean
   overlayLayers?: Partial<DomEditOverlayLayerVisibility> | null
@@ -129,6 +132,7 @@ export function DomEditSelectionOverlay<
     value: DomEditNodeState[DomEditAutoLayoutField],
   ) => void
   onCommand?: (action: DomEditInteractionAction) => boolean
+  resizable?: boolean
 }) {
   const [rect, setRect] = useState<DomEditScaledOverlayRect | null>(null)
   const [target, setTarget] = useState<HTMLElement | null>(null)
@@ -573,10 +577,10 @@ export function DomEditSelectionOverlay<
           ref={moveableRef}
           className="figma-dom-moveable"
           container={shellElement ?? undefined}
-          draggable
+          draggable={draggable}
           isDisplaySnapDigit
-          renderDirections={['e', 's', 'se']}
-          resizable
+          renderDirections={resizable ? ['e', 's', 'se'] : []}
+          resizable={resizable}
           rootContainer={shellElement ?? undefined}
           snapContainer={shellElement ?? undefined}
           snapGridHeight={8}

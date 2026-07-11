@@ -19,6 +19,9 @@
       ],
       "@interactive-os/figjam-pack": [
         "./packages/figjam-pack/src/index.ts"
+      ],
+      "@interactive-os/figjam-clone": [
+        "./packages/figjam-clone/src/index.ts"
       ]
     },
     "verbatimModuleSyntax": true,
@@ -40,6 +43,7 @@
     "packages/dom-edit-affordance/src",
     "packages/slide-edit-affordance/src",
     "packages/figma-clone/src",
+    "packages/figjam-clone/src",
     "packages/figjam-pack/src"
   ]
 }

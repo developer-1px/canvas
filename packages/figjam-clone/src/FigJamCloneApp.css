@@ -1,0 +1,234 @@
+.figjam-react-app {
+  --figma-blue: var(--canvas-blue);
+  --figma-line: var(--canvas-line);
+  --figma-muted: var(--canvas-muted);
+  --figma-text: var(--canvas-ink);
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: var(--canvas-paper);
+}
+
+.figjam-react-stage {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: var(--canvas-paper);
+  touch-action: none;
+  user-select: none;
+}
+
+.figjam-react-stage[data-mode='select'] {
+  cursor: default;
+}
+
+.figjam-react-stage[data-mode='pan'],
+.figjam-react-stage[data-gesture='pan'] {
+  cursor: grab;
+}
+
+.figjam-react-stage[data-gesture='pan'] {
+  cursor: grabbing;
+}
+
+.figjam-react-stage:not([data-mode='select']):not([data-mode='pan']) {
+  cursor: crosshair;
+}
+
+.figjam-react-stage:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--canvas-blue) 72%, transparent);
+  outline-offset: -2px;
+}
+
+.figjam-react-world {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+  will-change: transform;
+}
+
+.figjam-react-world [data-design-node-id] {
+  cursor: default;
+}
+
+.figjam-react-world [data-design-node-id][data-selected='true'] {
+  outline: 1px solid color-mix(in srgb, var(--canvas-blue) 72%, transparent);
+  outline-offset: 2px;
+}
+
+.figjam-react-world .figjam-connector[data-selected='true'],
+.figjam-react-world .figjam-drawing[data-selected='true'] {
+  outline-offset: 5px;
+}
+
+.figjam-react-world .figjam-board[data-selected='true'] {
+  outline: 0;
+}
+
+.figjam-react-marquee {
+  position: absolute;
+  z-index: 80;
+  border: 1px solid var(--canvas-blue);
+  background: var(--canvas-selection-fill);
+  pointer-events: none;
+}
+
+.figjam-react-pointer-preview {
+  position: absolute;
+  z-index: 80;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.figjam-react-pointer-preview line {
+  stroke: var(--canvas-text-secondary);
+  stroke-linecap: round;
+  stroke-width: 2.5px;
+}
+
+.figjam-react-text-editor {
+  position: absolute;
+  z-index: 90;
+  min-width: 0;
+  padding: 12px;
+  resize: none;
+  border: 0;
+  border-radius: var(--demo-radius);
+  outline: 2px solid var(--canvas-blue);
+  outline-offset: 2px;
+  background: color-mix(in srgb, var(--canvas-panel) 18%, transparent);
+  caret-color: var(--canvas-ink);
+  color: var(--canvas-ink);
+  font: 400 16px/1.4 var(--demo-font);
+}
+
+.figjam-react-app[data-preview-node-id]
+  [data-primary-selected='true'].figjam-sticky-note,
+.figjam-react-app[data-preview-node-id]
+  [data-primary-selected='true'].figjam-text,
+.figjam-react-app[data-preview-node-id]
+  [data-primary-selected='true'].figjam-shape {
+  color: transparent;
+}
+
+.figjam-react-app .figma-selection-layer {
+  position: absolute;
+  z-index: 40;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.figjam-react-app .figma-dom-moveable {
+  pointer-events: auto;
+}
+
+.figjam-react-app .figma-dom-moveable .moveable-line {
+  background: var(--canvas-blue);
+}
+
+.figjam-react-app .figma-dom-moveable .moveable-control {
+  width: 8px;
+  height: 8px;
+  border: 1px solid var(--canvas-line);
+  background: var(--canvas-panel);
+}
+
+.figjam-react-selection-toolbar {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  z-index: 45;
+  display: flex;
+  align-items: center;
+  gap: var(--demo-space-1);
+  max-width: calc(100vw - 24px);
+  min-height: 32px;
+  padding: var(--demo-space-1);
+  border-radius: var(--demo-radius);
+  background: color-mix(in srgb, var(--canvas-panel) 94%, transparent);
+  box-shadow: 0 4px 16px var(--canvas-overlay);
+  transform: translateX(-50%);
+}
+
+.figjam-react-selection-toolbar__label {
+  max-width: 140px;
+  overflow: hidden;
+  padding: 0 var(--demo-space-2);
+  color: var(--canvas-muted);
+  font-size: var(--demo-type-2);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.figjam-react-selection-toolbar button {
+  min-height: var(--demo-control);
+  padding: 0 var(--demo-space-2);
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--canvas-text-secondary);
+  cursor: pointer;
+  font-size: var(--demo-type-2);
+}
+
+.figjam-react-selection-toolbar button:hover,
+.figjam-react-selection-toolbar button:focus-visible {
+  background: var(--canvas-surface-muted);
+  color: var(--canvas-ink);
+  outline: 0;
+}
+
+.figjam-react-selection-toolbar .figjam-widget-inspector,
+.figjam-react-selection-toolbar .figjam-shape-inspector,
+.figjam-react-selection-toolbar .figjam-checklist-inspector {
+  display: flex;
+  align-items: center;
+  gap: var(--demo-space-1);
+}
+
+.figjam-react-selection-toolbar label {
+  display: flex;
+  grid-template-columns: none;
+  align-items: center;
+  gap: var(--demo-space-1);
+  min-height: 28px;
+  color: var(--canvas-muted);
+  font-size: var(--demo-type-2);
+}
+
+.figjam-react-selection-toolbar select {
+  height: var(--demo-control);
+  border: 0;
+  border-radius: 3px;
+  background: var(--canvas-surface-muted);
+  color: var(--canvas-ink);
+  font: inherit;
+}
+
+.figjam-react-app .engine-demo-controls,
+.figjam-react-app .engine-demo-viewport-controls {
+  z-index: 50;
+  box-shadow: 0 4px 16px var(--canvas-overlay);
+}
+
+.figjam-react-app .engine-demo-controls button:disabled,
+.figjam-react-app .engine-demo-viewport-controls button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+@media (max-width: 720px) {
+  .figjam-react-selection-toolbar {
+    top: 10px;
+    overflow-x: auto;
+  }
+
+  .figjam-react-selection-toolbar__label,
+  .figjam-react-selection-toolbar .figjam-widget-inspector,
+  .figjam-react-selection-toolbar .figjam-shape-inspector,
+  .figjam-react-selection-toolbar .figjam-checklist-inspector {
+    display: none;
+  }
+}

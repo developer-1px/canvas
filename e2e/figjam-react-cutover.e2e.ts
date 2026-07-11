@@ -194,6 +194,39 @@ test('previews, cancels, commits, and restores direct text edits', async ({
   await expect(sticky).toContainText('Ship the canonical DOM board')
 })
 
+test('honors widget move and resize capabilities in DOM controls', async ({
+  page,
+}) => {
+  await page.goto('/figjam')
+
+  const stageBox = await requiredBox(figJamStage(page))
+  const comments = page.locator('[data-figjam-widget="comment"]')
+
+  await page.getByRole('button', { name: 'Comment tool' }).click()
+  await page.mouse.click(
+    stageBox.x + stageBox.width * 0.8,
+    stageBox.y + stageBox.height * 0.76,
+  )
+  const comment = comments.last()
+  const editor = page.getByRole('textbox', { name: 'Edit comment text' })
+
+  await expect(comment).toHaveAttribute('data-selected', 'true')
+  await editor.fill('Movable annotation')
+  await page.keyboard.press(`${primaryModifier()}+Enter`)
+  await page.keyboard.down(primaryModifier())
+  await expect(page.locator('.figma-dom-moveable')).toHaveCount(1)
+  await expect(page.locator(
+    '.figma-dom-moveable .moveable-control[data-direction="se"]',
+  )).toHaveCount(0)
+  await page.keyboard.up(primaryModifier())
+
+  const initialLeft = await readComputedNumber(comment, 'left')
+
+  await dragSelectedNode(page, comment, { x: 28, y: 16 })
+  await expect.poll(() => readComputedNumber(comment, 'left'))
+    .not.toBe(initialLeft)
+})
+
 test('creates DOM drawings and a connector with stable node attachments', async ({
   page,
 }) => {
@@ -250,6 +283,32 @@ test('creates DOM drawings and a connector with stable node attachments', async 
   await expect(connectors.last())
     .toHaveAttribute('data-connector-end-id', 'figjam-sticky-next')
   await expect(connectors.last()).toHaveAttribute('data-selected', 'true')
+})
+
+test('erases stroke drawings without deleting ordinary design nodes', async ({
+  page,
+}) => {
+  await page.goto('/figjam')
+
+  const marker = designNode(page, 'figjam-drawing')
+  const shape = designNode(page, 'figjam-shape')
+
+  await page.getByRole('button', { name: 'Eraser tool' }).click()
+  await shape.click({ force: true })
+  await expect(shape).toBeVisible()
+
+  const markerBox = await requiredBox(marker)
+
+  await marker.dispatchEvent('pointerdown', {
+    button: 0,
+    buttons: 1,
+    clientX: markerBox.x + markerBox.width / 2,
+    clientY: markerBox.y + markerBox.height / 2,
+    pointerId: 17,
+  })
+  await expect(marker).toHaveCount(0)
+  await undo(page)
+  await expect(marker).toBeVisible()
 })
 
 test('quick-creates a connected sticky as one atomic history entry', async ({
@@ -432,6 +491,33 @@ test('inserts every hidden family through the command palette', async ({
   }
 })
 
+test('imports HTML tables and URL previews through the canonical paste path', async ({
+  page,
+}) => {
+  await page.goto('/figjam')
+
+  const tables = page.locator('[data-figjam-widget="table"]')
+  const links = page.locator('[data-figjam-widget="link-preview"]')
+  const initialTableCount = await tables.count()
+  const initialLinkCount = await links.count()
+
+  await dispatchPaste(page, {
+    html: '<table><tr><th>Owner</th><th>Status</th></tr><tr><td>Ada</td><td>Done</td></tr></table>',
+  })
+  await expect(tables).toHaveCount(initialTableCount + 1)
+  await expect(tables.last()).toContainText('Owner')
+  await expect(tables.last()).toContainText('Ada')
+  await expect(tables.last()).toHaveAttribute('data-selected', 'true')
+
+  await dispatchPaste(page, { text: 'https://example.com/roadmap' })
+  await expect(links).toHaveCount(initialLinkCount + 1)
+  await expect(links.last().getByRole('link')).toHaveAttribute(
+    'href',
+    'https://example.com/roadmap',
+  )
+  await expect(links.last()).toHaveAttribute('data-selected', 'true')
+})
+
 test('restores authored DOM content and stable references after reload', async ({
   page,
 }) => {
@@ -512,6 +598,29 @@ async function expectSelection(page: Page, expected: readonly string[]) {
   await expect.poll(() => selectedNodeIds(page)).toEqual(expected)
 }
 
+async function dispatchPaste(
+  page: Page,
+  { html = '', text = '' }: { readonly html?: string; readonly text?: string },
+) {
+  await page.evaluate(({ html: htmlValue, text: textValue }) => {
+    const clipboardData = new DataTransfer()
+
+    if (htmlValue) {
+      clipboardData.setData('text/html', htmlValue)
+    }
+
+    if (textValue) {
+      clipboardData.setData('text/plain', textValue)
+    }
+
+    window.dispatchEvent(new ClipboardEvent('paste', {
+      bubbles: true,
+      cancelable: true,
+      clipboardData,
+    }))
+  }, { html, text })
+}
+
 async function selectedNodeIds(page: Page) {
   const value = await figJamApp(page).getAttribute('data-selected-node-ids')
 
@@ -573,6 +682,8 @@ async function resizeSelectedNode(
   await page.keyboard.down(primaryModifier())
   const handle = page.locator('.figma-dom-moveable')
     .locator('.moveable-control[data-direction="se"]')
+  await expect(handle).toBeVisible()
+  await handle.hover()
   const box = await requiredBox(handle)
   const x = box.x + box.width / 2
   const y = box.y + box.height / 2

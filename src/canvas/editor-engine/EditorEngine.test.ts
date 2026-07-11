@@ -159,6 +159,90 @@ describe('EditorEngine', () => {
     projection.dispose()
   })
 
+  it('sets an ordered multi-selection and rejects unknown nodes', () => {
+    const document = createDesignDocument(createEditorSnapshot())
+    const projection = createDomProjection({
+      getStageElement: () => null,
+      getViewport: () => ({ scale: 1, x: 0, y: 0 }),
+    })
+    const engine = createEditorEngine({ document, projection })
+
+    expect(engine.commands.execute({
+      type: 'selection.set',
+      nodeIds: ['child', 'leaf', 'child'],
+    })).toEqual({ ok: true, changed: true })
+    expect(engine.snapshot().selection).toEqual({
+      nodeIds: ['child', 'leaf'],
+      primaryNodeId: 'leaf',
+    })
+    expect(engine.commands.can({
+      type: 'selection.set',
+      nodeIds: ['missing'],
+    })).toBe(false)
+    expect(engine.commands.execute({
+      type: 'selection.set',
+      nodeIds: ['missing'],
+    })).toMatchObject({
+      code: 'unavailable',
+      ok: false,
+      reason: 'Unknown design node: missing',
+    })
+    expect(engine.snapshot().selection.nodeIds).toEqual(['child', 'leaf'])
+
+    engine.dispose()
+    projection.dispose()
+  })
+
+  it('applies an atomic structural transaction through editor history', () => {
+    const document = createDesignDocument(createEditorSnapshot())
+    const projection = createDomProjection({
+      getStageElement: () => null,
+      getViewport: () => ({ scale: 1, x: 0, y: 0 }),
+    })
+    const engine = createEditorEngine({ document, projection })
+    const group = createNode('group')
+    const command = {
+      type: 'document.apply' as const,
+      label: 'Group leaf',
+      changes: [
+        {
+          type: 'add' as const,
+          index: 1,
+          node: group,
+          parentId: 'child',
+        },
+        {
+          type: 'move' as const,
+          index: 0,
+          nodeId: 'leaf',
+          parentId: 'group',
+        },
+      ],
+    } satisfies EditorEngineCommand
+
+    expect(engine.commands.can(command)).toBe(true)
+    expect(engine.commands.execute(command))
+      .toEqual({ ok: true, changed: true })
+    expect(engine.read.children('child').map(({ id }) => id))
+      .toEqual(['group'])
+    expect(engine.read.children('group').map(({ id }) => id))
+      .toEqual(['leaf'])
+
+    expect(engine.commands.execute({ type: 'history.undo' }))
+      .toEqual({ ok: true, changed: true })
+    expect(engine.read.node('group')).toBeNull()
+    expect(engine.read.children('child').map(({ id }) => id))
+      .toEqual(['leaf'])
+
+    expect(engine.commands.execute({ type: 'history.redo' }))
+      .toEqual({ ok: true, changed: true })
+    expect(engine.read.children('group').map(({ id }) => id))
+      .toEqual(['leaf'])
+
+    engine.dispose()
+    projection.dispose()
+  })
+
   it('merges component-peer edits independently into one atomic document command', () => {
     const document = createDesignDocument(createComponentEditorSnapshot())
     const projection = createDomProjection({

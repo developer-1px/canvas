@@ -57,6 +57,9 @@ importers:
       '@interactive-os/dom-edit-affordance':
         specifier: workspace:*
         version: link:packages/dom-edit-affordance
+      '@interactive-os/figjam-clone':
+        specifier: workspace:*
+        version: link:packages/figjam-clone
       '@interactive-os/figjam-pack':
         specifier: workspace:*
         version: link:packages/figjam-pack
@@ -259,6 +262,27 @@ importers:
       react-moveable:
         specifier: ^0.56.0
         version: 0.56.0
+
+  packages/figjam-clone:
+    dependencies:
+      '@interactive-os/canvas':
+        specifier: ^0.1.1
+        version: link:../..
+      '@interactive-os/dom-edit-affordance':
+        specifier: workspace:*
+        version: link:../dom-edit-affordance
+      '@interactive-os/figjam-pack':
+        specifier: workspace:*
+        version: link:../figjam-pack
+      lucide-react:
+        specifier: ^1.16.0
+        version: 1.16.0(react@19.2.6)
+      react:
+        specifier: ^19.0.0
+        version: 19.2.6
+      react-dom:
+        specifier: ^19.0.0
+        version: 19.2.6(react@19.2.6)
 
   packages/figjam-pack:
     dependencies:

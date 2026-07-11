@@ -1,5 +1,6 @@
 import type {
   DesignDocument,
+  DesignDocumentChange,
   DesignDocumentHistoryStatus,
   DesignDocumentRead,
   DesignJSONValue,
@@ -66,7 +67,16 @@ export type EditorEngineCommand =
       readonly nodeId: DesignNodeId | null
       readonly type: 'selection.replace'
     }
+  | {
+      readonly nodeIds: readonly DesignNodeId[]
+      readonly type: 'selection.set'
+    }
   | { readonly type: 'selection.parent' }
+  | {
+      readonly changes: readonly DesignDocumentChange[]
+      readonly label: string
+      readonly type: 'document.apply'
+    }
   | {
       readonly index: number
       readonly label: string
@@ -263,11 +273,17 @@ export function createEditorEngine({
   }
 
   function replaceSelection(nodeId: DesignNodeId | null) {
-    if (nodeId !== null && document.read.node(nodeId) === null) {
-      return unavailable(`Unknown design node: ${nodeId}`)
-    }
+    return setSelection(nodeId === null ? [] : [nodeId])
+  }
 
-    const nextSelection = nodeId === null ? [] : [nodeId]
+  function setSelection(nodeIds: readonly DesignNodeId[]) {
+    const nextSelection = [...new Set(nodeIds)]
+    const unknownNodeId = nextSelection.find((nodeId) =>
+      document.read.node(nodeId) === null)
+
+    if (unknownNodeId) {
+      return unavailable(`Unknown design node: ${unknownNodeId}`)
+    }
 
     if (areNodeIdListsEqual(selection, nextSelection)) {
       return changed(false)
@@ -313,8 +329,13 @@ export function createEditorEngine({
       case 'selection.replace':
         return command.nodeId === null ||
           document.read.node(command.nodeId) !== null
+      case 'selection.set':
+        return command.nodeIds.every((nodeId) =>
+          document.read.node(nodeId) !== null)
       case 'selection.parent':
         return selection.length > 0
+      case 'document.apply':
+        return command.changes.length > 0 && command.label.trim().length > 0
       case 'history.undo':
         return document.historyStatus().canUndo
       case 'history.redo':
@@ -360,6 +381,8 @@ export function createEditorEngine({
       }
       case 'selection.replace':
         return replaceSelection(command.nodeId)
+      case 'selection.set':
+        return setSelection(command.nodeIds)
       case 'selection.parent': {
         const primaryNodeId = selection.at(-1)
 
@@ -374,6 +397,11 @@ export function createEditorEngine({
         return restoreDocumentHistory('undo')
       case 'history.redo':
         return restoreDocumentHistory('redo')
+      case 'document.apply':
+        return executeDocumentCommand({
+          changes: command.changes,
+          label: command.label,
+        })
       case 'node.create':
         return executeDocumentCommand({
           label: command.label,
