@@ -18,6 +18,7 @@ export type ReactDesignRootProps = Omit<
   readonly ref: (element: HTMLElement | null) => void
   readonly 'data-design-node-id': DesignNodeId
   readonly 'data-design-definition-id': string
+  readonly 'data-design-frame-root'?: true
 }
 
 export type ReactDesignDefinitionRenderProps = {

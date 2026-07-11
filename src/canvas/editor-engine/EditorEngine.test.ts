@@ -555,6 +555,114 @@ describe('EditorEngine', () => {
     projection.dispose()
   })
 
+  it('edits authored frame settings atomically through document history', () => {
+    const snapshot = createEditorSnapshot()
+    const document = createDesignDocument({
+      ...snapshot,
+      nodes: snapshot.nodes.map((node) => node.id === 'root'
+        ? {
+            ...node,
+            frame: {
+              x: 10,
+              y: 20,
+              width: 1280,
+              height: 800,
+              rotation: 0,
+              widthMode: 'fixed' as const,
+              heightMode: 'content' as const,
+              overflow: 'scroll' as const,
+            },
+          }
+        : node),
+    })
+    const projection = createDomProjection({
+      getStageElement: () => null,
+      getViewport: () => ({ scale: 1, x: 0, y: 0 }),
+    })
+    const engine = createEditorEngine({ document, projection })
+    const command = {
+      type: 'frame.edit' as const,
+      nodeId: 'root',
+      label: 'Apply mobile frame',
+      values: {
+        width: 390,
+        height: 844,
+        heightMode: 'fixed' as const,
+        overflow: 'clip' as const,
+      },
+    } satisfies EditorEngineCommand
+
+    expect(engine.commands.can(command)).toBe(true)
+    expect(engine.commands.execute(command)).toEqual({
+      ok: true,
+      changed: true,
+    })
+    expect(engine.read.node('root')?.frame).toEqual({
+      x: 10,
+      y: 20,
+      width: 390,
+      height: 844,
+      rotation: 0,
+      widthMode: 'fixed',
+      heightMode: 'fixed',
+      overflow: 'clip',
+    })
+    expect(engine.snapshot().history.canUndo).toBe(true)
+
+    expect(engine.commands.execute({ type: 'history.undo' }))
+      .toEqual({ ok: true, changed: true })
+    expect(engine.read.node('root')?.frame).toMatchObject({
+      width: 1280,
+      height: 800,
+      heightMode: 'content',
+      overflow: 'scroll',
+    })
+    expect(engine.commands.execute({ type: 'history.redo' }))
+      .toEqual({ ok: true, changed: true })
+    expect(engine.read.node('root')?.frame).toMatchObject({
+      width: 390,
+      height: 844,
+      heightMode: 'fixed',
+      overflow: 'clip',
+    })
+
+    engine.dispose()
+    projection.dispose()
+  })
+
+  it('rejects invalid frame edits without creating history', () => {
+    const document = createDesignDocument(createEditorSnapshot())
+    const projection = createDomProjection({
+      getStageElement: () => null,
+      getViewport: () => ({ scale: 1, x: 0, y: 0 }),
+    })
+    const engine = createEditorEngine({ document, projection })
+
+    expect(engine.commands.execute({
+      type: 'frame.edit',
+      nodeId: 'root',
+      label: 'Edit missing frame',
+      values: { overflow: 'clip' },
+    })).toMatchObject({ code: 'unavailable', ok: false })
+
+    const invalidCommand = {
+      type: 'frame.edit',
+      nodeId: 'root',
+      label: 'Edit invalid frame',
+      values: { overflow: 'auto' },
+    } as unknown as EditorEngineCommand
+
+    expect(engine.commands.can(invalidCommand)).toBe(false)
+    expect(engine.commands.execute(invalidCommand)).toMatchObject({
+      code: 'unavailable',
+      ok: false,
+    })
+    expect(document.historyStatus().canUndo).toBe(false)
+
+    engine.dispose()
+    projection.dispose()
+  })
+
   it('rejects position edits for nodes without authored or frame geometry', () => {
     const document = createDesignDocument(createEditorSnapshot())
     const projection = createDomProjection({

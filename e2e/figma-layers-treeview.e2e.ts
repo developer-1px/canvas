@@ -61,6 +61,29 @@ test('exposes figma clone layers as a keyboard treeview', async ({
   await expect(workspaceSection).toHaveAttribute('aria-selected', 'true')
 })
 
+test('keeps Space available for focused editor controls', async ({ page }) => {
+  await page.goto('/?demo=figma')
+
+  const measureTool = page.getByRole('button', { name: 'Measure tool' })
+
+  await measureTool.focus()
+  await page.keyboard.press('Space')
+  await expect(measureTool).toHaveAttribute('aria-pressed', 'true')
+  await expect(page.locator('.figma-direct-dom__stage'))
+    .toHaveAttribute('data-mode', 'select')
+
+  const workspaceLayer = page.getByRole('button', {
+    name: 'Select layer Workspace page',
+  })
+
+  await workspaceLayer.focus()
+  await page.keyboard.press('Space')
+  await expect(page.getByRole('treeitem', {
+    exact: true,
+    name: 'Workspace page',
+  })).toHaveAttribute('aria-selected', 'true')
+})
+
 test('filters figma clone layers for component management', async ({
   page,
 }) => {

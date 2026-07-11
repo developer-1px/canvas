@@ -54,22 +54,22 @@ selected DOM node
 
 | CSS concept | Canvas affordance | Visibility rule | Current owner |
 | --- | --- | --- | --- |
-| `display:flex` | Flex gap/padding/size affordances | Only selected flex container with children | `FigmaCloneDomAutoLayoutOverlay` |
-| `flex-direction` | H/V toolbar | Only while flex gap is active | `FigmaCloneDomAutoLayoutOverlay` |
-| `justify-content` | Distribution segmented control | Inspector only | `FigmaCloneDomEditInspector` |
-| `align-items` | Align segmented control | Inspector only | `FigmaCloneDomEditInspector` |
-| `align-self` | Parent participation controls | Only selected child of flex parent | `FigmaCloneDomEditInspector` |
-| `gap` in flex | One band per real gap | Hover/drag gap; padding hidden | `FigmaCloneDomAutoLayoutOverlay` |
-| `display:grid` | Track guides + grid gap band | Hover/drag grid gap; padding hidden | `FigmaCloneDomGridOverlay` |
-| `gap` in grid | Grid gap value | Only grid gap state | `FigmaCloneDomGridOverlay` |
-| `padding` | Four box-edge bands | Hover/drag padding; gap hidden | `FigmaCloneDomAutoLayoutOverlay` |
-| `margin` | Parent participation field, X-ray outer band | Inspector/X-ray only | `FigmaCloneDomEditInspector`, `FigmaCloneDomBoxModelOverlay` |
-| `width/height` | Bottom size badge + dock | Hover/focus/click size badge | `FigmaCloneDomGuideOverlay`, `FigmaCloneDomAutoLayoutOverlay` |
-| `border-radius` | Numeric box field | Inspector only | `FigmaCloneDomEditInspector` |
-| `opacity` | Numeric effects field | Inspector only | `FigmaCloneDomEditInspector` |
-| `transform` | Moveable handles + center guides | Transform mode only | `FigmaCloneDomSelectionOverlay`, `FigmaCloneDomGuideOverlay` |
-| box model | Content/padding/border/margin X-ray | X-ray mode only | `FigmaCloneDomBoxModelOverlay` |
-| measurement | Parent inset distance lines | Measure mode only | `FigmaCloneDomGuideOverlay` |
+| `display:flex` | Flex gap/padding/size affordances | Only selected flex container with children | `DomEditEditorOverlay` |
+| `flex-direction` | H/V toolbar | Only while flex gap is active | `DomEditEditorOverlay` |
+| `justify-content` | Distribution segmented control | Inspector only | `DomEditEditorInspector` |
+| `align-items` | Align segmented control | Inspector only | `DomEditEditorInspector` |
+| `align-self` | Parent participation controls | Only selected child of flex parent | `DomEditEditorInspector` |
+| `gap` in flex | One band per real gap | Hover/drag gap; padding hidden | `DomEditEditorOverlay` |
+| `display:grid` | Track guides + grid gap band | Hover/drag grid gap; padding hidden | `DomEditEditorOverlay` |
+| `gap` in grid | Grid gap value | Only grid gap state | `DomEditEditorOverlay` |
+| `padding` | Four box-edge bands | Hover/drag padding; gap hidden | `DomEditEditorOverlay` |
+| `margin` | Parent participation field, X-ray outer band | Inspector/X-ray only | `DomEditEditorInspector`, `DomEditEditorOverlay` |
+| `width/height` | Bottom size badge + dock | Hover/focus/click size badge | `DomEditEditorOverlay` |
+| `border-radius` | Numeric box field | Inspector only | `DomEditEditorInspector` |
+| `opacity` | Numeric effects field | Inspector only | `DomEditEditorInspector` |
+| `transform` | Moveable handles + center guides | Transform mode only | `DomEditEditorOverlay` |
+| box model | Content/padding/border/margin X-ray | X-ray mode only | `DomEditEditorOverlay` |
+| measurement | Parent inset distance lines | Measure mode only | `DomEditEditorOverlay` |
 
 ## UI Placement Rules
 

@@ -20,8 +20,8 @@ test('presents figma clone editing as one CSS inspector surface', async ({
   await page.getByRole('button', { name: 'Select layer Workspace page' })
     .click()
 
-  await expect(inspector.getByLabel('CSS padding')).toBeVisible()
-  await expect(inspector).toContainText('display')
+  await expect(inspector.getByLabel('Pad')).toBeVisible()
+  await expect(inspector).toContainText('Display')
 })
 
 test('syncs figma clone component edits across instances', async ({
@@ -44,7 +44,7 @@ test('syncs figma clone component edits across instances', async ({
   )
 
   const initialPadding = await readStatCardPadding(page)
-  await inspector.getByLabel('CSS padding').fill('20')
+  await inspector.getByLabel('Pad').fill('20')
   await expect.poll(() => readStatCardPadding(page)).toEqual([20, 20, 20])
 
   await search.fill('stat card conversion')
@@ -52,16 +52,16 @@ test('syncs figma clone component edits across instances', async ({
     name: 'Select layer Conversion stat',
   }).click()
 
-  await expect(inspector.getByLabel('CSS padding')).toHaveValue('20')
+  await expect(inspector.getByLabel('Pad')).toHaveValue('20')
 
   await page.keyboard.press(`${primaryModifier()}+Z`)
   await expect.poll(() => readStatCardPadding(page)).toEqual(initialPadding)
-  await expect(inspector.getByLabel('CSS padding'))
+  await expect(inspector.getByLabel('Pad'))
     .toHaveValue(String(initialPadding[1]))
 
   await page.keyboard.press(`${primaryModifier()}+Shift+Z`)
   await expect.poll(() => readStatCardPadding(page)).toEqual([20, 20, 20])
-  await expect(inspector.getByLabel('CSS padding')).toHaveValue('20')
+  await expect(inspector.getByLabel('Pad')).toHaveValue('20')
 })
 
 test('edits text content from the CSS inspector', async ({ page }) => {
@@ -77,24 +77,24 @@ test('edits text content from the CSS inspector', async ({ page }) => {
   await page.getByRole('button', { name: 'Select layer Revenue label' })
     .click()
 
-  await expect(inspector.getByLabel('CSS text content'))
+  await expect(inspector.getByLabel('Text'))
     .toHaveValue('Revenue')
-  await inspector.getByLabel('CSS text content').fill('Annual revenue')
+  await inspector.getByLabel('Text').fill('Annual revenue')
 
-  await expect(page.locator('[data-figma-dom-node="workspaceStatRevenueLabel"]'))
+  await expect(page.locator('[data-design-node-id="workspaceStatRevenueLabel"]'))
     .toContainText('Annual revenue')
 
   await page.getByRole('button', { name: 'Select layer Revenue label' })
     .click()
   await page.keyboard.press(`${primaryModifier()}+Z`)
-  await expect(inspector.getByLabel('CSS text content')).toHaveValue('Revenue')
-  await expect(page.locator('[data-figma-dom-node="workspaceStatRevenueLabel"]'))
+  await expect(inspector.getByLabel('Text')).toHaveValue('Revenue')
+  await expect(page.locator('[data-design-node-id="workspaceStatRevenueLabel"]'))
     .toContainText('Revenue')
 
   await page.keyboard.press(`${primaryModifier()}+Shift+Z`)
-  await expect(inspector.getByLabel('CSS text content'))
+  await expect(inspector.getByLabel('Text'))
     .toHaveValue('Annual revenue')
-  await expect(page.locator('[data-figma-dom-node="workspaceStatRevenueLabel"]'))
+  await expect(page.locator('[data-design-node-id="workspaceStatRevenueLabel"]'))
     .toContainText('Annual revenue')
 })
 
@@ -113,17 +113,17 @@ test('edits figma clone CSS declarations in the inspector', async ({
   await page.getByRole('button', { name: 'Select layer Revenue stat' }).click()
 
   await expect(inspector).toContainText('CSS')
-  await expect(inspector.getByLabel('CSS padding')).toHaveValue('14')
+  await expect(inspector.getByLabel('Pad')).toHaveValue('14')
 
-  await inspector.getByLabel('CSS padding').fill('22')
-  await expect(inspector.getByLabel('CSS padding')).toHaveValue('22')
+  await inspector.getByLabel('Pad').fill('22')
+  await expect(inspector.getByLabel('Pad')).toHaveValue('22')
 
   await search.fill('stat card tickets')
   await page.getByRole('button', {
     name: 'Select layer Tickets stat',
   }).click()
 
-  await expect(inspector.getByLabel('CSS padding')).toHaveValue('22')
+  await expect(inspector.getByLabel('Pad')).toHaveValue('22')
 })
 
 async function readStatCardPadding(page: Page) {
@@ -132,7 +132,7 @@ async function readStatCardPadding(page: Page) {
     'workspaceStatConversion',
     'workspaceStatTickets',
   ].map((nodeId) =>
-    page.locator(`[data-figma-dom-node="${nodeId}"]`).evaluate((element) =>
+    page.locator(`[data-design-node-id="${nodeId}"]`).evaluate((element) =>
       Math.round(Number.parseFloat(getComputedStyle(element).paddingTop))),
   ))
 }

@@ -110,6 +110,8 @@ test('pans, zooms, and fits registered DOM nodes by canonical identity', async (
     await app.getAttribute('data-viewport-x'),
   )).not.toBe(initialViewportX)
 
+  await page.getByRole('button', { name: 'Select layer Workspace page' })
+    .click()
   await page.getByRole('button', { name: 'Select layer Revenue stat' }).click()
   await page.getByRole('button', { name: 'Fit selection' }).click()
   await expect(app).toHaveAttribute(

@@ -259,24 +259,18 @@ importers:
       '@interactive-os/canvas':
         specifier: ^0.1.1
         version: link:../..
-      '@interactive-os/canvas-pack-devtools':
-        specifier: workspace:*
-        version: link:../canvas-pack-devtools
       '@interactive-os/dom-edit-affordance':
         specifier: workspace:*
         version: link:../dom-edit-affordance
-      '@interactive-os/json-document':
-        specifier: ^1.0.0
-        version: link:../../../json-document/packages/json-document
+      lucide-react:
+        specifier: ^1.16.0
+        version: 1.16.0(react@19.2.6)
       react:
         specifier: ^19.0.0
         version: 19.2.6
       react-dom:
         specifier: ^19.0.0
         version: 19.2.6(react@19.2.6)
-      zod:
-        specifier: ^4.0.0
-        version: 4.4.3
 
   packages/slide-edit-affordance:
     dependencies:

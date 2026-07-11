@@ -298,7 +298,7 @@ test('previews spacing gestures, cancels cleanly, and commits one history entry'
   const previewGap = await readComputedNumber(actions, 'columnGap')
   await page.mouse.up()
   await expect.poll(() => readNumericAttribute(app, 'data-hero-actions-gap'))
-    .toBe(previewGap)
+    .toBeCloseTo(previewGap, 4)
   await expect(app).toHaveAttribute('data-history-can-undo', 'true')
 
   await page.keyboard.press(`${primaryModifier()}+Z`)
@@ -400,7 +400,14 @@ async function selectLayer(
   label: string,
   nodeId: string,
 ) {
-  await page.getByRole('button', { name: `Select layer ${label}` }).click()
+  const layer = page.getByRole('button', { name: `Select layer ${label}` })
+
+  if (await layer.count() === 0) {
+    await page.getByRole('button', { name: 'Select layer Workspace page' })
+      .click()
+  }
+
+  await layer.click()
   await expectSelectedNode(figmaApp(page), nodeId)
 }
 

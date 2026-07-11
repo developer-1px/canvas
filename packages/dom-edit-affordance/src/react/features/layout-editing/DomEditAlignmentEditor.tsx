@@ -1,5 +1,6 @@
 import {
   useEffect,
+  useRef,
   type KeyboardEvent,
 } from 'react'
 import type {
@@ -73,8 +74,14 @@ export function DomEditAlignmentEditor<
   onClose: () => void
   onPreview: (preview: DomEditAlignmentPreview | null) => void
 }) {
+  const wasOpenRef = useRef(isOpen)
+
   useEffect(() => {
-    if (!isOpen) {
+    const wasOpen = wasOpenRef.current
+
+    wasOpenRef.current = isOpen
+
+    if (wasOpen && !isOpen) {
       onPreview(null)
     }
   }, [isOpen, onPreview])
