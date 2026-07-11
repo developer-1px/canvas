@@ -88,6 +88,9 @@ describe('Canvas package manifest', () => {
       './engine': createPackageExportEntry('./dist/package/canvas/engine/index'),
       './entities': createPackageExportEntry('./dist/package/canvas/entities/index'),
       './host': createPackageExportEntry('./dist/package/canvas/host/index'),
+      './react-design': createPackageExportEntry(
+        './dist/package/canvas/react-design/index',
+      ),
       './renderer': createPackageExportEntry('./dist/package/canvas/renderer/index'),
       './style.css': {
         default: './dist/package/canvas/app/shell/CanvasApp.css',
@@ -100,7 +103,7 @@ describe('Canvas package manifest', () => {
       .filter(isPackageCodeExportEntry)
       .flatMap((entry) => [entry.types, entry.import, entry.default])
 
-    expect(exportedPaths).toHaveLength(30)
+    expect(exportedPaths).toHaveLength(33)
     expect(exportedPaths.every((path) => path.startsWith('./dist/package/canvas/'))).toBe(true)
     expect(exportedPaths.every((path) => path.endsWith('/index.d.ts') || path.endsWith('/index.js'))).toBe(true)
     expect(
@@ -116,7 +119,7 @@ describe('Canvas package manifest', () => {
         isPackageCodeExportEntry(entry) ? [[subpath, entry] as const] : [],
       )
 
-    expect(exportEntries).toHaveLength(10)
+    expect(exportEntries).toHaveLength(11)
     for (const [, entry] of exportEntries) {
       expect(entry.types).toBe(entry.import.replace(/\.js$/, '.d.ts'))
       expect(entry.import).toBe(entry.default)

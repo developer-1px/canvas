@@ -54,6 +54,12 @@ importers:
       '@interactive-os/canvas-pack-devtools':
         specifier: workspace:*
         version: link:packages/canvas-pack-devtools
+      '@interactive-os/dom-edit-affordance':
+        specifier: workspace:*
+        version: link:packages/dom-edit-affordance
+      '@interactive-os/figjam-pack':
+        specifier: workspace:*
+        version: link:packages/figjam-pack
       '@playwright/test':
         specifier: ^1.60.0
         version: 1.60.0
@@ -253,6 +259,15 @@ importers:
       react-moveable:
         specifier: ^0.56.0
         version: 0.56.0
+
+  packages/figjam-pack:
+    dependencies:
+      '@interactive-os/canvas':
+        specifier: ^0.1.1
+        version: link:../..
+      react:
+        specifier: ^19.0.0
+        version: 19.2.6
 
   packages/figma-clone:
     dependencies:

@@ -235,8 +235,9 @@ function useDomEditEditorCanvasSelection({
 }
 
 function isDomEditEditorControlTarget(target: EventTarget | null) {
-  return target instanceof Element &&
-    target.closest('.figma-selection-layer') !== null
+  return target instanceof Element && target.closest(
+    '.figma-selection-layer, [data-dom-edit-editor-control]',
+  ) !== null
 }
 
 function runDomEditEditorCommand(

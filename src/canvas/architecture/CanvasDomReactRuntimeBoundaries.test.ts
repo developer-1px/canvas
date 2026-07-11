@@ -36,8 +36,11 @@ describe('direct DOM React runtime boundaries', () => {
     )).toEqual([])
   })
 
-  it('keeps ReactDesignRenderer independent from products and legacy canvas items', () => {
-    const files = productionFiles('src/canvas/react-design-renderer/')
+  it('keeps the React design runtime independent from products and legacy canvas items', () => {
+    const files = [
+      ...productionFiles('src/canvas/react-design-renderer/'),
+      ...productionFiles('src/canvas/react-design/'),
+    ]
     const source = files.map((file) => file.source).join('\n')
 
     expect(files.length).toBeGreaterThan(0)

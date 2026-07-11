@@ -30,6 +30,9 @@ const canvasFoundationSourceEntry = fileURLToPath(
 const canvasHostSourceEntry = fileURLToPath(
   new URL('./src/canvas/host/index.ts', import.meta.url),
 )
+const canvasReactDesignSourceEntry = fileURLToPath(
+  new URL('./src/canvas/react-design/index.ts', import.meta.url),
+)
 const canvasRendererSourceEntry = fileURLToPath(
   new URL('./src/canvas/renderer/index.ts', import.meta.url),
 )
@@ -90,6 +93,10 @@ export default defineConfig({
       {
         find: /^@interactive-os\/canvas\/host$/,
         replacement: canvasHostSourceEntry,
+      },
+      {
+        find: /^@interactive-os\/canvas\/react-design$/,
+        replacement: canvasReactDesignSourceEntry,
       },
       {
         find: /^@interactive-os\/canvas\/renderer$/,

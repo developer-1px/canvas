@@ -159,6 +159,47 @@ describe('DomEditEditor bridge', () => {
 
     fixture.dispose()
   })
+
+  it('keeps canvas selection while interacting with native editor controls', async () => {
+    const fixture = createEditorFixture()
+    const authoredControl = document.createElement('input')
+    const textEditor = document.createElement('textarea')
+
+    fixture.copyElement.append(authoredControl)
+    textEditor.setAttribute('data-dom-edit-editor-control', '')
+    fixture.stage.append(textEditor)
+    fixture.editor.commands.execute({
+      nodeId: 'root',
+      type: 'selection.replace',
+    })
+    container = document.createElement('div')
+    document.body.append(container)
+    root = createRoot(container)
+
+    await act(async () => root?.render(
+      <DomEditEditorOverlay
+        editor={fixture.editor}
+        isCanvasPanActive={false}
+        shellRef={{ current: fixture.stage }}
+        viewport={{ scale: 1, x: 0, y: 0 }}
+      />,
+    ))
+    await click(authoredControl)
+
+    expect(fixture.editor.snapshot().selection.primaryNodeId).toBe('copy')
+
+    await act(async () => {
+      fixture.editor.commands.execute({
+        nodeId: 'root',
+        type: 'selection.replace',
+      })
+    })
+    await click(textEditor)
+
+    expect(fixture.editor.snapshot().selection.primaryNodeId).toBe('root')
+
+    fixture.dispose()
+  })
 })
 
 function createEditorFixture() {

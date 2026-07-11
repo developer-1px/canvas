@@ -12,6 +12,7 @@ describe('Canvas package facade boundaries', () => {
       'src/canvas',
       'src/canvas/app',
       'src/canvas/app/authoring',
+      'src/canvas/react-design',
     ])
     const violations = sourceFiles
       .filter((file) =>

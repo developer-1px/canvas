@@ -15,6 +15,98 @@ import {
 } from './index'
 
 describe('EditorEngine', () => {
+  it('creates one node without changing selection and restores it through history', () => {
+    const document = createDesignDocument(createEditorSnapshot())
+    const projection = createDomProjection({
+      getStageElement: () => null,
+      getViewport: () => ({ scale: 1, x: 0, y: 0 }),
+    })
+    const engine = createEditorEngine({ document, projection })
+    const note = {
+      ...createNode('note'),
+      text: 'Review note',
+    }
+    const command = {
+      type: 'node.create' as const,
+      label: 'Create note',
+      node: note,
+      parentId: 'root',
+      index: 1,
+    } satisfies EditorEngineCommand
+
+    engine.commands.execute({
+      type: 'selection.replace',
+      nodeId: 'leaf',
+    })
+
+    expect(engine.commands.can(command)).toBe(true)
+    expect(engine.commands.execute(command)).toEqual({
+      ok: true,
+      changed: true,
+    })
+    expect(engine.read.children('root').map((node) => node.id))
+      .toEqual(['child', 'note'])
+    expect(engine.snapshot().selection.primaryNodeId).toBe('leaf')
+
+    expect(engine.commands.execute({ type: 'history.undo' }))
+      .toEqual({ ok: true, changed: true })
+    expect(engine.read.node('note')).toBeNull()
+    expect(engine.snapshot().selection.primaryNodeId).toBe('leaf')
+
+    expect(engine.commands.execute({ type: 'history.redo' }))
+      .toEqual({ ok: true, changed: true })
+    expect(engine.read.node('note')).toEqual(note)
+    expect(engine.commands.can({ type: 'history.redo' })).toBe(false)
+
+    engine.dispose()
+    projection.dispose()
+  })
+
+  it('rejects duplicate and invalid node creation without adding history', () => {
+    const document = createDesignDocument(createEditorSnapshot())
+    const projection = createDomProjection({
+      getStageElement: () => null,
+      getViewport: () => ({ scale: 1, x: 0, y: 0 }),
+    })
+    const engine = createEditorEngine({ document, projection })
+    const before = document.snapshot
+
+    expect(engine.commands.can({
+      type: 'node.create',
+      label: 'Duplicate leaf',
+      node: createNode('leaf'),
+      parentId: 'root',
+      index: 1,
+    })).toBe(false)
+    expect(engine.commands.execute({
+      type: 'node.create',
+      label: 'Duplicate leaf',
+      node: createNode('leaf'),
+      parentId: 'root',
+      index: 1,
+    })).toMatchObject({ code: 'invalid-command', ok: false })
+
+    const invalidPlacement = {
+      type: 'node.create',
+      label: 'Invalid placement',
+      node: createNode('note'),
+      parentId: 'root',
+      index: 99,
+    } satisfies EditorEngineCommand
+
+    expect(engine.commands.can(invalidPlacement)).toBe(false)
+    expect(engine.commands.execute(invalidPlacement))
+      .toMatchObject({ code: 'invalid-command', ok: false })
+    expect(document.snapshot).toBe(before)
+    expect(document.historyStatus()).toEqual({
+      canRedo: false,
+      canUndo: false,
+    })
+
+    engine.dispose()
+    projection.dispose()
+  })
+
   it('resolves nested, exact, replacement, and parent selection through one command seam', () => {
     const document = createDesignDocument(createEditorSnapshot())
     const projection = createDomProjection({
@@ -162,6 +254,53 @@ describe('EditorEngine', () => {
       code: 'stale-preview',
       ok: false,
     })
+
+    engine.dispose()
+    projection.dispose()
+  })
+
+  it('merges props fields in preview and commits them as one command', () => {
+    const document = createDesignDocument(createEditorSnapshot())
+    const projection = createDomProjection({
+      getStageElement: () => null,
+      getViewport: () => ({ scale: 1, x: 0, y: 0 }),
+    })
+    const engine = createEditorEngine({ document, projection })
+    const session = engine.commands.beginPreview({
+      label: 'Edit leaf props',
+      nodeId: 'leaf',
+    })
+
+    expect(session?.update([
+      { target: 'props', field: 'variant', value: 'warning' },
+    ])).toEqual({ ok: true, changed: true })
+    expect(session?.update([
+      { target: 'props', field: 'compact', value: true },
+    ])).toEqual({ ok: true, changed: true })
+    expect(session?.update([
+      { target: 'props', field: 'variant', value: 'danger' },
+    ])).toEqual({ ok: true, changed: true })
+
+    expect(engine.read.node('leaf')?.props).toEqual({
+      position: 'absolute',
+      compact: true,
+      variant: 'danger',
+    })
+    expect(document.read.node('leaf')?.props)
+      .toEqual({ position: 'absolute' })
+    expect(document.historyStatus().canUndo).toBe(false)
+
+    expect(session?.commit()).toEqual({ ok: true, changed: true })
+    expect(document.read.node('leaf')?.props).toEqual({
+      position: 'absolute',
+      compact: true,
+      variant: 'danger',
+    })
+    expect(engine.commands.execute({ type: 'history.undo' }))
+      .toEqual({ ok: true, changed: true })
+    expect(document.read.node('leaf')?.props)
+      .toEqual({ position: 'absolute' })
+    expect(engine.commands.can({ type: 'history.undo' })).toBe(false)
 
     engine.dispose()
     projection.dispose()
@@ -401,6 +540,117 @@ describe('EditorEngine', () => {
     projection.dispose()
   })
 
+  it('merges one props field and restores it through document history', () => {
+    const document = createDesignDocument(createEditorSnapshot())
+    const projection = createDomProjection({
+      getStageElement: () => null,
+      getViewport: () => ({ scale: 1, x: 0, y: 0 }),
+    })
+    const engine = createEditorEngine({ document, projection })
+    const command = {
+      type: 'node.edit' as const,
+      nodeId: 'leaf',
+      label: 'Label leaf',
+      edits: [{
+        target: 'props' as const,
+        field: 'aria-label',
+        value: 'Revenue note',
+      }],
+    } satisfies EditorEngineCommand
+
+    expect(engine.commands.can(command)).toBe(true)
+    expect(engine.commands.execute(command))
+      .toEqual({ ok: true, changed: true })
+    expect(engine.read.node('leaf')?.props).toEqual({
+      position: 'absolute',
+      'aria-label': 'Revenue note',
+    })
+
+    expect(engine.commands.execute({ type: 'history.undo' }))
+      .toEqual({ ok: true, changed: true })
+    expect(engine.read.node('leaf')?.props).toEqual({ position: 'absolute' })
+
+    expect(engine.commands.execute({ type: 'history.redo' }))
+      .toEqual({ ok: true, changed: true })
+    expect(engine.read.node('leaf')?.props['aria-label'])
+      .toBe('Revenue note')
+
+    engine.dispose()
+    projection.dispose()
+  })
+
+  it('rejects a non-JSON props edit without adding document history', () => {
+    const document = createDesignDocument(createEditorSnapshot())
+    const projection = createDomProjection({
+      getStageElement: () => null,
+      getViewport: () => ({ scale: 1, x: 0, y: 0 }),
+    })
+    const engine = createEditorEngine({ document, projection })
+    const before = document.snapshot
+    const command = {
+      type: 'node.edit',
+      nodeId: 'leaf',
+      label: 'Install invalid handler',
+      edits: [{
+        target: 'props',
+        field: 'onClick',
+        value: () => undefined,
+      }],
+    } as unknown as EditorEngineCommand
+
+    expect(engine.commands.can(command)).toBe(false)
+    expect(engine.commands.execute(command)).toMatchObject({
+      code: 'unavailable',
+      ok: false,
+      reason: 'Invalid JSON props value: onClick',
+    })
+    expect(document.snapshot).toBe(before)
+    expect(document.historyStatus()).toEqual({
+      canRedo: false,
+      canUndo: false,
+    })
+
+    engine.dispose()
+    projection.dispose()
+  })
+
+  it.each([
+    ['undefined', undefined],
+    ['function', () => undefined],
+    ['BigInt', BigInt(1)],
+    ['cycle', createCyclicValue()],
+    ['sparse array', Array(1)],
+  ])('rejects %s props during preview without throwing', (_label, value) => {
+    const document = createDesignDocument(createEditorSnapshot())
+    const projection = createDomProjection({
+      getStageElement: () => null,
+      getViewport: () => ({ scale: 1, x: 0, y: 0 }),
+    })
+    const engine = createEditorEngine({ document, projection })
+    const session = engine.commands.beginPreview({
+      label: 'Preview invalid props',
+      nodeId: 'leaf',
+    })
+
+    expect(session?.update([{
+      target: 'props',
+      field: 'invalid',
+      value,
+    } as never])).toMatchObject({
+      code: 'unavailable',
+      ok: false,
+      reason: 'Invalid JSON props value: invalid',
+    })
+    expect(engine.read.node('leaf')?.props)
+      .toEqual({ position: 'absolute' })
+    expect(document.historyStatus().canUndo).toBe(false)
+    expect(engine.snapshot().preview).toEqual({ nodeId: 'leaf' })
+    expect(session?.cancel()).toEqual({ ok: true, changed: true })
+
+    engine.dispose()
+    projection.dispose()
+  })
+
   it('keeps component instance content local while synchronizing layout and style', () => {
     const document = createDesignDocument(createComponentEditorSnapshot())
     const projection = createDomProjection({
@@ -417,6 +667,32 @@ describe('EditorEngine', () => {
     })).toEqual({ ok: true, changed: true })
     expect(engine.read.node('card-a')?.text).toBe('Edited A')
     expect(engine.read.node('card-b')?.text).toBe('Card B')
+
+    engine.dispose()
+    projection.dispose()
+  })
+
+  it('keeps component instance props edits node-local', () => {
+    const document = createDesignDocument(createComponentEditorSnapshot())
+    const projection = createDomProjection({
+      getStageElement: () => null,
+      getViewport: () => ({ scale: 1, x: 0, y: 0 }),
+    })
+    const engine = createEditorEngine({ document, projection })
+
+    expect(engine.commands.execute({
+      type: 'node.edit',
+      nodeId: 'card-a',
+      label: 'Edit card A variant',
+      edits: [{ target: 'props', field: 'variant', value: 'warning' }],
+    })).toEqual({ ok: true, changed: true })
+    expect(engine.read.node('card-a')?.props).toEqual({
+      className: 'card-a',
+      variant: 'warning',
+    })
+    expect(engine.read.node('card-b')?.props).toEqual({
+      className: 'card-b',
+    })
 
     engine.dispose()
     projection.dispose()
@@ -493,7 +769,7 @@ describe('EditorEngine', () => {
       type: 'node.edit',
       nodeId: 'leaf',
       label: 'Reject storage target',
-      edits: [{ target: 'props', field: 'opacity', value: 50 }],
+      edits: [{ target: 'storage', field: 'opacity', value: 50 }],
     } as unknown as EditorEngineCommand
 
     expect(engine.commands.execute(invalidRuntimeCommand)).toMatchObject({
@@ -859,6 +1135,13 @@ function createNode(id: string, children: readonly string[] = []) {
 
 function createElement(parentElement: HTMLElement | null = null) {
   return { parentElement } as HTMLElement
+}
+
+function createCyclicValue() {
+  const value: Record<string, unknown> = {}
+
+  value.self = value
+  return value
 }
 
 function countDocumentSubscriptions(

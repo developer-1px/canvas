@@ -47,6 +47,11 @@ export type EditorEngineNodeEdit =
       readonly value: number
     }
   | {
+      readonly field: string
+      readonly target: 'props'
+      readonly value: DesignJSONValue
+    }
+  | {
       readonly target: 'text'
       readonly value: string
     }
@@ -62,6 +67,13 @@ export type EditorEngineCommand =
       readonly type: 'selection.replace'
     }
   | { readonly type: 'selection.parent' }
+  | {
+      readonly index: number
+      readonly label: string
+      readonly node: DesignNode
+      readonly parentId: DesignNodeId | null
+      readonly type: 'node.create'
+    }
   | {
       readonly edits: readonly EditorEngineNodeEdit[]
       readonly label: string
@@ -266,6 +278,27 @@ export function createEditorEngine({
     return changed(true)
   }
 
+  function canCreateNode(
+    command: Extract<EditorEngineCommand, { type: 'node.create' }>,
+  ) {
+    if (
+      document.read.node(command.node.id) !== null ||
+      command.node.children.length > 0 ||
+      !Number.isInteger(command.index) ||
+      command.index < 0
+    ) {
+      return false
+    }
+
+    if (command.parentId === null) {
+      return command.index <= document.read.roots().length
+    }
+
+    const parent = document.read.node(command.parentId)
+
+    return parent !== null && command.index <= parent.children.length
+  }
+
   function canExecute(command: EditorEngineCommand): boolean {
     if (disposed) {
       return false
@@ -286,6 +319,8 @@ export function createEditorEngine({
         return document.historyStatus().canUndo
       case 'history.redo':
         return document.historyStatus().canRedo
+      case 'node.create':
+        return canCreateNode(command)
       case 'node.edit':
         return planNodeEdit(command).ok
       case 'frame.edit':
@@ -339,6 +374,16 @@ export function createEditorEngine({
         return restoreDocumentHistory('undo')
       case 'history.redo':
         return restoreDocumentHistory('redo')
+      case 'node.create':
+        return executeDocumentCommand({
+          label: command.label,
+          changes: [{
+            type: 'add',
+            index: command.index,
+            node: command.node,
+            parentId: command.parentId,
+          }],
+        })
       case 'node.edit': {
         const plan = planNodeEdit(command)
 
@@ -811,10 +856,12 @@ function applyNodeEdits(
   | { readonly ok: false; readonly result: EditorEngineCommandResult } {
   let layout = node.layout
   let frame = node.frame
+  let props = node.props
   let style = node.style
   let text = node.text
   let updatesLayout = false
   let updatesFrame = false
+  let updatesProps = false
   let updatesStyle = false
   let updatesText = false
 
@@ -823,6 +870,7 @@ function applyNodeEdits(
 
     if (
       runtimeTarget !== 'layout' &&
+      runtimeTarget !== 'props' &&
       runtimeTarget !== 'style' &&
       runtimeTarget !== 'text'
     ) {
@@ -857,6 +905,18 @@ function applyNodeEdits(
         ok: false,
         result: unavailable('A node edit field must not be empty'),
       }
+    }
+
+    if (edit.target === 'props') {
+      const normalized = normalizePropsEditValue(edit.field, edit.value)
+
+      if (!normalized.ok) {
+        return normalized
+      }
+
+      props = { ...props, [edit.field]: normalized.value }
+      updatesProps = true
+      continue
     }
 
     if (edit.target === 'layout') {
@@ -920,6 +980,7 @@ function applyNodeEdits(
     values: {
       ...(updatesFrame ? { frame } : {}),
       ...(updatesLayout ? { layout } : {}),
+      ...(updatesProps ? { props } : {}),
       ...(updatesStyle ? { style } : {}),
       ...(updatesText ? { text } : {}),
     },
@@ -972,7 +1033,7 @@ function updateEditorFrameLayout(
 }
 
 function normalizeLayoutEdit(
-  edit: Exclude<EditorEngineNodeEdit, { target: 'style' | 'text' }>,
+  edit: Extract<EditorEngineNodeEdit, { target: 'layout' }>,
 ):
   | { readonly ok: true; readonly value: DesignJSONValue }
   | { readonly ok: false; readonly result: EditorEngineCommandResult } {
@@ -1042,6 +1103,95 @@ function freezePreviewNode(node: DesignNode): DesignNode {
   return deepFreezeEditorValue(
     JSON.parse(JSON.stringify(node)) as DesignNode,
   )
+}
+
+function normalizePropsEditValue(
+  field: string,
+  value: unknown,
+):
+  | { readonly ok: true; readonly value: DesignJSONValue }
+  | { readonly ok: false; readonly result: EditorEngineCommandResult } {
+  try {
+    return {
+      ok: true,
+      value: cloneEditorDesignJSONValue(value, new WeakSet()),
+    }
+  } catch {
+    return {
+      ok: false,
+      result: unavailable(`Invalid JSON props value: ${field}`),
+    }
+  }
+}
+
+function cloneEditorDesignJSONValue(
+  value: unknown,
+  ancestors: WeakSet<object>,
+): DesignJSONValue {
+  if (
+    value === null ||
+    typeof value === 'boolean' ||
+    typeof value === 'string'
+  ) {
+    return value
+  }
+
+  if (typeof value === 'number') {
+    if (!Number.isFinite(value)) {
+      throw new Error('JSON numbers must be finite')
+    }
+
+    return value
+  }
+
+  if (typeof value !== 'object' || ancestors.has(value)) {
+    throw new Error('Value is not JSON')
+  }
+
+  ancestors.add(value)
+
+  try {
+    if (Array.isArray(value)) {
+      assertDenseEditorJSONArray(value)
+      return value.map((child) =>
+        cloneEditorDesignJSONValue(child, ancestors))
+    }
+
+    const prototype = Object.getPrototypeOf(value) as unknown
+
+    if (prototype !== Object.prototype && prototype !== null) {
+      throw new Error('JSON objects must use a plain prototype')
+    }
+
+    const keys = Object.keys(value)
+
+    if (Reflect.ownKeys(value).length !== keys.length) {
+      throw new Error('JSON objects require enumerable string keys')
+    }
+
+    return Object.fromEntries(keys.map((key) => [
+      key,
+      cloneEditorDesignJSONValue(
+        (value as Record<string, unknown>)[key],
+        ancestors,
+      ),
+    ]))
+  } finally {
+    ancestors.delete(value)
+  }
+}
+
+function assertDenseEditorJSONArray(value: readonly unknown[]) {
+  const keys = Object.keys(value)
+  const hasDenseIndexes = keys.length === value.length &&
+    keys.every((key, index) => key === String(index))
+
+  if (
+    !hasDenseIndexes ||
+    Reflect.ownKeys(value).length !== value.length + 1
+  ) {
+    throw new Error('JSON arrays must contain only dense indexes')
+  }
 }
 
 function deepFreezeEditorValue<T>(value: T): T {
