@@ -2,6 +2,7 @@ import { createElement, type ComponentType, type ReactNode } from 'react'
 
 import {
   createDesignDocument,
+  type DesignDocumentRead,
   type DesignJSONObject,
   type DesignNode,
   type DesignNodeId,
@@ -57,6 +58,7 @@ export type ReactDesignWidgetRenderProps<
   readonly node: DesignNode
   readonly props: Props
   readonly children: ReactNode
+  readonly read: DesignDocumentRead
   readonly rootProps: ReactDesignRootProps
 }
 

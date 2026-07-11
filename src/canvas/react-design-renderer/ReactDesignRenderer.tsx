@@ -89,6 +89,7 @@ function ReactDesignNodeRenderer({
     : createElement(resolution.definition.render, {
         children,
         node,
+        read,
         rootProps,
       })
 

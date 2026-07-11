@@ -9,17 +9,19 @@ import {
 import {
   useCallback,
   useEffect,
-  useMemo,
   useRef,
   useState,
-  useSyncExternalStore,
   type PointerEvent as ReactPointerEvent,
   type WheelEvent as ReactWheelEvent,
 } from 'react'
+import type { EditorEngine } from '@interactive-os/canvas/editor'
 import {
-  createEditorEngine,
-  type EditorEngine,
-} from '@interactive-os/canvas/editor'
+  ReactDesignRenderer,
+  createReactDesignDefinitionRegistry,
+  useReactDesignEditorRuntime,
+  type DesignNodeId,
+  type DomProjection,
+} from '@interactive-os/canvas/react-design'
 import {
   DomEditEditorOverlay,
   type DomEditAffordanceState,
@@ -28,22 +30,7 @@ import {
   CANVAS_TOOLBAR_ITEM_PROPS,
   useCanvasToolbarRovingFocus,
 } from '../../../src/canvas/app'
-import type {
-  Bounds,
-  Viewport,
-} from '../../../src/canvas/core'
-import type {
-  DesignDocument,
-  DesignNodeId,
-} from '../../../src/canvas/design-document'
-import {
-  createDomProjection,
-  type DomProjection,
-} from '../../../src/canvas/dom-projection'
-import {
-  ReactDesignRenderer,
-  createReactDesignDefinitionRegistry,
-} from '../../../src/canvas/react-design-renderer'
+import type { Viewport } from '../../../src/canvas/core'
 import {
   createFigmaDesignDocument,
 } from './design-document'
@@ -66,16 +53,6 @@ const FIGMA_FIT_PADDING = 48
 const FIGMA_MIN_SCALE = 0.15
 const FIGMA_MAX_SCALE = 3
 
-type FigmaViewportMemory = {
-  read: () => Viewport
-  write: (viewport: Viewport) => void
-}
-
-type FigmaStageMemory = {
-  read: () => HTMLElement | null
-  write: (element: HTMLElement | null) => void
-}
-
 type FigmaPanSession = {
   readonly clientX: number
   readonly clientY: number
@@ -87,20 +64,28 @@ export function FigmaCloneApp() {
   const panSessionRef = useRef<FigmaPanSession | null>(null)
   const stageRef = useRef<HTMLElement | null>(null)
   const lastFittedRootIdRef = useRef<DesignNodeId | null>(null)
-  const [document] = useState(createFigmaDesignDocument)
-  const [viewportMemory] = useState(createFigmaViewportMemory)
-  const [stageMemory] = useState(createFigmaStageMemory)
-  const [viewport, setViewportState] = useState(viewportMemory.read)
-  const [projection] = useState(() => createDomProjection({
-    getStageElement: stageMemory.read,
-    getViewport: viewportMemory.read,
-  }))
-  const [editor] = useState(() => createFigmaEditor(document, projection))
-  const editorSnapshot = useSyncExternalStore(
-    editor.subscribe,
-    editor.snapshot,
-    editor.snapshot,
-  )
+  const runtime = useReactDesignEditorRuntime({
+    createDocument: createFigmaDesignDocument,
+    createRegistry: createFigmaReactDesignRegistry,
+    viewport: {
+      fitPadding: FIGMA_FIT_PADDING,
+      initial: FIGMA_INITIAL_VIEWPORT,
+      maxScale: FIGMA_MAX_SCALE,
+      minScale: FIGMA_MIN_SCALE,
+    },
+  })
+  const {
+    document,
+    editor,
+    projection,
+    registry,
+    snapshot: editorSnapshot,
+    stage,
+    viewport: viewportRuntime,
+  } = runtime
+  const viewport = viewportRuntime.value
+  const attachRuntimeStage = stage.attach
+  const fitRuntimeNodeIds = viewportRuntime.fitNodeIds
   const projectionRevision = editorSnapshot.revision
   const [affordanceState, setAffordanceState] =
     useState<DomEditAffordanceState>({ mode: 'idle' })
@@ -111,10 +96,6 @@ export function FigmaCloneApp() {
   const toolToolbarRovingFocus = useCanvasToolbarRovingFocus<HTMLDivElement>()
   const viewportToolbarRovingFocus =
     useCanvasToolbarRovingFocus<HTMLDivElement>()
-  const registry = useMemo(() => createReactDesignDefinitionRegistry({
-    definitions: createFigmaReactDefinitions(),
-    intrinsics: FIGMA_REACT_INTRINSICS,
-  }), [])
   const selectedNodeId = editorSnapshot.selection.primaryNodeId
   const selectedRootId = getFigmaRootId(editor, selectedNodeId)
   const initialRootId = editor.read.roots().find((root) =>
@@ -136,7 +117,6 @@ export function FigmaCloneApp() {
   const floatingNote = document.read.node('workspaceFloatingNote')
   const heroActions = document.read.node('workspaceHeroActions')
 
-  useStrictModeSafeEditorRuntimeDisposal(editor, projection)
   useFigmaDomSelectionMirror({
     primaryNodeId: editableSelectedNodeId,
     projection,
@@ -145,72 +125,19 @@ export function FigmaCloneApp() {
 
   const setStageElement = useCallback((element: HTMLElement | null) => {
     stageRef.current = element
-    stageMemory.write(element)
-  }, [stageMemory])
-  const commitViewport = useCallback((nextViewport: Viewport) => {
-    viewportMemory.write(nextViewport)
-    setViewportState(nextViewport)
-  }, [viewportMemory])
+    attachRuntimeStage(element)
+  }, [attachRuntimeStage])
+  const commitViewport = viewportRuntime.set
   const fitNodeIds = useCallback((nodeIds: readonly DesignNodeId[]) => {
-    const stage = stageMemory.read()
-    const bounds = getFigmaMeasuredBounds(projection, nodeIds)
+    const didFit = fitRuntimeNodeIds(nodeIds)
 
-    if (!stage || !bounds) {
-      return false
+    if (didFit) {
+      setViewportFocusNodeId(nodeIds.length === 1 ? nodeIds[0] : null)
     }
 
-    const stageRect = stage.getBoundingClientRect()
-    const availableWidth = Math.max(
-      1,
-      stageRect.width - FIGMA_FIT_PADDING * 2,
-    )
-    const availableHeight = Math.max(
-      1,
-      stageRect.height - FIGMA_FIT_PADDING * 2,
-    )
-    const scale = clampFigmaScale(Math.min(
-      availableWidth / Math.max(1, bounds.w),
-      availableHeight / Math.max(1, bounds.h),
-    ))
-    const contentWidth = bounds.w * scale
-    const contentHeight = bounds.h * scale
-    const targetX = FIGMA_FIT_PADDING + (availableWidth - contentWidth) / 2
-    const targetY = FIGMA_FIT_PADDING + (availableHeight - contentHeight) / 2
-
-    commitViewport({
-      scale,
-      x: targetX - bounds.x * scale,
-      y: targetY - bounds.y * scale,
-    })
-    setViewportFocusNodeId(nodeIds.length === 1 ? nodeIds[0] : null)
-    return true
-  }, [commitViewport, projection, stageMemory])
-  const zoomAtStageCenter = useCallback((factor: number) => {
-    const stage = stageMemory.read()
-
-    if (!stage) {
-      return
-    }
-
-    const stageRect = stage.getBoundingClientRect()
-    const clientPoint = {
-      x: stageRect.left + stageRect.width / 2,
-      y: stageRect.top + stageRect.height / 2,
-    }
-    const worldPoint = projection.clientToWorld(clientPoint)
-
-    if (!worldPoint) {
-      return
-    }
-
-    const scale = clampFigmaScale(viewportMemory.read().scale * factor)
-
-    commitViewport({
-      scale,
-      x: clientPoint.x - stageRect.left - worldPoint.x * scale,
-      y: clientPoint.y - stageRect.top - worldPoint.y * scale,
-    })
-  }, [commitViewport, projection, stageMemory, viewportMemory])
+    return didFit
+  }, [fitRuntimeNodeIds])
+  const zoomAtStageCenter = viewportRuntime.zoomAtStageCenter
   const selectTool = useCallback(() => {
     setTemporaryPan(false)
     setAffordanceState({ mode: 'idle' })
@@ -222,10 +149,6 @@ export function FigmaCloneApp() {
       setTemporaryPan(false)
     }
   }, [])
-
-  useEffect(() => {
-    projection.refresh()
-  }, [projection, viewport])
 
   useEffect(() => {
     const rootId = selectedRootId ?? (
@@ -311,7 +234,7 @@ export function FigmaCloneApp() {
       clientX: event.clientX,
       clientY: event.clientY,
       pointerId: event.pointerId,
-      viewport: viewportMemory.read(),
+      viewport: viewportRuntime.read(),
     }
     event.currentTarget.setPointerCapture(event.pointerId)
     setPanning(true)
@@ -345,36 +268,14 @@ export function FigmaCloneApp() {
     event.preventDefault()
 
     if (!event.ctrlKey && !event.metaKey) {
-      const current = viewportMemory.read()
-
-      commitViewport({
-        ...current,
-        x: current.x - event.deltaX,
-        y: current.y - event.deltaY,
-      })
+      viewportRuntime.panBy({ x: -event.deltaX, y: -event.deltaY })
       return
     }
 
-    const stage = stageMemory.read()
-    const worldPoint = projection.clientToWorld({
-      x: event.clientX,
-      y: event.clientY,
-    })
-
-    if (!stage || !worldPoint) {
-      return
-    }
-
-    const stageRect = stage.getBoundingClientRect()
-    const scale = clampFigmaScale(
-      viewportMemory.read().scale * Math.exp(-event.deltaY * 0.002),
+    viewportRuntime.zoomAtClientPoint(
+      { x: event.clientX, y: event.clientY },
+      Math.exp(-event.deltaY * 0.002),
     )
-
-    commitViewport({
-      scale,
-      x: event.clientX - stageRect.left - worldPoint.x * scale,
-      y: event.clientY - stageRect.top - worldPoint.y * scale,
-    })
   }
   const canvasPanActive = temporaryPan || panning
 
@@ -558,45 +459,11 @@ export function FigmaCloneApp() {
   )
 }
 
-function createFigmaEditor(
-  document: DesignDocument,
-  projection: DomProjection,
-) {
-  return createEditorEngine({ document, projection })
-}
-
 function getFigmaRootId(
   editor: EditorEngine,
   nodeId: DesignNodeId | null,
 ) {
   return nodeId ? editor.read.ancestry(nodeId)[0]?.id ?? null : null
-}
-
-function getFigmaMeasuredBounds(
-  projection: DomProjection,
-  nodeIds: readonly DesignNodeId[],
-): Bounds | null {
-  const bounds = nodeIds.flatMap((nodeId) => {
-    const measurement = projection.measure(nodeId)
-
-    return measurement ? [measurement.worldBounds] : []
-  })
-
-  if (bounds.length === 0) {
-    return null
-  }
-
-  const minX = Math.min(...bounds.map((item) => item.x))
-  const minY = Math.min(...bounds.map((item) => item.y))
-  const maxX = Math.max(...bounds.map((item) => item.x + item.w))
-  const maxY = Math.max(...bounds.map((item) => item.y + item.h))
-
-  return {
-    h: maxY - minY,
-    w: maxX - minX,
-    x: minX,
-    y: minY,
-  }
 }
 
 function useFigmaDomSelectionMirror({
@@ -629,58 +496,11 @@ function useFigmaDomSelectionMirror({
   }, [primaryNodeId, projection, revision])
 }
 
-function useStrictModeSafeEditorRuntimeDisposal(
-  editor: EditorEngine,
-  projection: DomProjection,
-) {
-  const lifetimeRef = useRef({ editor, generation: 0, projection })
-
-  useEffect(() => {
-    const generation = lifetimeRef.current.generation + 1
-
-    lifetimeRef.current = { editor, generation, projection }
-
-    return () => {
-      queueMicrotask(() => {
-        const current = lifetimeRef.current
-
-        if (
-          current.generation === generation ||
-          current.editor !== editor ||
-          current.projection !== projection
-        ) {
-          editor.dispose()
-          projection.dispose()
-        }
-      })
-    }
-  }, [editor, projection])
-}
-
-function createFigmaViewportMemory(): FigmaViewportMemory {
-  let viewport = { ...FIGMA_INITIAL_VIEWPORT }
-
-  return {
-    read: () => viewport,
-    write: (nextViewport) => {
-      viewport = { ...nextViewport }
-    },
-  }
-}
-
-function createFigmaStageMemory(): FigmaStageMemory {
-  let element: HTMLElement | null = null
-
-  return {
-    read: () => element,
-    write: (nextElement) => {
-      element = nextElement
-    },
-  }
-}
-
-function clampFigmaScale(scale: number) {
-  return Math.min(FIGMA_MAX_SCALE, Math.max(FIGMA_MIN_SCALE, scale))
+function createFigmaReactDesignRegistry() {
+  return createReactDesignDefinitionRegistry({
+    definitions: createFigmaReactDefinitions(),
+    intrinsics: FIGMA_REACT_INTRINSICS,
+  })
 }
 
 function formatOptionalNumber(value: number | undefined) {

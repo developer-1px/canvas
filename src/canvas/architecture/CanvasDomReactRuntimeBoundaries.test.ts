@@ -59,6 +59,8 @@ describe('direct DOM React runtime boundaries', () => {
 
     expect(Object.keys(figmaProductEntryModules)).toHaveLength(1)
     expect(runtimeModules.length).toBeGreaterThan(1)
+    expect(source).toContain('useReactDesignEditorRuntime')
+    expect(source).not.toMatch(/\b(?:createDomProjection|createEditorEngine)\b/)
     expect(source).not.toContain('FigmaWorkspaceDesignDocumentProjection')
     expect(source).not.toContain('FigmaCloneDomEditModel')
     expect(source).not.toContain('FigmaCloneDomDocument')

@@ -6,6 +6,12 @@ import {
   FigJamStickyNote,
   FigJamStickyNoteFallback,
 } from './FigJamStickyNoteViews'
+import {
+  cloneDesignProps,
+  createFigJamAbsoluteWidgetNode,
+  type FigJamPlacementInput,
+  type FigJamSizeInput,
+} from './FigJamWidgetPrimitives'
 
 export const FIGJAM_STICKY_NOTE_DEFINITION_ID = 'figjam.sticky-note'
 
@@ -24,6 +30,12 @@ export type FigJamStickyNoteProps = {
   readonly tone: FigJamStickyNoteTone
 }
 
+export type CreateFigJamStickyNoteNodeInput = FigJamPlacementInput &
+  FigJamSizeInput & {
+    readonly text?: string
+    readonly tone?: FigJamStickyNoteTone
+  }
+
 export const FIGJAM_STICKY_NOTE_DEFAULT_PROPS = Object.freeze({
   position: 'absolute',
   tone: 'yellow',
@@ -37,28 +49,7 @@ export const FIGJAM_STICKY_NOTE_DEFINITION =
       defaults: FIGJAM_STICKY_NOTE_DEFAULT_PROPS,
       safeParse: parseFigJamStickyNoteProps,
     },
-    create: ({ nodeId, x, y }) => ({
-      id: nodeId,
-      label: 'Sticky note',
-      definition: {
-        id: FIGJAM_STICKY_NOTE_DEFINITION_ID,
-        kind: 'widget',
-      },
-      children: [],
-      props: FIGJAM_STICKY_NOTE_DEFAULT_PROPS,
-      text: 'Write something…',
-      layout: {
-        x,
-        y,
-        w: 180,
-        h: 140,
-        widthMode: 'fixed',
-        heightMode: 'fixed',
-      },
-      style: {},
-      frame: null,
-      component: null,
-    }),
+    create: ({ nodeId, x, y }) => createFigJamStickyNoteNode({ nodeId, x, y }),
     capabilities: {
       textEdit: {
         source: 'node-text',
@@ -73,7 +64,38 @@ export const FIGJAM_STICKY_NOTE_DEFINITION =
     fallback: FigJamStickyNoteFallback,
   })
 
-function parseFigJamStickyNoteProps(value: unknown) {
+export function createFigJamStickyNoteNode({
+  height = 140,
+  nodeId,
+  text = 'Write something…',
+  tone = FIGJAM_STICKY_NOTE_DEFAULT_PROPS.tone,
+  width = 180,
+  x,
+  y,
+}: CreateFigJamStickyNoteNodeInput) {
+  const parsed = parseFigJamStickyNoteProps({
+    position: 'absolute',
+    tone,
+  })
+
+  if (!parsed.ok) {
+    throw new Error(parsed.reason)
+  }
+
+  return createFigJamAbsoluteWidgetNode({
+    definitionId: FIGJAM_STICKY_NOTE_DEFINITION_ID,
+    height,
+    label: 'Sticky note',
+    nodeId,
+    props: cloneDesignProps(parsed.value),
+    text,
+    width,
+    x,
+    y,
+  })
+}
+
+export function parseFigJamStickyNoteProps(value: unknown) {
   if (
     isJSONObject(value) &&
     value.position === 'absolute' &&

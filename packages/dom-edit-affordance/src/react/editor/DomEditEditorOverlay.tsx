@@ -36,6 +36,8 @@ import {
 
 export function DomEditEditorOverlay({
   affordanceState: controlledAffordanceState,
+  canvasSelection = true,
+  draggable = true,
   editor,
   frameGuides,
   isCanvasPanActive,
@@ -43,8 +45,11 @@ export function DomEditEditorOverlay({
   onAffordanceStateChange,
   shellRef,
   viewport,
+  resizable = true,
 }: {
   readonly affordanceState?: DomEditAffordanceState
+  readonly canvasSelection?: boolean
+  readonly draggable?: boolean
   readonly editor: EditorEngine
   readonly frameGuides?: DomEditFrameGuideConfig<string> | null
   readonly isCanvasPanActive: boolean
@@ -52,6 +57,7 @@ export function DomEditEditorOverlay({
   readonly onAffordanceStateChange?: (state: DomEditAffordanceState) => void
   readonly shellRef: RefObject<HTMLElement | null>
   readonly viewport: DomEditViewport
+  readonly resizable?: boolean
 }) {
   const model = useDomEditEditorModel(editor)
   const [internalAffordanceState, setInternalAffordanceState] =
@@ -72,6 +78,7 @@ export function DomEditEditorOverlay({
 
   useDomEditEditorCanvasSelection({
     editor,
+    enabled: canvasSelection,
     isCanvasPanActive,
     shellRef,
   })
@@ -81,9 +88,11 @@ export function DomEditEditorOverlay({
       adapter={model.adapter}
       affordanceState={affordanceState}
       directManipulation={directManipulation}
+      draggable={draggable}
       frameGuides={frameGuides}
       isCanvasPanActive={isCanvasPanActive}
       selectedNodeId={selectedNodeId}
+      resizable={resizable}
       shellRef={shellRef}
       state={model.state}
       viewport={viewport}
@@ -190,14 +199,20 @@ function readDomEditPreviewLabel(
 
 function useDomEditEditorCanvasSelection({
   editor,
+  enabled,
   isCanvasPanActive,
   shellRef,
 }: {
   readonly editor: EditorEngine
+  readonly enabled: boolean
   readonly isCanvasPanActive: boolean
   readonly shellRef: RefObject<HTMLElement | null>
 }) {
   useEffect(() => {
+    if (!enabled) {
+      return undefined
+    }
+
     const shell = shellRef.current
 
     if (!shell) {
@@ -231,7 +246,7 @@ function useDomEditEditorCanvasSelection({
     return () => {
       shell.removeEventListener('click', selectFromCanvas, true)
     }
-  }, [editor, isCanvasPanActive, shellRef])
+  }, [editor, enabled, isCanvasPanActive, shellRef])
 }
 
 function isDomEditEditorControlTarget(target: EventTarget | null) {

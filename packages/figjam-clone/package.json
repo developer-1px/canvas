@@ -1,0 +1,23 @@
+{
+  "name": "@interactive-os/figjam-clone",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./style.css": "./src/FigJamCloneApp.css"
+  },
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "dependencies": {
+    "@interactive-os/dom-edit-affordance": "workspace:*",
+    "@interactive-os/figjam-pack": "workspace:*",
+    "lucide-react": "^1.16.0"
+  },
+  "peerDependencies": {
+    "@interactive-os/canvas": "^0.1.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  }
+}

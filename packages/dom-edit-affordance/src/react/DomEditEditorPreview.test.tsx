@@ -14,6 +14,7 @@ vi.mock('react-moveable', async () => {
 
   type MockMoveableProps = {
     readonly className?: string
+    readonly draggable?: boolean
     readonly onDrag: (event: {
       beforeTranslate: number[]
       datas: Record<string, unknown>
@@ -26,6 +27,7 @@ vi.mock('react-moveable', async () => {
       datas: Record<string, unknown>
       set(value: number[]): void
     }) => void
+    readonly resizable?: boolean
   }
 
   const MockMoveable = React.forwardRef<
@@ -37,7 +39,11 @@ vi.mock('react-moveable', async () => {
     React.useImperativeHandle(ref, () => ({ updateRect() {} }))
 
     return (
-      <div className={props.className}>
+      <div
+        className={props.className}
+        data-draggable={String(props.draggable)}
+        data-resizable={String(props.resizable)}
+      >
         <button
           aria-label="Test drag start"
           type="button"
@@ -111,15 +117,22 @@ describe('DomEditEditor direct manipulation', () => {
     await act(async () => reactRoot.render(
       <DomEditEditorOverlay
         affordanceState={{ mode: 'hover-property', property: 'geometry' }}
+        draggable
         editor={fixture.editor}
         isCanvasPanActive={false}
         shellRef={{ current: fixture.stage }}
         viewport={{ scale: 1, x: 0, y: 0 }}
+        resizable={false}
       />,
     ))
     await flushAnimationFrames(animationFrames)
 
     const initialSerialized = fixture.document.serialize()
+
+    const moveable = container.querySelector('.figma-dom-moveable')
+
+    expect(moveable?.getAttribute('data-draggable')).toBe('true')
+    expect(moveable?.getAttribute('data-resizable')).toBe('false')
 
     await clickButton(container, 'Test drag start')
     await clickButton(container, 'Test drag move')

@@ -53,8 +53,12 @@ describe('ReactDesignRenderer', () => {
       definitions: [{
         id: 'sales-card',
         kind: 'component',
-        render: ({ children, rootProps }) => (
-          <article {...rootProps} data-component="sales-card">
+        render: ({ children, read, rootProps }) => (
+          <article
+            {...rootProps}
+            data-component="sales-card"
+            data-related-title={read.node('title')?.text ?? undefined}
+          >
             {children}
           </article>
         ),
@@ -70,7 +74,8 @@ describe('ReactDesignRenderer', () => {
 
     expect(markup).toContain(
       '<article class="page" data-design-node-id="page" ' +
-      'data-design-definition-id="sales-card" data-component="sales-card">',
+      'data-design-definition-id="sales-card" data-component="sales-card" ' +
+      'data-related-title="Canonical title">',
     )
     expect(markup).toContain('Canonical title</h1></article>')
   })

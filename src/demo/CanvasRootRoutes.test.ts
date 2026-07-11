@@ -16,7 +16,7 @@ describe('CanvasRootRoutes', () => {
     expect(resolveCanvasRootRoute({ pathname: '/figma', search: '' }))
       .toBe('figma')
     expect(resolveCanvasRootRoute({ pathname: '/figjam-widgets', search: '' }))
-      .toBe('figjam-widgets')
+      .toBe('launcher')
     expect(resolveCanvasRootRoute({ pathname: '/engine', search: '' }))
       .toBe('engine')
   })

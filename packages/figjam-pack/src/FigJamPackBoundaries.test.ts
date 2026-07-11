@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { FIGJAM_PRODUCT_DEFINITIONS } from './index'
 
 const productionModules = import.meta.glob([
   './*.ts',
@@ -17,6 +18,18 @@ const packageModules = import.meta.glob('../package.json', {
   query: '?raw',
 }) as Record<string, string>
 
+const canonicalEngineModules = import.meta.glob([
+  '../../../src/canvas/editor-engine/*.ts',
+  '../../../src/canvas/react-design-renderer/*.ts',
+  '../../../src/canvas/react-design-renderer/*.tsx',
+  '../../../src/canvas/app/**/*.ts',
+  '../../../src/canvas/app/**/*.tsx',
+], {
+  eager: true,
+  import: 'default',
+  query: '?raw',
+}) as Record<string, string>
+
 describe('FigJam pack boundaries', () => {
   it('depends only on the public React design authoring facade', () => {
     const source = Object.values(productionModules).join('\n')
@@ -24,13 +37,26 @@ describe('FigJam pack boundaries', () => {
       .map(([, specifier]) => specifier)
       .filter((specifier) => !specifier.startsWith('.'))
 
-    expect(Object.keys(productionModules)).toHaveLength(6)
-    expect([...new Set(bareImports)]).toEqual([
+    expect(Object.keys(productionModules).length).toBeGreaterThanOrEqual(18)
+    expect(new Set(bareImports)).toEqual(new Set([
       '@interactive-os/canvas/react-design',
-    ])
+      'react',
+    ]))
     expect(source).not.toMatch(
-      /\bCanvasItem\b|foreignObject|src\/demo|canvas\/(?:app|entities|host)/,
+      /\bCanvasItem\b|<canvas|foreignObject|src\/demo|canvas\/(?:app|entities|host)/,
     )
+  })
+
+  it('keeps family ids and the private pack out of canonical engine switches', () => {
+    const source = Object.values(canonicalEngineModules).join('\n')
+    const familyIds = new RegExp(
+      FIGJAM_PRODUCT_DEFINITIONS
+        .map(({ id }) => id.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+        .join('|'),
+    )
+
+    expect(source).not.toMatch(familyIds)
+    expect(source).not.toContain('@interactive-os/figjam-pack')
   })
 
   it('publishes only the private pack entry and its existing-token styles', () => {
