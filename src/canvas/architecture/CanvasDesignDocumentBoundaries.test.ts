@@ -58,7 +58,7 @@ const forbiddenDesignDocumentGlobalNames = new Set([
 ])
 
 describe('Canvas DesignDocument boundaries', () => {
-  it('keeps the canonical graph private until a public facade decision', () => {
+  it('exposes the canonical graph through only the React design facade', () => {
     const packageEntry = getSourceFile('src/canvas/index.ts')
     const privateImports = getImportReferences(packageEntry)
       .filter((reference) =>
@@ -67,6 +67,17 @@ describe('Canvas DesignDocument boundaries', () => {
       )
 
     expect(privateImports).toEqual([])
+    expect(
+      getImportReferences(getSourceFile('src/canvas/react-design/index.ts'))
+        .filter((reference) =>
+          reference.target === 'src/canvas/design-document' ||
+          reference.target.startsWith('src/canvas/design-document/'),
+        )
+        .map((reference) => reference.target),
+    ).toEqual([
+      'src/canvas/design-document',
+      'src/canvas/design-document',
+    ])
   })
 
   it('keeps the future canonical graph independent from UI, products, renderers, and the legacy item model', () => {

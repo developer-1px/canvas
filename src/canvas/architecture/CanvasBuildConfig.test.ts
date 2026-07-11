@@ -54,6 +54,7 @@ describe('Canvas build config', () => {
         '/^@interactive-os\\/canvas\\/entities$/',
         '/^@interactive-os\\/canvas\\/foundation$/',
         '/^@interactive-os\\/canvas\\/host$/',
+        '/^@interactive-os\\/canvas\\/react-design$/',
         '/^@interactive-os\\/canvas\\/renderer$/',
         '/^@interactive-os\\/canvas\\/style\\.css$/',
       ])
@@ -68,6 +69,7 @@ describe('Canvas build config', () => {
         expect.stringContaining('src/canvas/entities/index.ts'),
         expect.stringContaining('src/canvas/foundation/index.ts'),
         expect.stringContaining('src/canvas/host/index.ts'),
+        expect.stringContaining('src/canvas/react-design/index.ts'),
         expect.stringContaining('src/canvas/renderer/index.ts'),
         expect.stringContaining('src/canvas/app/shell/CanvasApp.css'),
       ])

@@ -9,6 +9,7 @@ import * as CanvasFoundation from '../foundation'
 import * as CanvasEngine from '../engine'
 import * as CanvasEntities from '../entities'
 import * as CanvasHost from '../host'
+import * as CanvasReactDesign from '../react-design'
 import * as CanvasRenderer from '../renderer'
 
 describe('Canvas package public surface', () => {
@@ -22,6 +23,7 @@ describe('Canvas package public surface', () => {
     foundation: CanvasFoundation,
     host: CanvasHost,
     package: CanvasPackage,
+    reactDesign: CanvasReactDesign,
     renderer: CanvasRenderer,
   } as const
 

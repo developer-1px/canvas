@@ -13,6 +13,12 @@
     "paths": {
       "@interactive-os/canvas/editor": [
         "./src/canvas/editor-engine/index.ts"
+      ],
+      "@interactive-os/canvas/react-design": [
+        "./src/canvas/react-design/index.ts"
+      ],
+      "@interactive-os/figjam-pack": [
+        "./packages/figjam-pack/src/index.ts"
       ]
     },
     "verbatimModuleSyntax": true,
@@ -33,6 +39,7 @@
     "packages/canvas-pack-devtools/src",
     "packages/dom-edit-affordance/src",
     "packages/slide-edit-affordance/src",
-    "packages/figma-clone/src"
+    "packages/figma-clone/src",
+    "packages/figjam-pack/src"
   ]
 }

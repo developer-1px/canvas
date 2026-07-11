@@ -741,6 +741,16 @@ exports[`Canvas package public surface > snapshots facade runtime value exports 
     "CanvasHost",
     "CanvasRenderer",
   ],
+  "reactDesign": [
+    "ReactDesignRenderer",
+    "createDesignDocument",
+    "createDomProjection",
+    "createReactDesignDefinitionRegistry",
+    "createReactDesignNodeDomProps",
+    "createReactDesignWidgetPack",
+    "defineReactDesignWidget",
+    "restoreDesignDocument",
+  ],
   "renderer": [
     "CANVAS_SVG_ARROW_MARKER_ID",
     "CANVAS_SVG_ARROW_MARKER_IRI",
