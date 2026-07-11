@@ -6,13 +6,27 @@ import {
   type DesignNode,
   type DesignNodeComponentBinding,
 } from '../../../../src/canvas/design-document'
-import type {
-  FigmaCloneDomEditNodeState,
-} from '../dom-edit/FigmaCloneDomEditModel'
 import {
   FIGMA_WORKSPACE_COMPONENT_METADATA,
   type FigmaWorkspaceDesignNodeId,
 } from './FigmaWorkspaceComponentMetadata'
+import {
+  normalizeFigmaDesignNodeState,
+  type FigmaDesignNodeState,
+} from './FigmaDesignDocumentSeedTypes'
+import {
+  FIGMA_HOME_DESIGN_DOCUMENT_NODES,
+  type FigmaHomeDesignNodeId,
+} from './FigmaHomeDesignDocumentSeed'
+import {
+  FIGMA_WIDGET_DESIGN_DOCUMENT_NODE,
+  type FigmaWidgetDesignNodeId,
+} from './FigmaWidgetDesignDocumentSeed'
+
+export type FigmaDesignNodeId =
+  | FigmaWorkspaceDesignNodeId
+  | FigmaHomeDesignNodeId
+  | FigmaWidgetDesignNodeId
 
 type FigmaWorkspaceNodeSeed = {
   readonly children?: readonly FigmaWorkspaceNodeSeed[]
@@ -478,7 +492,7 @@ const WORKSPACE_AUTHORED_PROPS: Partial<Record<
   workspaceUpgrade: { className: 'figma-dom-workspace__usage' },
 }
 
-const EMPTY_STYLE: FigmaCloneDomEditNodeState = {
+const EMPTY_STYLE: FigmaDesignNodeState = {
   align: 'stretch',
   alignSelf: 'auto',
   direction: 'column',
@@ -522,7 +536,7 @@ const HUG_AUTO_LAYOUT_FRAME = {
 
 const HUG_BOX_LAYOUT = HUG_AUTO_LAYOUT_FRAME
 
-const TEXT_LEAF_STYLE: FigmaCloneDomEditNodeState = {
+const TEXT_LEAF_STYLE: FigmaDesignNodeState = {
   ...EMPTY_STYLE,
   ...HUG_BOX_LAYOUT,
   h: 18,
@@ -1014,7 +1028,7 @@ const WORKSPACE_NODE_STATES = mapWorkspaceNodeStates({
     ...TEXT_LEAF_STYLE,
     widthMode: 'fill',
   },
-} satisfies Record<FigmaWorkspaceDesignNodeId, FigmaCloneDomEditNodeState>)
+} satisfies Record<FigmaWorkspaceDesignNodeId, FigmaDesignNodeState>)
 
 const WORKSPACE_TEXT = {
   workspaceActivityHeader: 'Activity',
@@ -1064,8 +1078,22 @@ export const FIGMA_WORKSPACE_DESIGN_DOCUMENT_SNAPSHOT = deepFreeze({
   nodes: flattenWorkspaceNodes(WORKSPACE_TREE),
 } satisfies DesignDocumentSnapshot)
 
-export function createFigmaWorkspaceDesignDocument(): DesignDocument {
-  return createDesignDocument(FIGMA_WORKSPACE_DESIGN_DOCUMENT_SNAPSHOT)
+export const FIGMA_DESIGN_DOCUMENT_SNAPSHOT = deepFreeze({
+  schemaVersion: 1,
+  roots: [
+    FIGMA_WIDGET_DESIGN_DOCUMENT_NODE.id,
+    'workspacePage',
+    'homePage',
+  ],
+  nodes: [
+    FIGMA_WIDGET_DESIGN_DOCUMENT_NODE,
+    ...FIGMA_WORKSPACE_DESIGN_DOCUMENT_SNAPSHOT.nodes,
+    ...FIGMA_HOME_DESIGN_DOCUMENT_NODES,
+  ],
+} satisfies DesignDocumentSnapshot)
+
+export function createFigmaDesignDocument(): DesignDocument {
+  return createDesignDocument(FIGMA_DESIGN_DOCUMENT_SNAPSHOT)
 }
 
 function flattenWorkspaceNodes(
@@ -1153,36 +1181,14 @@ function getWorkspaceComponentBinding(
 }
 
 function mapWorkspaceNodeStates(
-  states: Record<FigmaWorkspaceDesignNodeId, FigmaCloneDomEditNodeState>,
-): Record<FigmaWorkspaceDesignNodeId, FigmaCloneDomEditNodeState> {
+  states: Record<FigmaWorkspaceDesignNodeId, FigmaDesignNodeState>,
+): Record<FigmaWorkspaceDesignNodeId, FigmaDesignNodeState> {
   return Object.fromEntries(
     Object.entries(states).map(([nodeId, state]) => [
       nodeId,
-      normalizeWorkspaceNodeState(state),
+      normalizeFigmaDesignNodeState(state),
     ]),
-  ) as Record<FigmaWorkspaceDesignNodeId, FigmaCloneDomEditNodeState>
-}
-
-function normalizeWorkspaceNodeState(
-  state: FigmaCloneDomEditNodeState,
-): FigmaCloneDomEditNodeState {
-  const hasOnlyLegacyUniformPadding = state.padding !== 0 &&
-    state.paddingBottom === 0 &&
-    state.paddingLeft === 0 &&
-    state.paddingRight === 0 &&
-    state.paddingTop === 0
-
-  if (!hasOnlyLegacyUniformPadding) {
-    return { ...state }
-  }
-
-  return {
-    ...state,
-    paddingBottom: state.padding,
-    paddingLeft: state.padding,
-    paddingRight: state.padding,
-    paddingTop: state.padding,
-  }
+  ) as Record<FigmaWorkspaceDesignNodeId, FigmaDesignNodeState>
 }
 
 function deepFreeze<T>(value: T): T {

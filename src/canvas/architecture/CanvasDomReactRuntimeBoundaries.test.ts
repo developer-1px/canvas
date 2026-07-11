@@ -4,7 +4,16 @@ import {
   sourceFiles,
 } from './CanvasArchitectureTestSources'
 
-const directDomProductModules = import.meta.glob(
+const figmaProductEntryModules = import.meta.glob(
+  '../../../packages/figma-clone/src/FigmaCloneApp.tsx',
+  {
+    eager: true,
+    import: 'default',
+    query: '?raw',
+  },
+) as Record<string, string>
+
+const figmaProductSupportModules = import.meta.glob(
   '../../../packages/figma-clone/src/direct-dom/*.{ts,tsx}',
   {
     eager: true,
@@ -37,14 +46,29 @@ describe('direct DOM React runtime boundaries', () => {
     expect(source).not.toContain('/entities/')
   })
 
-  it('keeps the direct Figma product path off the compatibility and SVG runtimes', () => {
-    const source = Object.values(directDomProductModules).join('\n')
+  it('keeps the final Figma runtime off legacy Canvas and compatibility paths', () => {
+    const runtimeModules = Object.entries({
+      ...figmaProductEntryModules,
+      ...figmaProductSupportModules,
+    }).filter(([path]) => !/\.test\.[tj]sx?$/.test(path))
+    const source = runtimeModules.map(([, moduleSource]) => moduleSource)
+      .join('\n')
 
-    expect(Object.keys(directDomProductModules).length).toBeGreaterThan(0)
+    expect(Object.keys(figmaProductEntryModules)).toHaveLength(1)
+    expect(runtimeModules.length).toBeGreaterThan(1)
     expect(source).not.toContain('FigmaWorkspaceDesignDocumentProjection')
     expect(source).not.toContain('FigmaCloneDomEditModel')
+    expect(source).not.toContain('FigmaCloneDomDocument')
+    expect(source).not.toContain('figmaCloneCanvas')
+    expect(source).not.toMatch(
+      /from ['"](?:\.\.?\/)+(?:dom-edit|dom-editor|figmaCloneCanvas)/,
+    )
     expect(source).not.toMatch(/\bCanvasApp\b/)
     expect(source).not.toMatch(/\bCanvasItem\b/)
+    expect(source).not.toMatch(
+      /\b(?:createFigmaCloneCanvas(?:Items|Modules)|createFigmaCloneDomEditAdapter|projectFigmaWorkspaceDesignDocument|routeFigmaWorkspaceOwned(?:Edit|SectionEdit))\b/,
+    )
+    expect(source).not.toMatch(/getFigmaClone(?:SelectedCanvasItemId|CanvasItemIdForNode|DomCanvasFrameItemId)/)
     expect(source).not.toContain('foreignObject')
     expect(source).not.toMatch(/<svg\b/)
   })

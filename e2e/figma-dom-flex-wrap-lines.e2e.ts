@@ -12,11 +12,11 @@ test('shows flex-wrap line guides and line gap values', async ({ page }) => {
   await expect(flexWrapLineGapLabel(page)).toContainText(/row gap \d+/)
   await expectLineContainsNode(
     flexWrapLine(page).nth(0),
-    page.locator('[data-figma-dom-node="workspaceAudienceTagEnterprise"]'),
+    page.locator('[data-design-node-id="workspaceAudienceTagEnterprise"]'),
   )
   await expectLineContainsNode(
     flexWrapLine(page).nth(1),
-    page.locator('[data-figma-dom-node="workspaceAudienceTagExpansion"]'),
+    page.locator('[data-design-node-id="workspaceAudienceTagExpansion"]'),
   )
 
   await selectLayer(page, 'Select layer Hero actions', 'workspaceHeroActions')
@@ -27,11 +27,11 @@ test('shows flex-wrap line guides and line gap values', async ({ page }) => {
   await page.getByRole('button', { name: 'Zoom in' }).click()
   await expectLineContainsNode(
     flexWrapLine(page).nth(0),
-    page.locator('[data-figma-dom-node="workspaceAudienceTagRenewal"]'),
+    page.locator('[data-design-node-id="workspaceAudienceTagRenewal"]'),
   )
   await expectLineContainsNode(
     flexWrapLine(page).nth(1),
-    page.locator('[data-figma-dom-node="workspaceAudienceTagRisk"]'),
+    page.locator('[data-design-node-id="workspaceAudienceTagRisk"]'),
   )
 })
 
@@ -41,7 +41,7 @@ async function selectLayer(
   nodeId: string,
 ) {
   await page.getByRole('button', { name: buttonName }).click()
-  await expect(page.locator(`[data-figma-dom-node="${nodeId}"]`))
+  await expect(page.locator(`[data-design-node-id="${nodeId}"]`))
     .toHaveAttribute('data-selected', 'true')
 }
 

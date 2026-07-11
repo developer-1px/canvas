@@ -63,7 +63,7 @@ test('scales padding bands and keeps gap/padding active states exclusive', async
   await selectLayer(page, 'Select layer Main area', 'workspaceMain')
 
   const initialPaddingHeight = await readBoxHeight(sideHandle(page, 'top'))
-  await page.getByRole('spinbutton', { name: 'CSS padding' }).fill('36')
+  await page.getByRole('spinbutton', { name: 'Pad' }).fill('36')
   await expect.poll(() => readBoxHeight(sideHandle(page, 'top')))
     .toBeGreaterThan(initialPaddingHeight + 2)
 
@@ -87,7 +87,7 @@ async function selectLayer(
   nodeId: string,
 ) {
   await page.getByRole('button', { name: buttonName }).click()
-  await expect(page.locator(`[data-figma-dom-node="${nodeId}"]`))
+  await expect(page.locator(`[data-design-node-id="${nodeId}"]`))
     .toHaveAttribute('data-selected', 'true')
 }
 
@@ -126,17 +126,18 @@ async function readBoxHeight(locator: Locator) {
 }
 
 async function readFlexDirection(page: Page, nodeId: string) {
-  return page.locator(`[data-figma-dom-node="${nodeId}"]`).evaluate((element) =>
+  return page.locator(`[data-design-node-id="${nodeId}"]`).evaluate((element) =>
     getComputedStyle(element).flexDirection)
 }
 
 async function readFlexGap(page: Page, nodeId: string) {
-  return page.locator(`[data-figma-dom-node="${nodeId}"]`).evaluate((element) =>
+  return page.locator(`[data-design-node-id="${nodeId}"]`).evaluate((element) =>
     Number.parseFloat(getComputedStyle(element).rowGap))
 }
 
 function horizontalDirection(page: Page) {
-  return page.getByRole('radio', { name: 'Horizontal auto layout' })
+  return page.getByRole('radiogroup', { name: 'Direction' })
+    .getByRole('radio', { exact: true, name: 'H' })
 }
 
 function sideHandle(page: Page, side: 'bottom' | 'left' | 'right' | 'top') {
@@ -144,5 +145,6 @@ function sideHandle(page: Page, side: 'bottom' | 'left' | 'right' | 'top') {
 }
 
 function verticalDirection(page: Page) {
-  return page.getByRole('radio', { name: 'Vertical auto layout' })
+  return page.getByRole('radiogroup', { name: 'Direction' })
+    .getByRole('radio', { exact: true, name: 'V' })
 }

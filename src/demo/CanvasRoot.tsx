@@ -2,10 +2,7 @@ import { CanvasAppLauncher } from './CanvasAppLauncher'
 import { resolveCanvasRootRoute } from './CanvasRootRoutes'
 import { CanvasEngineDemoApp } from './CanvasEngineDemoApp'
 import { DEMO_CANVAS_APP_ASSEMBLY_INPUT } from './CanvasDemoAssembly'
-import {
-  FigmaCloneApp,
-  FigmaCloneDirectDomShadowApp,
-} from '../../packages/figma-clone/src'
+import { FigmaCloneApp } from '../../packages/figma-clone/src'
 
 export function CanvasRoot() {
   const route = typeof window === 'undefined'
@@ -17,10 +14,6 @@ export function CanvasRoot() {
 
   if (route === 'figma') {
     return <FigmaCloneApp />
-  }
-
-  if (route === 'figma-dom') {
-    return <FigmaCloneDirectDomShadowApp />
   }
 
   if (route === 'engine' || route === 'figjam') {

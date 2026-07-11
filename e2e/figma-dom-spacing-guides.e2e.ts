@@ -50,13 +50,15 @@ test('keeps equal spacing labels stable under zoom and pan', async ({
   await expect(spacingLabel(cssGapEqualSpacing.first())).toHaveText(labelText)
 
   await page.keyboard.press('h')
-  await expect(page.locator('.canvas-stage')).toHaveAttribute(
+  await expect(page.locator('.figma-direct-dom__stage')).toHaveAttribute(
     'data-mode',
     'pan',
   )
   await panCanvas(page, { x: 56, y: 28 })
   await expect(spacingLabel(cssGapEqualSpacing.first())).toHaveText(labelText)
   await page.keyboard.press('v')
+  await expect(page.locator('.figma-direct-dom__stage'))
+    .toHaveAttribute('data-mode', 'select')
 })
 
 test('marks margin-derived equal spacing without adding margin handles', async ({
@@ -65,7 +67,7 @@ test('marks margin-derived equal spacing without adding margin handles', async (
   await page.goto('/?demo=figma')
   await selectLayer(page, 'Select layer Workspace page', 'workspacePage')
   await selectLayer(page, 'Select layer Deal row 1', 'workspaceDealOne')
-  await page.getByRole('spinbutton', { name: 'CSS margin' }).fill('10')
+  await page.getByRole('spinbutton', { name: 'Mar' }).fill('10')
   await page.getByRole('button', { name: 'Measure tool' }).click()
 
   const marginDistance = spacingGuide(page, {
@@ -94,7 +96,9 @@ async function panCanvas(
   page: Page,
   delta: { x: number; y: number },
 ) {
-  const stageBox = await getRequiredBox(page.locator('.canvas-stage'))
+  const stageBox = await getRequiredBox(
+    page.locator('.figma-direct-dom__stage'),
+  )
   const x = stageBox.x + 120
   const y = stageBox.y + 120
 
@@ -121,7 +125,7 @@ async function readRequiredText(locator: Locator) {
 }
 
 function domNode(page: Page, nodeId: string) {
-  return page.locator(`[data-figma-dom-node="${nodeId}"]`)
+  return page.locator(`[data-design-node-id="${nodeId}"]`)
 }
 
 function spacingGuide(

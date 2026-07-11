@@ -52,7 +52,7 @@ test('shows margin outside selected bounds without mixing with container gap', a
   await selectLayer(page, 'Select layer Workspace page', 'workspacePage')
   await selectLayer(page, 'Select layer Deal row 1', 'workspaceDealOne')
 
-  await page.getByRole('spinbutton', { name: 'CSS margin' }).fill('10')
+  await page.getByRole('spinbutton', { name: 'Mar' }).fill('10')
   await expect(marginGhost(page)).toHaveCount(4)
   await expectMarginOutsideSelection(page, 'workspaceDealOne')
 
@@ -87,7 +87,7 @@ async function selectLayer(
   nodeId: string,
 ) {
   await page.getByRole('button', { name: buttonName }).click()
-  await expect(page.locator(`[data-figma-dom-node="${nodeId}"]`))
+  await expect(page.locator(`[data-design-node-id="${nodeId}"]`))
     .toHaveAttribute('data-selected', 'true')
 }
 
@@ -196,7 +196,7 @@ function marginGhostSide(
 }
 
 function selectedNode(page: Page, nodeId: string) {
-  return page.locator(`[data-figma-dom-node="${nodeId}"]`)
+  return page.locator(`[data-design-node-id="${nodeId}"]`)
 }
 
 function sizeOption(page: Page, label: string) {

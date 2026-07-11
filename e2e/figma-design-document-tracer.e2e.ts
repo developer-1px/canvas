@@ -6,7 +6,7 @@ import {
 const EXPECTED_WORKSPACE_PARENTS = createExpectedWorkspaceParents()
 const EXPECTED_WORKSPACE_INTRINSICS = Object.fromEntries(
   FIGMA_WORKSPACE_DESIGN_DOCUMENT_SNAPSHOT.nodes.flatMap((node) =>
-    node.definition.kind === 'intrinsic'
+    node.id.startsWith('workspace') && node.definition.kind === 'intrinsic'
       ? [[node.id, node.definition.id]]
       : []),
 )
@@ -22,7 +22,7 @@ test('keeps the migrated workspace canonical across edit, history, and page swit
   })
   const search = layers.getByRole('searchbox', { name: 'Search layers' })
 
-  await expect(page.locator('[data-figma-dom-node^="workspace"]'))
+  await expect(page.locator('[data-design-node-id^="workspace"]'))
     .toHaveCount(65)
   await layers.getByRole('button', { name: 'Select layer Workspace page' })
     .click()
@@ -40,11 +40,12 @@ test('keeps the migrated workspace canonical across edit, history, and page swit
     .click()
 
   const revenueLabel = page.locator(
-    '[data-figma-dom-node="workspaceStatRevenueLabel"]',
+    '[data-design-node-id="workspaceStatRevenueLabel"]',
   )
-  const textEditor = inspector.getByLabel('CSS text content')
+  const textEditor = inspector.getByLabel('Text')
 
-  await expect(revenueLabel).toHaveAttribute('data-selected', 'true')
+  await expect(page.locator('.figma-clone'))
+    .toHaveAttribute('data-selected-node-id', 'workspaceStatRevenueLabel')
   await expect(textEditor).toHaveValue('Revenue')
   await textEditor.fill('Canonical revenue')
   await expect(revenueLabel).toContainText('Canonical revenue')
@@ -59,9 +60,11 @@ test('keeps the migrated workspace canonical across edit, history, and page swit
     '[data-figma-layer-node-id="workspaceHeroActions"]',
   )
   await heroActionsLayer.click()
-  await inspector.getByLabel('CSS flex-direction').selectOption('column')
+  await inspector.getByRole('radiogroup', { name: 'Direction' })
+    .getByRole('radio', { name: 'V', exact: true })
+    .click()
   await expect(page.locator(
-    '[data-figma-dom-node="workspaceHeroActions"]',
+    '[data-design-node-id="workspaceHeroActions"]',
   )).toHaveCSS('flex-direction', 'column')
 
   await search.fill('')
@@ -80,24 +83,24 @@ test('keeps the migrated workspace canonical across edit, history, and page swit
 
   await page.keyboard.press(`${primaryModifier()}+Z`)
   await expect(page.locator(
-    '[data-figma-dom-node="workspaceHeroActions"]',
+    '[data-design-node-id="workspaceHeroActions"]',
   )).toHaveCSS('flex-direction', 'row')
   await expect(heroActionsLayer.locator('xpath=..'))
     .toHaveAttribute('aria-selected', 'true')
 
   await page.keyboard.press(`${primaryModifier()}+Shift+Z`)
   await expect(page.locator(
-    '[data-figma-dom-node="workspaceHeroActions"]',
+    '[data-design-node-id="workspaceHeroActions"]',
   )).toHaveCSS('flex-direction', 'column')
 
   await search.fill('revenue label')
   await layers.getByRole('button', { name: 'Select layer Revenue label' })
     .click()
-  await expect(inspector.getByLabel('CSS text content'))
+  await expect(inspector.getByLabel('Text'))
     .toHaveValue('Canonical revenue')
 })
 
-test('keeps workspace frame settings separate from the legacy page', async ({
+test('keeps canonical page frame settings independent', async ({
   page,
 }) => {
   await page.goto('/figma')
@@ -113,24 +116,27 @@ test('keeps workspace frame settings separate from the legacy page', async ({
     name: 'Select Editorial homepage section',
   })
   const workspaceCanvasFrame = page.locator(
-    '[data-canvas-item-id="figma-dom-workspace-frame"]',
+    '[data-design-node-id="workspacePage"]',
   )
+  const frameWidth = inspector.getByRole('heading', { name: 'Viewport' })
+    .locator('..')
+    .getByLabel('W', { exact: true })
 
   await workspaceSection.click()
   const initialCanvasWidth = await workspaceCanvasFrame.evaluate(
     (element) => element.getBoundingClientRect().width,
   )
   await inspector.getByRole('button', { name: /Mobile/ }).click()
-  await expect(inspector.getByLabel('W')).toHaveValue('390')
+  await expect(frameWidth).toHaveValue('390')
   await expect.poll(() => workspaceCanvasFrame.evaluate(
     (element) => element.getBoundingClientRect().width,
   )).toBeLessThan(initialCanvasWidth)
 
   await homeSection.click()
-  await expect(inspector.getByLabel('W')).toHaveValue('1280')
+  await expect(frameWidth).toHaveValue('1280')
 
   await workspaceSection.click()
-  await expect(inspector.getByLabel('W')).toHaveValue('390')
+  await expect(frameWidth).toHaveValue('390')
 })
 
 function primaryModifier() {
@@ -138,14 +144,14 @@ function primaryModifier() {
 }
 
 async function readWorkspaceDomParents(page: Page) {
-  return page.locator('[data-figma-dom-node^="workspace"]').evaluateAll(
+  return page.locator('[data-design-node-id^="workspace"]').evaluateAll(
     (elements) => Object.fromEntries(elements.map((element) => {
-      const nodeId = element.getAttribute('data-figma-dom-node') ?? ''
+      const nodeId = element.getAttribute('data-design-node-id') ?? ''
       const parent = element.parentElement?.closest(
-        '[data-figma-dom-node^="workspace"]',
+        '[data-design-node-id^="workspace"]',
       )
 
-      return [nodeId, parent?.getAttribute('data-figma-dom-node') ?? null]
+      return [nodeId, parent?.getAttribute('data-design-node-id') ?? null]
     })),
   )
 }
@@ -169,9 +175,9 @@ async function readWorkspaceLayerParents(page: Page) {
 }
 
 async function readWorkspaceIntrinsicTags(page: Page) {
-  return page.locator('[data-figma-dom-node^="workspace"]').evaluateAll(
+  return page.locator('[data-design-node-id^="workspace"]').evaluateAll(
     (elements) => Object.fromEntries(elements.map((element) => [
-      element.getAttribute('data-figma-dom-node') ?? '',
+      element.getAttribute('data-design-node-id') ?? '',
       element.tagName.toLowerCase(),
     ])),
   )
@@ -179,13 +185,16 @@ async function readWorkspaceIntrinsicTags(page: Page) {
 
 function createExpectedWorkspaceParents() {
   const parents: Record<string, string | null> = Object.fromEntries(
-    FIGMA_WORKSPACE_DESIGN_DOCUMENT_SNAPSHOT.roots.map((rootId) => [
-      rootId,
-      null,
-    ]),
+    FIGMA_WORKSPACE_DESIGN_DOCUMENT_SNAPSHOT.roots
+      .filter((rootId) => rootId.startsWith('workspace'))
+      .map((rootId) => [rootId, null]),
   )
 
   for (const node of FIGMA_WORKSPACE_DESIGN_DOCUMENT_SNAPSHOT.nodes) {
+    if (!node.id.startsWith('workspace')) {
+      continue
+    }
+
     for (const childId of node.children) {
       parents[childId] = node.id
     }

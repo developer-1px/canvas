@@ -73,7 +73,7 @@ async function selectLayer(
   nodeId: string,
 ) {
   await page.getByRole('button', { name: buttonName }).click()
-  await expect(page.locator(`[data-figma-dom-node="${nodeId}"]`))
+  await expect(page.locator(`[data-design-node-id="${nodeId}"]`))
     .toHaveAttribute('data-selected', 'true')
 }
 
@@ -87,7 +87,7 @@ async function readCursor(locator: Locator) {
 }
 
 async function readFlexGap(page: Page, nodeId: string) {
-  return page.locator(`[data-figma-dom-node="${nodeId}"]`).evaluate((element) =>
+  return page.locator(`[data-design-node-id="${nodeId}"]`).evaluate((element) =>
     getComputedStyle(element).columnGap)
 }
 

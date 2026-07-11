@@ -324,7 +324,9 @@ function readDomEditPosition(
 ): DomEditPosition {
   const node = editor.read.node(nodeId)
   if (node?.frame) {
-    return 'absolute'
+    // A document frame owns world placement, not CSS positioning inside its
+    // rendered page. Treat its content layout as in-flow for affordances.
+    return 'static'
   }
   const position = node?.props.position ||
     readRuntimeStyle(editor, nodeId, 'position')

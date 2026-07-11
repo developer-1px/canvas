@@ -49,7 +49,7 @@ async function selectHeroPanel(page: Page) {
   await page.getByRole('button', { name: 'Select layer Workspace page' })
     .click()
   await page.getByRole('button', { name: 'Select layer Hero panel' }).click()
-  await expect(page.locator('[data-figma-dom-node="workspaceHero"]'))
+  await expect(page.locator('[data-design-node-id="workspaceHero"]'))
     .toHaveAttribute('data-selected', 'true')
 }
 
@@ -86,7 +86,7 @@ async function expectActiveSides(
 }
 
 async function readHeroPadding(page: Page) {
-  return page.locator('[data-figma-dom-node="workspaceHero"]').evaluate(
+  return page.locator('[data-design-node-id="workspaceHero"]').evaluate(
     (element) => {
       const style = getComputedStyle(element)
 

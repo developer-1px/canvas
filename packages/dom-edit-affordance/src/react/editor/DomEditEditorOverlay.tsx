@@ -15,6 +15,9 @@ import {
 import type {
   DomEditAffordanceState,
 } from '../../features/node-selection/DomEditAffordanceVisibility'
+import type {
+  DomEditFrameGuideConfig,
+} from '../features/spatial-inspection/DomEditFrameGuides'
 import type { DomEditViewport } from '../../shared/model/DomEditTypes'
 import type {
   DomEditInteractionAction,
@@ -34,14 +37,18 @@ import {
 export function DomEditEditorOverlay({
   affordanceState: controlledAffordanceState,
   editor,
+  frameGuides,
   isCanvasPanActive,
+  selectedNodeId: controlledSelectedNodeId,
   onAffordanceStateChange,
   shellRef,
   viewport,
 }: {
   readonly affordanceState?: DomEditAffordanceState
   readonly editor: EditorEngine
+  readonly frameGuides?: DomEditFrameGuideConfig<string> | null
   readonly isCanvasPanActive: boolean
+  readonly selectedNodeId?: string | null
   readonly onAffordanceStateChange?: (state: DomEditAffordanceState) => void
   readonly shellRef: RefObject<HTMLElement | null>
   readonly viewport: DomEditViewport
@@ -51,6 +58,9 @@ export function DomEditEditorOverlay({
     useState<DomEditAffordanceState>({ mode: 'idle' })
   const isAffordanceStateControlled = controlledAffordanceState !== undefined
   const affordanceState = controlledAffordanceState ?? internalAffordanceState
+  const selectedNodeId = controlledSelectedNodeId === undefined
+    ? model.selectedNodeId
+    : controlledSelectedNodeId
   const changeAffordanceState = useCallback((state: DomEditAffordanceState) => {
     if (!isAffordanceStateControlled) {
       setInternalAffordanceState(state)
@@ -60,15 +70,20 @@ export function DomEditEditorOverlay({
   }, [isAffordanceStateControlled, onAffordanceStateChange])
   const directManipulation = useDomEditEditorDirectManipulation(editor)
 
-  useDomEditEditorCanvasSelection({ editor, shellRef })
+  useDomEditEditorCanvasSelection({
+    editor,
+    isCanvasPanActive,
+    shellRef,
+  })
 
   return (
     <DomEditSelectionOverlay
       adapter={model.adapter}
       affordanceState={affordanceState}
       directManipulation={directManipulation}
+      frameGuides={frameGuides}
       isCanvasPanActive={isCanvasPanActive}
-      selectedNodeId={model.selectedNodeId}
+      selectedNodeId={selectedNodeId}
       shellRef={shellRef}
       state={model.state}
       viewport={viewport}
@@ -175,9 +190,11 @@ function readDomEditPreviewLabel(
 
 function useDomEditEditorCanvasSelection({
   editor,
+  isCanvasPanActive,
   shellRef,
 }: {
   readonly editor: EditorEngine
+  readonly isCanvasPanActive: boolean
   readonly shellRef: RefObject<HTMLElement | null>
 }) {
   useEffect(() => {
@@ -189,6 +206,7 @@ function useDomEditEditorCanvasSelection({
 
     const selectFromCanvas = (event: MouseEvent) => {
       if (
+        isCanvasPanActive ||
         event.button !== 0 ||
         isDomEditEditorControlTarget(event.target)
       ) {
@@ -213,7 +231,7 @@ function useDomEditEditorCanvasSelection({
     return () => {
       shell.removeEventListener('click', selectFromCanvas, true)
     }
-  }, [editor, shellRef])
+  }, [editor, isCanvasPanActive, shellRef])
 }
 
 function isDomEditEditorControlTarget(target: EventTarget | null) {

@@ -108,7 +108,7 @@ describe('createReactDesignNodeDomProps', () => {
     })
   })
 
-  it('maps frame placement, sizing, rotation, and overflow onto its root', () => {
+  it('maps frame placement and applies overflow only to fixed viewports', () => {
     const node = {
       ...createNode({}),
       frame: {
@@ -126,12 +126,19 @@ describe('createReactDesignNodeDomProps', () => {
     expect(createReactDesignNodeDomProps(node).style).toEqual({
       height: 'fit-content',
       left: 40,
-      overflow: 'hidden',
+      overflow: 'visible',
       position: 'absolute',
       top: 76,
       transform: 'rotate(-5deg)',
       width: 1280,
     })
+    expect(createReactDesignNodeDomProps({
+      ...node,
+      frame: {
+        ...node.frame,
+        heightMode: 'fixed',
+      },
+    }).style.overflow).toBe('hidden')
   })
 
   it('uses internal grid presentation props after inferred flex layout', () => {

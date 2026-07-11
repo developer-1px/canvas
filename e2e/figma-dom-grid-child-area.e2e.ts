@@ -41,12 +41,12 @@ async function selectLayer(
   nodeId: string,
 ) {
   await page.getByRole('button', { name: buttonName }).click()
-  await expect(page.locator(`[data-figma-dom-node="${nodeId}"]`))
+  await expect(page.locator(`[data-design-node-id="${nodeId}"]`))
     .toHaveAttribute('data-selected', 'true')
 }
 
 async function expectAreaMatchesSelected(page: Page, nodeId: string) {
-  const selectedBox = await page.locator(`[data-figma-dom-node="${nodeId}"]`)
+  const selectedBox = await page.locator(`[data-design-node-id="${nodeId}"]`)
     .boundingBox()
   const areaBox = await gridChildArea(page).boundingBox()
 

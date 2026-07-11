@@ -5,6 +5,7 @@ import type {
   DesignJSONValue,
   DesignJSONObject,
   DesignNode,
+  DesignNodeFrame,
   DesignNodeId,
   DesignNodeUpdateValues,
 } from '../design-document'
@@ -66,6 +67,12 @@ export type EditorEngineCommand =
       readonly label: string
       readonly nodeId: DesignNodeId
       readonly type: 'node.edit'
+    }
+  | {
+      readonly label: string
+      readonly nodeId: DesignNodeId
+      readonly type: 'frame.edit'
+      readonly values: Partial<DesignNodeFrame>
     }
   | { readonly type: 'history.redo' | 'history.undo' }
 
@@ -281,6 +288,8 @@ export function createEditorEngine({
         return document.historyStatus().canRedo
       case 'node.edit':
         return planNodeEdit(command).ok
+      case 'frame.edit':
+        return planFrameEdit(command).ok
     }
   }
 
@@ -340,6 +349,18 @@ export function createEditorEngine({
         return executeDocumentCommand({
           label: command.label,
           changes: plan.changes,
+        })
+      }
+      case 'frame.edit': {
+        const plan = planFrameEdit(command)
+
+        if (!plan.ok) {
+          return plan.result
+        }
+
+        return executeDocumentCommand({
+          label: command.label,
+          changes: [plan.change],
         })
       }
     }
@@ -608,6 +629,50 @@ export function createEditorEngine({
     return { changes, ok: true }
   }
 
+  function planFrameEdit(
+    command: Extract<EditorEngineCommand, { type: 'frame.edit' }>,
+  ):
+    | {
+        readonly change: {
+          readonly nodeId: DesignNodeId
+          readonly type: 'update'
+          readonly values: DesignNodeUpdateValues
+        }
+        readonly ok: true
+      }
+    | { readonly ok: false; readonly result: EditorEngineCommandResult } {
+    const node = document.read.node(command.nodeId)
+
+    if (!node) {
+      return {
+        ok: false,
+        result: unavailable(`Unknown design node: ${command.nodeId}`),
+      }
+    }
+
+    if (!node.frame) {
+      return {
+        ok: false,
+        result: unavailable(`Design node has no authored frame: ${node.id}`),
+      }
+    }
+
+    const values = normalizeFrameEditValues(command.values)
+
+    if (!values.ok) {
+      return values
+    }
+
+    return {
+      ok: true,
+      change: {
+        type: 'update',
+        nodeId: node.id,
+        values: { frame: { ...node.frame, ...values.values } },
+      },
+    }
+  }
+
   function executeDocumentCommand(
     command: Parameters<DesignDocument['execute']>[0],
   ): EditorEngineCommandResult {
@@ -670,6 +735,72 @@ export function createEditorEngine({
       }
     },
   }
+}
+
+function normalizeFrameEditValues(
+  values: Partial<DesignNodeFrame>,
+):
+  | { readonly ok: true; readonly values: Partial<DesignNodeFrame> }
+  | { readonly ok: false; readonly result: EditorEngineCommandResult } {
+  const entries = Object.entries(values)
+
+  if (entries.length === 0) {
+    return {
+      ok: false,
+      result: unavailable('A frame edit requires at least one value'),
+    }
+  }
+
+  const normalized: MutableEditorFrameUpdate = {}
+
+  for (const [field, value] of entries) {
+    if (isEditorFrameNumericField(field)) {
+      if (typeof value !== 'number' || !Number.isFinite(value)) {
+        return {
+          ok: false,
+          result: unavailable(`Invalid numeric frame ${field} value`),
+        }
+      }
+
+      const limits = EDITOR_FRAME_NUMERIC_FIELD_LIMITS[field]
+      normalized[field] = Math.min(
+        limits.max,
+        Math.max(limits.min, value),
+      )
+      continue
+    }
+
+    if (field === 'heightMode' || field === 'widthMode') {
+      if (value !== 'content' && value !== 'fixed') {
+        return {
+          ok: false,
+          result: unavailable(`Invalid frame ${field} value: ${value}`),
+        }
+      }
+
+      normalized[field] = value
+      continue
+    }
+
+    if (field === 'overflow') {
+      if (value !== 'clip' && value !== 'scroll' && value !== 'visible') {
+        return {
+          ok: false,
+          result: unavailable(`Invalid frame overflow value: ${value}`),
+        }
+      }
+
+      normalized.overflow = value
+      continue
+    }
+
+    return {
+      ok: false,
+      result: unavailable(`Unsupported frame field: ${field}`),
+    }
+  }
+
+  return { ok: true, values: normalized }
 }
 
 function applyNodeEdits(
@@ -933,6 +1064,32 @@ const EDITOR_PADDING_SIDE_FIELDS = [
   'paddingRight',
   'paddingTop',
 ] as const
+
+type EditorFrameNumericField = Extract<
+  keyof DesignNodeFrame,
+  'height' | 'rotation' | 'width' | 'x' | 'y'
+>
+
+type MutableEditorFrameUpdate = {
+  -readonly [TField in keyof DesignNodeFrame]?: DesignNodeFrame[TField]
+}
+
+const EDITOR_FRAME_NUMERIC_FIELD_LIMITS = {
+  height: { max: 100_000, min: 12 },
+  rotation: { max: 180, min: -180 },
+  width: { max: 100_000, min: 12 },
+  x: { max: 100_000, min: -100_000 },
+  y: { max: 100_000, min: -100_000 },
+} as const satisfies Record<
+  EditorFrameNumericField,
+  { readonly max: number; readonly min: number }
+>
+
+function isEditorFrameNumericField(
+  field: string,
+): field is EditorFrameNumericField {
+  return Object.hasOwn(EDITOR_FRAME_NUMERIC_FIELD_LIMITS, field)
+}
 
 const EDITOR_NUMERIC_LAYOUT_FIELDS = new Set<EditorEngineNumericLayoutField>([
   'gap',

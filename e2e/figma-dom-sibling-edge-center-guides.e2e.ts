@@ -36,7 +36,7 @@ test('keeps smart edge and center guides aligned through pan and zoom', async ({
 
   const beforeNode = await getRequiredBox(domNode(page, 'workspaceStatRevenue'))
   await page.keyboard.press('h')
-  await expect(page.locator('.canvas-stage')).toHaveAttribute(
+  await expect(page.locator('.figma-direct-dom__stage')).toHaveAttribute(
     'data-mode',
     'pan',
   )
@@ -49,6 +49,8 @@ test('keeps smart edge and center guides aligned through pan and zoom', async ({
   }).toBeGreaterThan(1)
   await expectSmartGuidesMatchSelected(page)
   await page.keyboard.press('v')
+  await expect(page.locator('.figma-direct-dom__stage'))
+    .toHaveAttribute('data-mode', 'select')
 })
 
 async function selectLayer(
@@ -75,7 +77,9 @@ async function panCanvas(
   page: Page,
   delta: { x: number; y: number },
 ) {
-  const stageBox = await getRequiredBox(page.locator('.canvas-stage'))
+  const stageBox = await getRequiredBox(
+    page.locator('.figma-direct-dom__stage'),
+  )
   const x = stageBox.x + 120
   const y = stageBox.y + 120
 
@@ -94,7 +98,7 @@ async function getRequiredBox(locator: Locator) {
 }
 
 function domNode(page: Page, nodeId: string) {
-  return page.locator(`[data-figma-dom-node="${nodeId}"]`)
+  return page.locator(`[data-design-node-id="${nodeId}"]`)
 }
 
 function moveable(page: Page) {

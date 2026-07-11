@@ -1,36 +1,31 @@
 export {
-  applyFigmaWorkspaceFramePreset,
-  updateFigmaWorkspaceAutoLayoutField,
-  updateFigmaWorkspaceFrame,
-  updateFigmaWorkspaceNumericField,
-  updateFigmaWorkspaceText,
-} from './FigmaWorkspaceDesignDocumentCommands'
-export type {
-  FigmaWorkspaceAutoLayoutFieldUpdate,
-  FigmaWorkspaceFramePreset,
-  FigmaWorkspaceFrameUpdate,
-  FigmaWorkspaceNumericFieldUpdate,
-} from './FigmaWorkspaceDesignDocumentCommands'
-export {
-  getFigmaWorkspaceLegacyComponentBinding,
-  projectFigmaWorkspaceDesignDocument,
-} from './FigmaWorkspaceDesignDocumentProjection'
-export type {
-  FigmaWorkspaceDesignDocumentProjection,
-  FigmaWorkspaceProjectionSource,
-} from './FigmaWorkspaceDesignDocumentProjection'
-export {
-  createFigmaWorkspaceDesignDocument,
+  createFigmaDesignDocument,
+  FIGMA_DESIGN_DOCUMENT_SNAPSHOT,
   FIGMA_WORKSPACE_DESIGN_DOCUMENT_SNAPSHOT,
 } from './FigmaWorkspaceDesignDocumentSeed'
+export type {
+  FigmaDesignNodeId,
+} from './FigmaWorkspaceDesignDocumentSeed'
+export {
+  FIGMA_HOME_COMPONENT_METADATA,
+} from './FigmaHomeDesignDocumentSeed'
+export type {
+  FigmaHomeComponentDefinitionId,
+  FigmaHomeComponentMetadata,
+  FigmaHomeDesignNodeId,
+} from './FigmaHomeDesignDocumentSeed'
+export {
+  FIGMA_WIDGET_DEFINITION_ID,
+  FIGMA_WIDGET_NODE_ID,
+} from './FigmaWidgetDesignDocumentSeed'
+export type {
+  FigmaWidgetDefinitionId,
+  FigmaWidgetDesignNodeId,
+} from './FigmaWidgetDesignDocumentSeed'
 export {
   FIGMA_WORKSPACE_COMPONENT_METADATA,
   getFigmaWorkspaceComponentMetadata,
 } from './FigmaWorkspaceComponentMetadata'
-export {
-  routeFigmaWorkspaceOwnedEdit,
-  routeFigmaWorkspaceOwnedSectionEdit,
-} from './FigmaWorkspaceEditOwnership'
 export type {
   FigmaWorkspaceComponentDefinitionId,
   FigmaWorkspaceComponentInstanceMetadata,

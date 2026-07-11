@@ -19,19 +19,21 @@ test('shows overflow clip, visible, full, and scroll extent guides', async ({
   await expect(page.locator('.figma-overflow-clip-boundary--scroll'))
     .toHaveCount(1)
   await expect(page.locator('.figma-overflow-scroll-extent')).toHaveCount(1)
-  await expectOverflowClipMatchesBrowser(page)
+  await expectOverflowClipMatchesRoot(page)
 
   await page.getByRole('button', { name: 'Zoom in' }).click()
-  await expectOverflowClipMatchesBrowser(page)
+  await expectOverflowClipMatchesRoot(page)
 
   await page.keyboard.press('h')
-  await expect(page.locator('.canvas-stage')).toHaveAttribute(
+  await expect(page.locator('.figma-direct-dom__stage')).toHaveAttribute(
     'data-mode',
     'pan',
   )
   await panCanvas(page, { x: 56, y: 28 })
-  await expectOverflowClipMatchesBrowser(page)
+  await expectOverflowClipMatchesRoot(page)
   await page.keyboard.press('v')
+  await expect(page.locator('.figma-direct-dom__stage'))
+    .toHaveAttribute('data-mode', 'select')
 
   await page.getByRole('button', { name: 'Select Workspace page section' })
     .click()
@@ -64,10 +66,10 @@ async function readElementHeight(page: Page, selector: string) {
     element.getBoundingClientRect().height)
 }
 
-async function expectOverflowClipMatchesBrowser(page: Page) {
+async function expectOverflowClipMatchesRoot(page: Page) {
   await expectOverlayMatchesElement(
     page.locator('.figma-overflow-clip-boundary').first(),
-    page.locator('.figma-dom-browser').first(),
+    page.locator('[data-design-node-id="workspacePage"]'),
   )
 }
 
@@ -85,7 +87,9 @@ async function panCanvas(
   page: Page,
   delta: { x: number; y: number },
 ) {
-  const stageBox = await getRequiredBox(page.locator('.canvas-stage'))
+  const stageBox = await getRequiredBox(
+    page.locator('.figma-direct-dom__stage'),
+  )
   const x = stageBox.x + 120
   const y = stageBox.y + 120
 

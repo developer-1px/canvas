@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test, type Locator } from '@playwright/test'
 
 test('exposes figma clone layers as a keyboard treeview', async ({
   page,
@@ -59,6 +59,29 @@ test('exposes figma clone layers as a keyboard treeview', async ({
 
   await expect(workspaceNode).toHaveAttribute('aria-expanded', 'false')
   await expect(workspaceSection).toHaveAttribute('aria-selected', 'true')
+})
+
+test('keeps Space available for focused editor controls', async ({ page }) => {
+  await page.goto('/?demo=figma')
+
+  const measureTool = page.getByRole('button', { name: 'Measure tool' })
+
+  await measureTool.focus()
+  await page.keyboard.press('Space')
+  await expect(measureTool).toHaveAttribute('aria-pressed', 'true')
+  await expect(page.locator('.figma-direct-dom__stage'))
+    .toHaveAttribute('data-mode', 'select')
+
+  const workspaceLayer = page.getByRole('button', {
+    name: 'Select layer Workspace page',
+  })
+
+  await workspaceLayer.focus()
+  await page.keyboard.press('Space')
+  await expect(page.getByRole('treeitem', {
+    exact: true,
+    name: 'Workspace page',
+  })).toHaveAttribute('aria-selected', 'true')
 })
 
 test('filters figma clone layers for component management', async ({
@@ -143,19 +166,24 @@ test('keeps Figma chrome focused on the CSS inspector', async ({
   await expect(inspector).toContainText('Stat card')
 })
 
-test('focuses selected DOM layers and fits the selected frame', async ({
+test('focuses selected DOM layers by root and fits the exact selection', async ({
   page,
 }) => {
   await page.goto('/?demo=figma')
 
+  const app = page.locator('.figma-clone')
   const layers = page.getByRole('complementary', { name: 'Layers' })
   const viewport = page.getByRole('toolbar', { name: 'Viewport' })
-  const world = page.locator('.canvas-stage > g')
+  const stage = page.locator('.figma-direct-dom__stage')
+  const world = page.locator('.figma-direct-dom__world')
+  const homePage = page.locator('[data-design-node-id="homePage"]')
+  const readingTime = page.locator('[data-design-node-id="homeReadTime"]')
 
-  const initialTransform = await world.getAttribute('transform')
+  const initialTransform = await readWorldTransform(world)
 
   await viewport.getByRole('button', { name: 'Zoom in' }).click()
-  const zoomedTransform = await world.getAttribute('transform')
+  await expect.poll(() => readWorldTransform(world)).not.toBe(initialTransform)
+  const zoomedTransform = await readWorldTransform(world)
   expect(zoomedTransform).not.toBe(initialTransform)
 
   await layers.getByRole('searchbox', { name: 'Search layers' })
@@ -164,13 +192,47 @@ test('focuses selected DOM layers and fits the selected frame', async ({
     name: 'Select layer Reading time',
   }).click()
 
-  const focusedTransform = await world.getAttribute('transform')
+  await expect(app).toHaveAttribute('data-selected-node-id', 'homeReadTime')
+  await expect(app).toHaveAttribute(
+    'data-viewport-focus-node-id',
+    'homePage',
+  )
+  await expect.poll(() => readWorldTransform(world)).not.toBe(zoomedTransform)
+  const focusedTransform = await readWorldTransform(world)
   expect(focusedTransform).not.toBe(zoomedTransform)
+  await expectContained(stage, homePage)
 
   await viewport.getByRole('button', { name: 'Zoom in' }).click()
-  const refocusedZoomTransform = await world.getAttribute('transform')
+  await expect.poll(() => readWorldTransform(world)).not.toBe(focusedTransform)
+  const refocusedZoomTransform = await readWorldTransform(world)
   expect(refocusedZoomTransform).not.toBe(focusedTransform)
 
   await viewport.getByRole('button', { name: 'Fit selection' }).click()
-  await expect(world).toHaveAttribute('transform', focusedTransform ?? '')
+  await expect(app).toHaveAttribute(
+    'data-viewport-focus-node-id',
+    'homeReadTime',
+  )
+  await expect.poll(() => readWorldTransform(world))
+    .not.toBe(refocusedZoomTransform)
+  await expectContained(stage, readingTime)
 })
+
+async function readWorldTransform(world: Locator) {
+  return world.evaluate((element) => getComputedStyle(element).transform)
+}
+
+async function expectContained(container: Locator, target: Locator) {
+  const [containerBox, targetBox] = await Promise.all([
+    container.boundingBox(),
+    target.boundingBox(),
+  ])
+
+  expect(containerBox).not.toBeNull()
+  expect(targetBox).not.toBeNull()
+  expect(targetBox!.x).toBeGreaterThanOrEqual(containerBox!.x - 1)
+  expect(targetBox!.y).toBeGreaterThanOrEqual(containerBox!.y - 1)
+  expect(targetBox!.x + targetBox!.width)
+    .toBeLessThanOrEqual(containerBox!.x + containerBox!.width + 1)
+  expect(targetBox!.y + targetBox!.height)
+    .toBeLessThanOrEqual(containerBox!.y + containerBox!.height + 1)
+}

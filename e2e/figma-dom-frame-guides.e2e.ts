@@ -13,7 +13,7 @@ test('shows frame-local DOM guides and responsive layout columns', async ({
   await page.getByRole('button', { name: 'Select layer Workspace page' })
     .click()
   await page.getByRole('button', { name: 'Select layer Revenue stat' }).click()
-  await expect(page.locator('[data-figma-dom-node="workspaceStatRevenue"]'))
+  await expect(page.locator('[data-design-node-id="workspaceStatRevenue"]'))
     .toHaveAttribute('data-selected', 'true')
 
   await expect.poll(() => page.locator('.figma-frame-guide--ruler').count())

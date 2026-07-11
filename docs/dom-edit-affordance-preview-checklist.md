@@ -31,7 +31,7 @@ Target: `packages/figma-clone`
 ## Command Gates
 
 - `npx tsc --noEmit --pretty false`
-- `npm run test -- packages/dom-edit-affordance/src/features/node-selection/DomEditAffordanceVisibility.test.ts packages/figma-clone/src/dom-edit/FigmaCloneDomEditModel.test.ts`
+- `npm run test -- packages/dom-edit-affordance/src/react/DomEditEditorBridge.test.tsx packages/figma-clone/src/FigmaCloneApp.test.tsx`
 - `npx playwright test e2e/figma-dom-preview-verification-matrix.e2e.ts`
 - `npm run build`
 

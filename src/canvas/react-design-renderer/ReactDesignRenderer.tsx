@@ -77,6 +77,7 @@ function ReactDesignNodeRenderer({
     ref,
     'data-design-node-id': node.id,
     'data-design-definition-id': node.definition.id,
+    'data-design-frame-root': node.frame ? true : undefined,
   } satisfies ReactDesignRootProps
 
   if (!resolution) {

@@ -47,7 +47,8 @@ test('keeps selected DOM guide aligned while panning', async ({ page }) => {
   const beforeGuide = await getRequiredBox(selectionGuide(page))
 
   await page.keyboard.press('h')
-  await expect(page.locator('.canvas-stage')).toHaveAttribute('data-mode', 'pan')
+  await expect(page.locator('.figma-direct-dom__stage'))
+    .toHaveAttribute('data-mode', 'pan')
   await panCanvas(page, { x: 48, y: 24 })
 
   await expect.poll(async () => {
@@ -65,6 +66,8 @@ test('keeps selected DOM guide aligned while panning', async ({ page }) => {
   await expectOverlayMatchesNode(page, 'workspacePipelineList')
 
   await page.keyboard.press('v')
+  await expect(page.locator('.figma-direct-dom__stage'))
+    .toHaveAttribute('data-mode', 'select')
 })
 
 test('keeps widget selection separate from DOM edit selection', async ({
@@ -79,7 +82,7 @@ test('keeps widget selection separate from DOM edit selection', async ({
   await expect(selectionGuide(page)).toHaveCount(0)
   await expect(page.locator('.figma-guide-label')).toHaveCount(0)
   await expect(page.locator('.figma-size-mode-capsule')).toHaveCount(0)
-  await expect(page.locator('[data-figma-dom-node][data-selected="true"]'))
+  await expect(page.locator('[data-design-node-id][data-selected="true"]'))
     .toHaveCount(0)
   await expect(
     page.getByRole('complementary', { name: 'CSS Inspector' })
@@ -137,7 +140,9 @@ async function panCanvas(
   page: Page,
   delta: { x: number; y: number },
 ) {
-  const stageBox = await getRequiredBox(page.locator('.canvas-stage'))
+  const stageBox = await getRequiredBox(
+    page.locator('.figma-direct-dom__stage'),
+  )
   const x = stageBox.x + 120
   const y = stageBox.y + 120
 
@@ -156,7 +161,7 @@ async function getRequiredBox(locator: Locator) {
 }
 
 function domNode(page: Page, nodeId: string) {
-  return page.locator(`[data-figma-dom-node="${nodeId}"]`)
+  return page.locator(`[data-design-node-id="${nodeId}"]`)
 }
 
 function expectClose(actual: number, expected: number) {

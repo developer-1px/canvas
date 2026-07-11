@@ -179,7 +179,7 @@ function measureDomEditOverflow({
 function findDomEditOverflowClipElement(
   target: HTMLElement,
 ): HTMLElement | null {
-  const domSection = target.closest('[data-figma-section="dom"]')
+  const designFrame = target.closest('[data-design-frame-root="true"]')
   let element: HTMLElement | null = target
 
   while (element) {
@@ -187,7 +187,7 @@ function findDomEditOverflowClipElement(
       return element
     }
 
-    if (element === domSection) {
+    if (element === designFrame) {
       return null
     }
 

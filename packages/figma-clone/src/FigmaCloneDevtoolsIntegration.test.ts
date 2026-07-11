@@ -15,8 +15,12 @@ describe('Figma clone editor chrome', () => {
     expect(source).not.toContain('createFigmaCloneDevtoolsNotes')
   })
 
-  it('renders the DOM edit overlay through one stage overlay slot', () => {
-    expect(source.match(/stageOverlaySlot\.render/g) ?? []).toHaveLength(1)
-    expect(source).toContain('<DomEditSelectionOverlay')
+  it('renders canonical React DOM editing without a Canvas stage slot', () => {
+    expect(source).toContain('createEditorEngine')
+    expect(source).toContain('createDomProjection')
+    expect(source).toContain('<ReactDesignRenderer')
+    expect(source).toContain('<DomEditEditorOverlay')
+    expect(source).toContain('<FigmaCloneInspector')
+    expect(source).not.toContain('stageOverlaySlot.render')
   })
 })

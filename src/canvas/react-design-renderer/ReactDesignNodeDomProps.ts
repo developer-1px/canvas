@@ -280,9 +280,11 @@ function applyFrameStyle(
   style.top = frame.y
   style.width = frame.widthMode === 'fixed' ? frame.width : 'fit-content'
   style.height = frame.heightMode === 'fixed' ? frame.height : 'fit-content'
-  style.overflow = frame.overflow === 'clip'
-    ? 'hidden'
-    : frame.overflow === 'scroll' ? 'auto' : 'visible'
+  style.overflow = frame.heightMode === 'content'
+    ? 'visible'
+    : frame.overflow === 'clip'
+      ? 'hidden'
+      : frame.overflow === 'scroll' ? 'auto' : 'visible'
 
   if (frame.rotation !== 0) {
     style.transform = `rotate(${frame.rotation}deg)`

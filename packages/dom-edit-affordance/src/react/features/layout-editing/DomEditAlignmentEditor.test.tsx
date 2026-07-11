@@ -1,4 +1,8 @@
+// @vitest-environment jsdom
+
+import { act } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
+import { createRoot } from 'react-dom/client'
 import { describe, expect, it, vi } from 'vitest'
 import type {
   DomEditLayoutContext,
@@ -12,6 +16,9 @@ import {
   CANVAS_DOM_ALIGNMENT_PREVIEW_GUIDE_MODEL,
   DomEditAlignmentEditor,
 } from './DomEditAlignmentEditor'
+
+;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean })
+  .IS_REACT_ACT_ENVIRONMENT = true
 
 describe('DomEditAlignmentEditor', () => {
   it('exposes stable alignment affordance metadata values', () => {
@@ -48,6 +55,37 @@ describe('DomEditAlignmentEditor', () => {
     expect(markup).toContain('role="radio"')
     expect(markup).toContain('aria-checked="true"')
     expect(markup).not.toContain('role="dialog"')
+  })
+
+  it('clears a preview only after an open editor closes', async () => {
+    const container = document.createElement('div')
+    const root = createRoot(container)
+    const onPreview = vi.fn()
+    const renderEditor = (isOpen: boolean) => (
+      <DomEditAlignmentEditor
+        id="alignment-panel"
+        context={createLayoutContext()}
+        isOpen={isOpen}
+        labelledBy="alignment-trigger"
+        selectedNodeId="node-1"
+        style={createNodeStyle()}
+        onChangeAutoLayout={vi.fn()}
+        onClose={vi.fn()}
+        onPreview={onPreview}
+      />
+    )
+
+    await act(async () => root.render(renderEditor(false)))
+    expect(onPreview).not.toHaveBeenCalled()
+
+    await act(async () => root.render(renderEditor(true)))
+    expect(onPreview).not.toHaveBeenCalled()
+
+    await act(async () => root.render(renderEditor(false)))
+    expect(onPreview).toHaveBeenCalledOnce()
+    expect(onPreview).toHaveBeenCalledWith(null)
+
+    await act(async () => root.unmount())
   })
 
   it('connects the auto layout trigger to the alignment panel', () => {
