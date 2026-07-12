@@ -20,8 +20,8 @@ import { validateAndIndexDesignDocument } from './DesignDocumentValidation'
 /**
  * Guarded JSON projection for integrations that need patch publication.
  * Commits pass both the persisted schema and DesignDocument graph invariants,
- * then synchronize the immutable snapshot before returning. They currently
- * use the DesignDocument history stack and do not accept text selection.
+ * then synchronize the immutable snapshot before returning. Concrete external
+ * commits advance the local history barrier and do not accept text selection.
  */
 export type DesignDocumentPatchPort = Pick<
   JSONDocument<DesignDocumentSnapshot>,

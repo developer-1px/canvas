@@ -96,7 +96,14 @@ describe('EditorEngine causal integration tracer', () => {
     })
     expect(document.read.node('note-a')?.text).toBe('Composing A')
     expect(document.read.node('note-b')?.text).toBe('Remote B')
-    expect(engine.snapshot().preview).toBeNull()
+    expect(document.historyStatus()).toEqual({
+      canRedo: false,
+      canUndo: false,
+    })
+    expect(engine.snapshot()).toMatchObject({
+      history: { canRedo: false, canUndo: false },
+      preview: null,
+    })
     expect(projection.element('note-a')).toBe(noteAElement)
     expect(projection.element('note-b')).toBe(noteBElement)
     expect(inbox.current()).toMatchObject({
@@ -163,6 +170,10 @@ describe('EditorEngine causal integration tracer', () => {
       policy: 'stable-id-replace',
     })
     expect(document.read.node('note-b')?.text).toBe('Local B')
+    expect(document.historyStatus()).toEqual({
+      canRedo: false,
+      canUndo: true,
+    })
     expect(publications).toEqual(['design-document'])
     expect(inbox.current()).toMatchObject({
       failure: {
@@ -171,6 +182,8 @@ describe('EditorEngine causal integration tracer', () => {
       },
       status: 'blocked',
     })
+    expect(document.undo()).toBe(true)
+    expect(document.read.node('note-b')?.text).toBe('Draft B')
 
     stopPublication()
     inbox.dispose()
@@ -186,13 +199,19 @@ describe('EditorEngine causal integration tracer', () => {
       getDesignDocumentPatchPort(document),
       { host: getEditorEngineDocumentHost(engine) },
     )
+    expect(engine.commands.execute({
+      edits: [{ target: 'text', value: 'Local B' }],
+      label: 'Edit note B locally',
+      nodeId: 'note-b',
+      type: 'node.edit',
+    })).toEqual({ changed: true, ok: true })
     const before = engine.snapshot()
 
     expect(inbox.ingest({
       id: 'only-test',
       dependsOn: [],
       operations: [
-        { op: 'test', path: '/nodes/2/text', value: 'Draft B' },
+        { op: 'test', path: '/nodes/2/text', value: 'Local B' },
       ],
     })).toMatchObject({
       applied: ['only-test'],
@@ -200,17 +219,20 @@ describe('EditorEngine causal integration tracer', () => {
     })
     expect(document.historyStatus()).toEqual({
       canRedo: false,
-      canUndo: false,
+      canUndo: true,
     })
     expect(engine.snapshot()).toMatchObject({
-      history: { canRedo: false, canUndo: false },
+      history: { canRedo: false, canUndo: true },
       revision: before.revision,
     })
     expect(inbox.current()).toMatchObject({
       frontier: ['only-test'],
-      journalRevision: 1,
+      journalRevision: 2,
       status: 'active',
     })
+    expect(engine.commands.execute({ type: 'history.undo' }))
+      .toEqual({ changed: true, ok: true })
+    expect(document.read.node('note-b')?.text).toBe('Draft B')
 
     inbox.dispose()
     engine.dispose()

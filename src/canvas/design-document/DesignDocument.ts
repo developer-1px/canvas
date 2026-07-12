@@ -41,13 +41,16 @@ export function createDesignDocument(
   ) as JSONDocument<DesignDocumentSnapshot>
 
   const publications = createDesignDocumentPublicationCoordinator({
-    onExternalPublication: () => {
-      previousHistoryGroup = null
-    },
+    onExternalPublication: advanceExternalHistoryBarrier,
     readSnapshot: () => snapshot,
     store,
     synchronize: synchronizeSnapshot,
   })
+
+  function advanceExternalHistoryBarrier() {
+    previousHistoryGroup = null
+    store.history.clear()
+  }
 
   function synchronizeSnapshot() {
     const nextSnapshot = freezeSnapshot(

@@ -36,21 +36,26 @@ validation and widen the public mutation surface.
    listeners before notifying patch observers and returning. A successful
    test-only or net-no-op batch returns without creating history or a
    publication.
-4. DesignDocument commands, history restores, and patch-port commits reserve a
+4. A concrete patch-port publication advances a conservative local history
+   barrier after the internal patch is recorded but before canonical
+   synchronization. It clears prior local undo and redo, and the remote change
+   itself is not locally undoable. Local commands authored afterward start a
+   fresh history epoch and undo back to the remote state.
+5. DesignDocument commands, history restores, and patch-port commits reserve a
    monotonic ownership sequence before publication. Ownership remains active
    through snapshot synchronization and observer delivery so synchronous
    reentry fails closed. A subscriber added while synchronization is already
    handling a publication starts at the next publication. The sequence exists
    only in this synchronous scope and is not a transport clock.
-5. `getEditorEngineDocumentHost(engine)` defers a ready change while a text or
+6. `getEditorEngineDocumentHost(engine)` defers a ready change while a text or
    transform preview is active, while another document mutation is running, or
    while a ready change is already executing. The caller owns retry policy.
    The headless tracer schedules one microtask retry after an engine change;
    that is not a browser render-settle contract.
-6. The first tracer uses a stable design-node id and one text-field
+7. The first tracer uses a stable design-node id and one text-field
    replacement. It does not use positional rebase because current local
    DesignDocument commands publish a root replacement.
-7. Unpublished causal/rebase packages remain SHA-pinned test dependencies.
+8. Unpublished causal/rebase packages remain SHA-pinned test dependencies.
    Production `src/canvas/**` code does not import them and the published Canvas
    package keeps registry-only runtime dependencies.
 
@@ -65,8 +70,8 @@ validation and widen the public mutation surface.
   selection restoration, or layout has completed before retrying.
 - A conflicting stable-id replacement fails on its authored `expected` value;
   it never overwrites a newer local field automatically.
-- Patch-port commits currently enter the existing DesignDocument undo stack.
-  Canonical remote-history policy must be decided before production sync.
+- The history barrier is deliberately fail-closed. It is not selective undo,
+  inverse rebase, replicated undo, or a way to recover pre-remote local history.
 
 ## Consequences and Follow-up
 
@@ -75,6 +80,9 @@ validation and widen the public mutation surface.
   private labs. A FigJam browser test remains follow-up evidence.
 - Structural and positional delayed edits need granular DesignDocument command
   patches instead of a root replacement.
+- A concrete remote publication discards pre-remote local undo and redo. A
+  future selective-undo design must rebase owned inverses explicitly before it
+  can preserve that history safely.
 - DOM caret handoff needs a separate selection adapter plus a render-settle
   signal; it must not be inferred from the authored graph.
 - FigJam composition/blur behavior and a real ReactDesignRenderer commit must
