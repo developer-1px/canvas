@@ -21,11 +21,11 @@ import type {
 } from './CanvasAppExtensionConsumerContracts'
 
 export function useCanvasAppExtensionModel({
-  commitItemsChange,
   commitSelection,
   createId,
   customCommands,
   customCreationTools,
+  document,
   items,
   selection,
   setEditing,
@@ -33,18 +33,18 @@ export function useCanvasAppExtensionModel({
 }: CanvasAppExtensionModelInput): CanvasAppExtensionModel {
   const customCommandContext = useMemo<CanvasAppCustomCommandContext>(
     () => ({
-      commitItemsChange,
       commitSelection,
       createId,
+      document,
       items,
       selection,
       setEditing,
       viewport,
     }),
     [
-      commitItemsChange,
       commitSelection,
       createId,
+      document,
       items,
       selection,
       setEditing,
@@ -60,8 +60,8 @@ export function useCanvasAppExtensionModel({
     [customCommandContext, customCommands],
   )
   const customCreationToolStates = useMemo(
-    () => getCanvasAppCustomCreationToolStates(customCreationTools),
-    [customCreationTools],
+    () => getCanvasAppCustomCreationToolStates(customCreationTools, document),
+    [customCreationTools, document],
   )
   const runCustomCommand = useCallback(
     (commandId: string) =>

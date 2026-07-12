@@ -1,8 +1,4 @@
-import type {
-  CanvasExtensionAdapterSlot,
-  CanvasExtensionDescriptor,
-  CanvasExtensionToolKind,
-} from '../../../foundation'
+import type { CanvasExtensionDescriptor } from '../../../foundation'
 import {
   assertCanvasAppArray,
   assertCanvasAppDescriptorObject,
@@ -10,41 +6,15 @@ import {
 } from '../CanvasAppDescriptorContracts'
 import { snapshotCanvasAppArray } from '../CanvasAppDescriptorSnapshot'
 import type { CanvasAppExtensionRegistryOwner } from '../CanvasAppExtensionRegistries'
+import { assertCanvasAppRequiredCapability } from '../../CanvasAppCapabilityContracts'
 
 export type CanvasAppFoundationToolDescriptor =
   NonNullable<CanvasExtensionDescriptor['tools']>[number]
-
-export type CanvasAppFoundationExtensionTool = Readonly<{
-  extensionId: CanvasExtensionDescriptor['id']
-  id: CanvasAppFoundationToolDescriptor['id']
-  kind: CanvasExtensionToolKind
-  requiredAdapters?: readonly CanvasExtensionAdapterSlot[]
-}>
 
 type CanvasAppFoundationExtensionToolSource = Pick<
   CanvasExtensionDescriptor,
   'id' | 'tools'
 >
-
-export function getCanvasAppFoundationExtensionTools(
-  extensions: readonly CanvasAppFoundationExtensionToolSource[],
-) {
-  assertUniqueCanvasAppFoundationExtensionToolIds({
-    extensions,
-    owner: 'foundation extension descriptors',
-  })
-
-  return snapshotCanvasAppArray(
-    extensions.flatMap((extension) =>
-      (extension.tools ?? []).map((tool) =>
-        snapshotCanvasAppFoundationExtensionTool({
-          extensionId: extension.id,
-          tool,
-        }),
-      ),
-    ),
-  ) as readonly CanvasAppFoundationExtensionTool[]
-}
 
 export function assertUniqueCanvasAppFoundationExtensionToolIds({
   extensions,
@@ -99,6 +69,15 @@ export function assertCanvasAppFoundationToolDescriptors(
       owner: 'foundation extension tool',
       value: tool.kind,
     })
+    assertCanvasAppDescriptorStringField({
+      field: 'requiredCapability',
+      owner: 'foundation extension tool',
+      value: tool.requiredCapability,
+    })
+    assertCanvasAppRequiredCapability({
+      owner: `foundation extension tool ${tool.id}`,
+      value: tool.requiredCapability,
+    })
     assertOptionalCanvasAppFoundationToolArray({
       label: 'foundation extension tool requiredAdapters',
       value: tool.requiredAdapters,
@@ -111,23 +90,6 @@ export function snapshotCanvasAppFoundationToolDescriptor(
 ) {
   return Object.freeze({
     ...tool,
-    ...(tool.requiredAdapters ? {
-      requiredAdapters: snapshotCanvasAppArray(tool.requiredAdapters),
-    } : {}),
-  })
-}
-
-function snapshotCanvasAppFoundationExtensionTool({
-  extensionId,
-  tool,
-}: {
-  extensionId: CanvasExtensionDescriptor['id']
-  tool: CanvasAppFoundationToolDescriptor
-}): CanvasAppFoundationExtensionTool {
-  return Object.freeze({
-    extensionId,
-    id: tool.id,
-    kind: tool.kind,
     ...(tool.requiredAdapters ? {
       requiredAdapters: snapshotCanvasAppArray(tool.requiredAdapters),
     } : {}),

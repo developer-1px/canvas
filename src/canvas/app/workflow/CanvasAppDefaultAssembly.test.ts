@@ -7,13 +7,8 @@ import {
 import { DEFAULT_CANVAS_AFFORDANCE_CONFIG } from '../../engine'
 import {
   CANVAS_STICKY_NOTE_EXTENSION,
-  CANVAS_STICKY_NOTE_RENDERER_SLOT_ID,
   CANVAS_STICKY_NOTE_TOOL_ID,
 } from '../../foundation'
-import {
-  getCanvasAppFoundationExtensionRendererSlots,
-} from '../extensions/foundation-extensions'
-import { getCanvasAppFoundationExtensionTools } from '../extensions/foundation-extensions'
 import {
   DEFAULT_CANVAS_APP_COMPONENT_PRESENTATION_RENDERERS,
   DEFAULT_CANVAS_APP_CUSTOM_ITEM_RENDERERS,
@@ -38,7 +33,11 @@ describe('CanvasAppDefaultAssembly', () => {
       CANVAS_COMPONENT_LIBRARY,
     )
     expect(DEFAULT_CANVAS_APP_ASSEMBLY.componentPresentationRenderers).toEqual(
-      DEFAULT_CANVAS_APP_COMPONENT_PRESENTATION_RENDERERS,
+      {
+        ...DEFAULT_CANVAS_APP_COMPONENT_PRESENTATION_RENDERERS,
+        ...DEFAULT_CANVAS_APP_ASSEMBLY.foundationExtensionRuntime
+          .componentPresentationRenderers,
+      },
     )
     expect(DEFAULT_CANVAS_APP_ASSEMBLY.featurePackViewRenderers).toEqual(
       DEFAULT_CANVAS_APP_FEATURE_PACK_VIEW_RENDERERS,
@@ -54,21 +53,11 @@ describe('CanvasAppDefaultAssembly', () => {
     expect(DEFAULT_CANVAS_APP_ASSEMBLY.foundationExtensions).toEqual([
       CANVAS_STICKY_NOTE_EXTENSION,
     ])
-    expect(getCanvasAppFoundationExtensionTools(
-      DEFAULT_CANVAS_APP_ASSEMBLY.foundationExtensions,
-    )).toEqual([{
-      extensionId: CANVAS_STICKY_NOTE_EXTENSION.id,
-      id: CANVAS_STICKY_NOTE_TOOL_ID,
-      kind: 'creation',
-      requiredAdapters: ['creation', 'document', 'text-target'],
-    }])
-    expect(getCanvasAppFoundationExtensionRendererSlots(
-      DEFAULT_CANVAS_APP_ASSEMBLY.foundationExtensions,
-    )).toEqual([{
-      extensionId: CANVAS_STICKY_NOTE_EXTENSION.id,
-      id: CANVAS_STICKY_NOTE_RENDERER_SLOT_ID,
-      surface: 'item-layer',
-    }])
+    expect(DEFAULT_CANVAS_APP_ASSEMBLY.foundationExtensionRuntime.hasTool(
+      CANVAS_STICKY_NOTE_TOOL_ID,
+    )).toBe(true)
+    expect(DEFAULT_CANVAS_APP_ASSEMBLY.foundationExtensionRuntime
+      .componentPresentationRenderers['note-card']).toBeDefined()
     expect(DEFAULT_CANVAS_APP_ASSEMBLY.inspectorPanels).toEqual(
       DEFAULT_CANVAS_APP_FEATURE_PACK_EXTENSION_BUNDLE.inspectorPanels,
     )

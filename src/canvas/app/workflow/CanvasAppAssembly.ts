@@ -7,7 +7,6 @@ import type {
 } from './CanvasAppAssemblyTypes'
 import {
   createCanvasAppCapabilityAssembly,
-  withCanvasAppCapabilities,
 } from './CanvasAppCapabilityAssembly'
 import { createCanvasAppCollaborationAssembly } from './CanvasAppCollaborationAssembly'
 import { createCanvasAppComponentAssembly } from './CanvasAppComponentAssembly'
@@ -21,9 +20,15 @@ import {
 } from './CanvasAppFeaturePackAssembly'
 import {
   DEFAULT_CANVAS_APP_FEATURE_PACK_EXTENSION_BUNDLE,
+  mergeCanvasAppAffordanceConfigInput,
 } from '../feature-packs'
 import { createCanvasAppWorkspaceAssembly } from './CanvasAppWorkspaceAssembly'
 import { snapshotCanvasAppAssembly } from './CanvasAppAssemblySnapshot'
+import {
+  createCanvasAppDocumentAuthorityAffordanceConfigInput,
+  createCanvasAppDocumentAuthorityRead,
+} from './CanvasAppDocumentAuthority'
+import { compileCanvasAppFoundationExtensions } from '../extensions/foundation-extensions'
 
 export { assertCanvasAppAssembly } from './CanvasAppAssemblyContracts'
 export { DEFAULT_CANVAS_APP_ASSEMBLY } from './CanvasAppDefaultAssembly'
@@ -36,10 +41,6 @@ export type {
 export function createCanvasAppAssembly(
   input: CanvasAppAssemblyInput = {},
 ): CanvasAppAssembly {
-  const componentAssembly = createCanvasAppComponentAssembly(
-    input,
-    DEFAULT_CANVAS_APP_ASSEMBLY,
-  )
   const featurePackAssembly = createCanvasAppFeaturePackAssembly(
     input,
     {
@@ -72,12 +73,32 @@ export function createCanvasAppAssembly(
     input,
     DEFAULT_CANVAS_APP_ASSEMBLY,
   )
+  const documentAuthority = createCanvasAppDocumentAuthorityRead(
+    capabilityAssembly.capabilities,
+  )
+  const foundationExtensionRuntime = compileCanvasAppFoundationExtensions({
+    adapters: extensionAssembly.foundationExtensionAdapters,
+    can: (capability) => documentAuthority.can(
+      capability as Parameters<typeof documentAuthority.can>[0],
+    ),
+    extensions: extensionAssembly.foundationExtensions,
+  })
+  const componentAssembly = createCanvasAppComponentAssembly(
+    input,
+    DEFAULT_CANVAS_APP_ASSEMBLY,
+    {
+      foundationRenderers:
+        foundationExtensionRuntime.componentPresentationRenderers,
+    },
+  )
   const affordanceAssembly = createCanvasAppAffordanceAssembly(
     {
       ...input,
-      affordanceConfig: withCanvasAppCapabilities(
-        input.affordanceConfig,
-        capabilityAssembly.capabilities,
+      affordanceConfig: mergeCanvasAppAffordanceConfigInput(
+        input.affordanceConfig ?? {},
+        createCanvasAppDocumentAuthorityAffordanceConfigInput(
+          documentAuthority,
+        ),
       ),
     },
     DEFAULT_CANVAS_APP_ASSEMBLY,
@@ -93,7 +114,9 @@ export function createCanvasAppAssembly(
     componentLibrary: componentAssembly.componentLibrary,
     componentPresentationRenderers:
       componentAssembly.componentPresentationRenderers,
+    documentAuthority,
     featurePackViewRenderers: featurePackAssembly.featurePackViewRenderers,
+    foundationExtensionRuntime,
     installedFeaturePackIds: featurePackAssembly.installedFeaturePackIds,
     initialItems: workspaceAssembly.initialItems,
     initialSelection: workspaceAssembly.initialSelection,

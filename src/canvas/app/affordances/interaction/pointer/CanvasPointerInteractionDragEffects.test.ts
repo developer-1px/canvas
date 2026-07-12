@@ -6,6 +6,7 @@ import type {
 import { EMPTY_CANVAS_SNAP_GUIDES } from '../../../../engine'
 import {
   applyCanvasPointerInteractionCancelEffect,
+  applyCanvasPointerInteractionCommitResultEffect,
   applyCanvasPointerInteractionEndEffect,
   applyCanvasPointerInteractionPreviewEffect,
 } from './CanvasPointerInteractionDragEffects'
@@ -169,11 +170,32 @@ describe('CanvasPointerInteractionDragEffects', () => {
     })
 
     expect(context.setLiveItems).toHaveBeenCalledWith(historyItems)
+    expect(context.setSelection).toHaveBeenCalledWith(['rect-1'])
     expect(context.stageElement.releasePointer).toHaveBeenCalledWith(9)
     expect(context.interactionRef.current).toEqual({ kind: 'none' })
     expect(context.setSnapGuides).toHaveBeenCalledWith(
       EMPTY_CANVAS_SNAP_GUIDES,
     )
+  })
+
+  it('rolls back a live transform when the document authority rejects commit', () => {
+    const historyItems = [rect('rect-1')]
+    const interaction = moveInteraction({ historyItems })
+    const context = createContext({
+      interactionRef: { current: interaction },
+    })
+
+    expect(applyCanvasPointerInteractionCommitResultEffect({
+      committed: false,
+      context,
+      event: { pointerId: 9 },
+      interaction,
+    })).toBe(false)
+
+    expect(context.setLiveItems).toHaveBeenCalledWith(historyItems)
+    expect(context.setSelection).toHaveBeenCalledWith(['rect-1'])
+    expect(context.stageElement.releasePointer).toHaveBeenCalledWith(9)
+    expect(context.interactionRef.current).toEqual({ kind: 'none' })
   })
 })
 

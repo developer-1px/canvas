@@ -1,4 +1,4 @@
-import { CANVAS_APP_TEXT_TARGET } from '../affordances/editing/text-editor/CanvasAppTextTarget'
+import { createCanvasAppTextTarget } from '../affordances/editing/text-editor/CanvasAppTextTarget'
 import { describe, expect, it, vi } from 'vitest'
 import { renderToStaticMarkup } from 'react-dom/server'
 import type {
@@ -10,6 +10,17 @@ import type {
 import { getCanvasWhiteboardSvgItemRenderRoute } from './CanvasWhiteboardSvgItemRenderRouting'
 import { DEFAULT_CANVAS_WHITEBOARD_SVG_COMPONENT_PRESENTATION_RENDERERS } from './CanvasWhiteboardSvgComponentPresentationRegistry'
 import { DEFAULT_CANVAS_WHITEBOARD_SVG_CUSTOM_ITEM_RENDERERS } from './CanvasWhiteboardSvgCustomItemRendererRegistry'
+import { CANVAS_STICKY_NOTE_EXTENSION } from '../../foundation'
+import {
+  CANVAS_APP_STICKY_NOTE_CAPABILITY_ADAPTER,
+  compileCanvasAppFoundationExtensions,
+} from '../extensions/foundation-extensions'
+
+const foundationRuntime = compileCanvasAppFoundationExtensions({
+  adapters: [CANVAS_APP_STICKY_NOTE_CAPABILITY_ADAPTER],
+  extensions: [CANVAS_STICKY_NOTE_EXTENSION],
+})
+const textTarget = createCanvasAppTextTarget({}, foundationRuntime.textTargets)
 
 describe('CanvasWhiteboardSvgItemRenderRouting', () => {
   it('routes built-in editable component double-clicks into text editing', () => {
@@ -20,17 +31,17 @@ describe('CanvasWhiteboardSvgItemRenderRouting', () => {
 
     const stickyRoute = getCanvasWhiteboardSvgItemRenderRoute({
       ...createInput(sticky),
-      canEditText: (item: CanvasItem) => CANVAS_APP_TEXT_TARGET.canEdit(item),
+      canEditText: (item: CanvasItem) => textTarget.canEdit(item),
       onTextDoubleClick,
     })
     const cardRoute = getCanvasWhiteboardSvgItemRenderRoute({
       ...createInput(card),
-      canEditText: (item: CanvasItem) => CANVAS_APP_TEXT_TARGET.canEdit(item),
+      canEditText: (item: CanvasItem) => textTarget.canEdit(item),
       onTextDoubleClick,
     })
     const sectionRoute = getCanvasWhiteboardSvgItemRenderRoute({
       ...createInput(section),
-      canEditText: (item: CanvasItem) => CANVAS_APP_TEXT_TARGET.canEdit(item),
+      canEditText: (item: CanvasItem) => textTarget.canEdit(item),
       onTextDoubleClick,
     })
 
@@ -50,7 +61,7 @@ describe('CanvasWhiteboardSvgItemRenderRouting', () => {
 
     const route = getCanvasWhiteboardSvgItemRenderRoute({
       ...createInput(arrow),
-      canEditText: (item: CanvasItem) => CANVAS_APP_TEXT_TARGET.canEdit(item),
+      canEditText: (item: CanvasItem) => textTarget.canEdit(item),
       onTextDoubleClick,
     })
 
@@ -65,13 +76,31 @@ describe('CanvasWhiteboardSvgItemRenderRouting', () => {
 
     const route = getCanvasWhiteboardSvgItemRenderRoute({
       ...createInput(comment),
-      canEditText: (item: CanvasItem) => CANVAS_APP_TEXT_TARGET.canEdit(item),
+      canEditText: (item: CanvasItem) => textTarget.canEdit(item),
       onTextDoubleClick,
     })
 
     route.onDoubleClick?.()
 
     expect(onTextDoubleClick).toHaveBeenCalledWith(comment)
+  })
+
+  it('does not expose a double-click editor when text authority denies it', () => {
+    const item: CanvasItem = {
+      h: 40,
+      id: 'text-1',
+      text: 'Locked by authority',
+      type: 'text',
+      w: 120,
+      x: 0,
+      y: 0,
+    }
+    const route = getCanvasWhiteboardSvgItemRenderRoute({
+      ...createInput(item),
+      canEditText: () => false,
+    })
+
+    expect(route.onDoubleClick).toBeUndefined()
   })
 
   it('shows path anchor handles only while a path item is selected', () => {
@@ -111,14 +140,16 @@ describe('CanvasWhiteboardSvgItemRenderRouting', () => {
 function createInput(item: CanvasItem) {
   return {
     bounds: item,
-    componentPresentationRenderers:
-      DEFAULT_CANVAS_WHITEBOARD_SVG_COMPONENT_PRESENTATION_RENDERERS,
+    componentPresentationRenderers: {
+      ...DEFAULT_CANVAS_WHITEBOARD_SVG_COMPONENT_PRESENTATION_RENDERERS,
+      ...foundationRuntime.componentPresentationRenderers,
+    },
     customItemRenderers: DEFAULT_CANVAS_WHITEBOARD_SVG_CUSTOM_ITEM_RENDERERS,
     getComponentPresentation: (component: string) => component,
     item,
     locked: false,
     onArrowEndpointPointerDown: () => undefined,
-    canEditText: (item: CanvasItem) => CANVAS_APP_TEXT_TARGET.canEdit(item),
+    canEditText: (item: CanvasItem) => textTarget.canEdit(item),
     onTextDoubleClick: () => undefined,
     renderChild: () => null,
     selected: false,

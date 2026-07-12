@@ -25,7 +25,6 @@ import {
   CanvasWhiteboardSvgLabelComponent,
   CanvasWhiteboardSvgLinkPreviewComponent,
   CanvasWhiteboardSvgSectionComponent,
-  CanvasWhiteboardSvgStickyComponent,
 } from './CanvasWhiteboardSvgTextComponentRenderer'
 import {
   CanvasWhiteboardSvgConnectorComponent,
@@ -47,7 +46,6 @@ export const DEFAULT_CANVAS_WHITEBOARD_SVG_COMPONENT_PRESENTATION_RENDERERS: Can
   'line-connector': CanvasWhiteboardSvgConnectorComponent,
   'matrix-table': CanvasWhiteboardSvgTableComponent,
   'metric-scorecard': CanvasWhiteboardSvgScorecardComponent,
-  'note-card': CanvasWhiteboardSvgStickyComponent,
   'review-queue': CanvasWhiteboardSvgQueueComponent,
   'review-board': CanvasWhiteboardSvgReviewBoardComponent,
   'workflow-timeline': CanvasWhiteboardSvgTimelineComponent,

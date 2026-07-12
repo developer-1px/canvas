@@ -7,6 +7,7 @@ import {
   assertCanvasAppOptionalDescriptorStringField,
 } from '../CanvasAppDescriptorContracts'
 import { assertCanvasAppExtensionEntries } from '../CanvasAppExtensionIds'
+import { assertCanvasAppRequiredCapability } from '../../CanvasAppCapabilityContracts'
 import type { CanvasAppCustomCommand } from './CanvasAppCustomCommands'
 
 export function assertCanvasAppCustomCommands(
@@ -39,6 +40,10 @@ export function assertCanvasAppCustomCommands(
       field: 'run',
       owner,
       value: command.run,
+    })
+    assertCanvasAppRequiredCapability({
+      owner,
+      value: command.requiredCapability,
     })
     assertCanvasAppOptionalDescriptorFunctionField({
       field: 'isEnabled',

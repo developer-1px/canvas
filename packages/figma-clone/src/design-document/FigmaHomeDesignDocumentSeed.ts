@@ -2,7 +2,7 @@ import type {
   DesignJSONObject,
   DesignNode,
   DesignNodeComponentBinding,
-} from '../../../../src/canvas/design-document'
+} from '@interactive-os/canvas/react-design'
 import {
   createFigmaDesignNodeLayout,
   createFigmaDesignNodeStyle,

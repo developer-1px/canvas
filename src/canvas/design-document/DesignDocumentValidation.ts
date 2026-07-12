@@ -6,21 +6,25 @@ import type {
 
 export type DesignDocumentGraphIndex = {
   readonly nodeById: ReadonlyMap<DesignNodeId, DesignNode>
+  readonly nodeIndexById: ReadonlyMap<DesignNodeId, number>
   readonly parentById: ReadonlyMap<DesignNodeId, DesignNodeId>
+  readonly componentNodeIdBySlot: ReadonlyMap<string, DesignNodeId>
 }
 
 export function validateAndIndexDesignDocument(
   snapshot: DesignDocumentSnapshot,
 ): DesignDocumentGraphIndex {
   const nodeById = new Map<DesignNodeId, DesignNode>()
+  const nodeIndexById = new Map<DesignNodeId, number>()
   const parentById = new Map<DesignNodeId, DesignNodeId>()
 
-  for (const node of snapshot.nodes) {
+  for (const [index, node] of snapshot.nodes.entries()) {
     if (nodeById.has(node.id)) {
       throw new Error(`Duplicate design node id: ${node.id}`)
     }
 
     nodeById.set(node.id, node)
+    nodeIndexById.set(node.id, index)
   }
 
   const rootIds = new Set<DesignNodeId>()
@@ -38,7 +42,7 @@ export function validateAndIndexDesignDocument(
   }
 
   for (const node of snapshot.nodes) {
-    validateParentKind(node)
+    validateDesignNodeParentKind(node)
 
     for (const childId of node.children) {
       if (!nodeById.has(childId)) {
@@ -53,7 +57,7 @@ export function validateAndIndexDesignDocument(
     }
   }
 
-  validateComponentBindings(snapshot.nodes)
+  const componentNodeIdBySlot = validateComponentBindings(snapshot.nodes)
 
   validateAcyclicGraph(snapshot.nodes, nodeById)
 
@@ -75,43 +79,33 @@ export function validateAndIndexDesignDocument(
     }
   }
 
-  return { nodeById, parentById }
+  return {
+    componentNodeIdBySlot,
+    nodeById,
+    nodeIndexById,
+    parentById,
+  }
 }
 
 function validateComponentBindings(nodes: readonly DesignNode[]) {
-  const instanceSlots = new Set<string>()
+  const componentNodeIdBySlot = new Map<string, DesignNodeId>()
 
   for (const node of nodes) {
-    const binding = node.component
-
-    if (!binding) {
+    const instanceSlot = validateDesignNodeComponentBinding(node)
+    if (instanceSlot === null) {
       continue
     }
 
-    if (
-      node.definition.kind === 'component' &&
-      node.definition.id !== binding.definitionId
-    ) {
+    if (componentNodeIdBySlot.has(instanceSlot.key)) {
       throw new Error(
-        `Component definition mismatch for design node: ${node.id}`,
+        `Duplicate component instance slot: ${instanceSlot.label}`,
       )
     }
 
-    const instanceSlotParts = [
-      binding.definitionId,
-      binding.instanceId,
-      binding.slotId,
-    ]
-    const instanceSlot = JSON.stringify(instanceSlotParts)
-
-    if (instanceSlots.has(instanceSlot)) {
-      throw new Error(
-        `Duplicate component instance slot: ${instanceSlotParts.join('/')}`,
-      )
-    }
-
-    instanceSlots.add(instanceSlot)
+    componentNodeIdBySlot.set(instanceSlot.key, node.id)
   }
+
+  return componentNodeIdBySlot
 }
 
 const VOID_INTRINSIC_IDS = new Set([
@@ -131,7 +125,7 @@ const VOID_INTRINSIC_IDS = new Set([
   'wbr',
 ])
 
-function validateParentKind(node: DesignNode) {
+export function validateDesignNodeParentKind(node: DesignNode) {
   if (node.children.length === 0) {
     return
   }
@@ -154,6 +148,37 @@ function validateParentKind(node: DesignNode) {
   }
 }
 
+export function validateDesignNodeComponentBinding(node: DesignNode): {
+  readonly key: string
+  readonly label: string
+} | null {
+  const binding = node.component
+
+  if (!binding) {
+    return null
+  }
+
+  if (
+    node.definition.kind === 'component' &&
+    node.definition.id !== binding.definitionId
+  ) {
+    throw new Error(
+      `Component definition mismatch for design node: ${node.id}`,
+    )
+  }
+
+  const instanceSlotParts = [
+    binding.definitionId,
+    binding.instanceId,
+    binding.slotId,
+  ]
+
+  return {
+    key: JSON.stringify(instanceSlotParts),
+    label: instanceSlotParts.join('/'),
+  }
+}
+
 function validateAcyclicGraph(
   nodes: readonly DesignNode[],
   nodeById: ReadonlyMap<DesignNodeId, DesignNode>,
@@ -162,32 +187,44 @@ function validateAcyclicGraph(
   const visited = new Set<DesignNodeId>()
   const path: DesignNodeId[] = []
 
-  function visit(nodeId: DesignNodeId) {
-    if (visiting.has(nodeId)) {
-      const cycleStart = path.indexOf(nodeId)
-      const cycle = [...path.slice(cycleStart), nodeId]
-
-      throw new Error(`Design graph cycle: ${cycle.join(' -> ')}`)
-    }
-
-    if (visited.has(nodeId)) {
-      return
-    }
-
-    visiting.add(nodeId)
-    path.push(nodeId)
-
-    for (const childId of nodeById.get(nodeId)?.children ?? []) {
-      visit(childId)
-    }
-
-    path.pop()
-    visiting.delete(nodeId)
-    visited.add(nodeId)
-  }
-
   for (const node of nodes) {
-    visit(node.id)
+    if (visited.has(node.id)) {
+      continue
+    }
+
+    const frames = [{ childIndex: 0, nodeId: node.id }]
+    visiting.add(node.id)
+    path.push(node.id)
+
+    while (frames.length > 0) {
+      const frame = frames[frames.length - 1]
+      const children = nodeById.get(frame.nodeId)?.children ?? []
+      const childId = children[frame.childIndex]
+
+      if (childId !== undefined) {
+        frame.childIndex += 1
+
+        if (visiting.has(childId)) {
+          const cycleStart = path.indexOf(childId)
+          const cycle = [...path.slice(cycleStart), childId]
+
+          throw new Error(`Design graph cycle: ${cycle.join(' -> ')}`)
+        }
+
+        if (!visited.has(childId)) {
+          visiting.add(childId)
+          path.push(childId)
+          frames.push({ childIndex: 0, nodeId: childId })
+        }
+
+        continue
+      }
+
+      frames.pop()
+      path.pop()
+      visiting.delete(frame.nodeId)
+      visited.add(frame.nodeId)
+    }
   }
 }
 
@@ -196,13 +233,19 @@ function collectReachableIds(
   nodeById: ReadonlyMap<DesignNodeId, DesignNode>,
   reachableIds: Set<DesignNodeId>,
 ) {
-  if (reachableIds.has(nodeId)) {
-    return
-  }
+  const pending = [nodeId]
 
-  reachableIds.add(nodeId)
+  while (pending.length > 0) {
+    const currentId = pending.pop()
 
-  for (const childId of nodeById.get(nodeId)?.children ?? []) {
-    collectReachableIds(childId, nodeById, reachableIds)
+    if (currentId === undefined || reachableIds.has(currentId)) {
+      continue
+    }
+
+    reachableIds.add(currentId)
+
+    for (const childId of nodeById.get(currentId)?.children ?? []) {
+      pending.push(childId)
+    }
   }
 }

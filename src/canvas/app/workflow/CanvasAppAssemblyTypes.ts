@@ -30,14 +30,18 @@ import type {
   CanvasAppPresenceProvider,
 } from './CanvasAppCollaborationAssembly'
 import type { CanvasAppExtensionAssemblyInput } from './CanvasAppExtensionAssemblyTypes'
+import type { CanvasAppDocumentAuthorityRead } from '../workspace/document/CanvasAppDocumentContracts'
+import type { CanvasAppFoundationExtensionRuntime } from '../extensions/foundation-extensions'
 
 export type CanvasAppAssembly = CanvasAppExtensionBundle & {
   affordanceConfig: CanvasAffordanceConfig
   capabilities: CanvasAppCapabilitySnapshot
   componentLibrary: CanvasAppComponentLibrary
   componentPresentationRenderers: CanvasAppComponentPresentationRenderers
+  documentAuthority: CanvasAppDocumentAuthorityRead
   featurePackViewRenderers:
     CanvasAppFeaturePackAssembly['featurePackViewRenderers']
+  foundationExtensionRuntime: CanvasAppFoundationExtensionRuntime
   installedFeaturePackIds:
     CanvasAppFeaturePackAssembly['installedFeaturePackIds']
   initialItems: CanvasItem[]

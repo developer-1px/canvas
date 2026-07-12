@@ -271,6 +271,7 @@ export function useCanvasAppModel({
     ...appAssembly.pointer,
     ...stageElement.pointer,
     workspace: {
+      canEditText: workspace.pointer.canEditText,
       ...workspace.pointer.workspace,
       ...text.pointer.workspace,
     },

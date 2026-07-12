@@ -14,9 +14,9 @@ import type {
 } from '../extensions/CanvasAppExtensionStateContracts'
 import type { CanvasAppCustomCreationTool } from '../extensions/custom-tools/CanvasAppCustomCreationTools'
 import type {
-  CommitCanvasItemsChange,
   CommitCanvasSelection,
 } from './CanvasWorkflowContract'
+import type { CanvasAppDocumentAuthority } from '../workspace/document/CanvasAppDocumentContracts'
 
 export type CanvasAppExtensionRuntime = {
   customCommandStates: CanvasAppCustomCommandState[]
@@ -26,11 +26,11 @@ export type CanvasAppExtensionRuntime = {
 }
 
 export type CanvasAppExtensionModelInput = {
-  commitItemsChange: CommitCanvasItemsChange
   commitSelection: CommitCanvasSelection
   createId: (prefix: string) => string
   customCommands: readonly CanvasAppCustomCommand[]
   customCreationTools: readonly CanvasAppCustomCreationTool[]
+  document: CanvasAppDocumentAuthority
   items: CanvasItem[]
   selection: string[]
   setEditing: Dispatch<SetStateAction<EditingText | null>>

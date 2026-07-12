@@ -5,8 +5,10 @@ import { createRoot } from 'react-dom/client'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { createEditorEngine } from '@interactive-os/canvas/editor'
-import { createDesignDocument } from '../../../../src/canvas/design-document'
-import { createDomProjection } from '../../../../src/canvas/dom-projection'
+import {
+  createDesignDocument,
+  createDomProjection,
+} from '@interactive-os/canvas/react-design'
 import { DomEditEditorOverlay } from '../react'
 
 vi.mock('react-moveable', async () => {

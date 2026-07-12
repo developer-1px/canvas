@@ -16,6 +16,9 @@ import type { CanvasResizePointerInteractionStartResult } from './CanvasResizePo
 import type {
   CanvasArrowEndpointPointerInteractionStartResult,
 } from './CanvasArrowEndpointPointerInteractionStart'
+import {
+  executeCanvasAppFoundationExtensionEffects,
+} from '../../../extensions/foundation-extensions'
 
 export function applyCanvasPointerInteractionStartEffect({
   context,
@@ -36,21 +39,52 @@ export function applyCanvasPointerInteractionStartEffect({
     capturePointer(context.stageElement, event.pointerId)
   }
 
+  if (start.kind === 'extension-effects') {
+    return executeCanvasAppFoundationExtensionEffects({
+      context: {
+        commitDocumentPatch: (patch, selection) => {
+          const [change] = patch
+
+          return patch.length === 1 && change !== undefined &&
+            context.commitItemsChange(change, selection)
+        },
+        commitSelection: context.commitSelection,
+        setEditing: context.setEditing,
+      },
+      effects: start.effects,
+    })
+  }
+
   if (start.kind === 'created-text') {
-    context.commitItemsChange({ type: 'add', items: [start.item] }, {
+    const committed = context.commitItemsChange({
+      type: 'add',
+      items: [start.item],
+    }, {
       before: context.selection,
       after: [start.item.id],
     })
+
+    if (!committed) {
+      return false
+    }
+
     context.setEditing(start.edit)
     context.setTool('select')
     return true
   }
 
   if (start.kind === 'created-item') {
-    context.commitItemsChange({ type: 'add', items: [start.item] }, {
+    const committed = context.commitItemsChange({
+      type: 'add',
+      items: [start.item],
+    }, {
       before: context.selection,
       after: [start.item.id],
     })
+
+    if (!committed) {
+      return false
+    }
 
     if (start.edit) {
       context.setEditing(start.edit)

@@ -12,6 +12,7 @@ import type {
 import {
   bindCanvasNativeGestureBoundary,
   CANVAS_NATIVE_GESTURE_BOUNDARY_SELECTOR,
+  resolveCanvasNativeWheelOwnership,
   type CanvasNativeGestureTarget,
 } from '../../../browser-runtime/CanvasNativeGestureBoundary'
 import {
@@ -19,9 +20,6 @@ import {
   type CanvasPointerPinchChange,
   type CanvasPointerPinchTarget,
 } from '../../../browser-runtime/CanvasPointerPinchGesture'
-import {
-  isCanvasWheelPassthroughTarget,
-} from '../../affordances/interaction/dom/CanvasInteractionTarget'
 
 export type CanvasAppStageRect = {
   height: number
@@ -312,16 +310,16 @@ function isCanvasStageWheelEvent(
 ): boolean {
   const target = event.target
 
+  if (resolveCanvasNativeWheelOwnership(event) === 'native') {
+    return false
+  }
+
   if (typeof Node === 'undefined' || typeof Element === 'undefined') {
     return true
   }
 
   if (!(target instanceof Node)) {
     return true
-  }
-
-  if (isCanvasWheelPassthroughTarget(target)) {
-    return false
   }
 
   if (stageElement.contains(target)) {

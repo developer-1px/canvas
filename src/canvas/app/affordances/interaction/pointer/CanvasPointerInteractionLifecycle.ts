@@ -58,7 +58,7 @@ export function commitCanvasPointerInteraction({
   setTool,
   textTarget,
 }: CanvasPointerInteractionCommitInput) {
-  routeCanvasPointerInteraction(interaction, {
+  return routeCanvasPointerInteraction(interaction, {
     creation: (interaction) =>
       commitCanvasPointerCreation({
         componentLibrary,
@@ -73,7 +73,7 @@ export function commitCanvasPointerInteraction({
         setTool,
         textTarget,
       }),
-    fallback: () => undefined,
+    fallback: () => true,
     eraser: (interaction) =>
       commitCanvasPointerEraserInteraction({
         commitItemsChange,
@@ -120,6 +120,7 @@ export function cancelCanvasPointerInteraction({
       cancelCanvasPointerTransformInteraction({
         interaction,
         setLiveItems,
+        setSelection,
       }),
   })
 }

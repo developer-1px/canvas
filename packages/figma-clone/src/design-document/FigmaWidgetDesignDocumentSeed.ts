@@ -1,4 +1,4 @@
-import type { DesignNode } from '../../../../src/canvas/design-document'
+import type { DesignNode } from '@interactive-os/canvas/react-design'
 import {
   createFigmaDesignNodeLayout,
   createFigmaDesignNodeStyle,

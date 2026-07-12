@@ -22,6 +22,7 @@ import type {
   CanvasAppCustomCreationTool,
   CanvasAppCustomToolShortcut,
 } from './CanvasAppCustomCreationTools'
+import { assertCanvasAppRequiredCapability } from '../../CanvasAppCapabilityContracts'
 
 type CanvasAppCustomCreationToolDescriptor = Omit<
   CanvasAppCustomCreationTool,
@@ -160,6 +161,10 @@ function assertCanvasAppCustomCreationToolDescriptor(
     field: 'createItem',
     owner,
     value: tool.createItem,
+  })
+  assertCanvasAppRequiredCapability({
+    owner,
+    value: tool.requiredCapability,
   })
 
   if (tool.shortcut !== undefined) {

@@ -1,4 +1,4 @@
-import { CANVAS_APP_TEXT_TARGET } from '../affordances/editing/text-editor/CanvasAppTextTarget'
+import { createCanvasAppTextTarget } from '../affordances/editing/text-editor/CanvasAppTextTarget'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import type { CanvasItem } from '../../entities'
@@ -9,6 +9,17 @@ import {
 } from '../affordances/editing/text-editor/CanvasInlineTextEditingContext'
 import { DEFAULT_CANVAS_WHITEBOARD_SVG_COMPONENT_PRESENTATION_RENDERERS } from './CanvasWhiteboardSvgComponentPresentationRegistry'
 import { DEFAULT_CANVAS_WHITEBOARD_SVG_CUSTOM_ITEM_RENDERERS } from './CanvasWhiteboardSvgCustomItemRendererRegistry'
+import { CANVAS_STICKY_NOTE_EXTENSION } from '../../foundation'
+import {
+  CANVAS_APP_STICKY_NOTE_CAPABILITY_ADAPTER,
+  compileCanvasAppFoundationExtensions,
+} from '../extensions/foundation-extensions'
+
+const foundationRuntime = compileCanvasAppFoundationExtensions({
+  adapters: [CANVAS_APP_STICKY_NOTE_CAPABILITY_ADAPTER],
+  extensions: [CANVAS_STICKY_NOTE_EXTENSION],
+})
+const textTarget = createCanvasAppTextTarget({}, foundationRuntime.textTargets)
 
 describe('CanvasWhiteboardSvgItemRenderer built-in components', () => {
   it('renders sticky notes as a single editable note body', () => {
@@ -327,15 +338,17 @@ function renderItem(
   const itemMarkup = (
     <svg>
       {renderCanvasWhiteboardSvgItem({
-        componentPresentationRenderers:
-          DEFAULT_CANVAS_WHITEBOARD_SVG_COMPONENT_PRESENTATION_RENDERERS,
+        componentPresentationRenderers: {
+          ...DEFAULT_CANVAS_WHITEBOARD_SVG_COMPONENT_PRESENTATION_RENDERERS,
+          ...foundationRuntime.componentPresentationRenderers,
+        },
         customItemRenderers: DEFAULT_CANVAS_WHITEBOARD_SVG_CUSTOM_ITEM_RENDERERS,
         getComponentPresentation,
         item,
         locked: false,
         onArrowEndpointPointerDown: () => undefined,
         onItemPointerDown: () => undefined,
-        canEditText: (item) => CANVAS_APP_TEXT_TARGET.canEdit(item),
+        canEditText: (item) => textTarget.canEdit(item),
         onTextDoubleClick: () => undefined,
         outlineIds: new Set(),
         selected: options.selected ?? new Set(),

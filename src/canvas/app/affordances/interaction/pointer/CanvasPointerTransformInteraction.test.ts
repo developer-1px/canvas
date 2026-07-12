@@ -135,15 +135,33 @@ describe('CanvasPointerTransformInteraction', () => {
   it('restores history items on cancel', () => {
     const historyItem = createRectItem('rect-1')
     const setLiveItems = vi.fn()
+    const setSelection = vi.fn()
 
     cancelCanvasPointerTransformInteraction({
       interaction: createResizeInteraction({
         historyItems: [historyItem],
       }),
       setLiveItems,
+      setSelection,
     })
 
     expect(setLiveItems).toHaveBeenCalledWith([historyItem])
+    expect(setSelection).not.toHaveBeenCalled()
+  })
+
+  it('restores the pre-drag selection when a move is cancelled', () => {
+    const setSelection = vi.fn()
+
+    cancelCanvasPointerTransformInteraction({
+      interaction: createMoveInteraction({
+        historySelection: ['rect-1'],
+        ids: ['rect-1-copy'],
+      }),
+      setLiveItems: vi.fn(),
+      setSelection,
+    })
+
+    expect(setSelection).toHaveBeenCalledWith(['rect-1'])
   })
 })
 

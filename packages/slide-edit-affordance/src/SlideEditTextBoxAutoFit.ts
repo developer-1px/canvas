@@ -1,4 +1,4 @@
-import type { Bounds } from '../../../src/canvas/core'
+import type { Bounds } from '@interactive-os/canvas/core'
 import {
   parseSlideEditJSONPasteTextValue,
   SLIDE_EDIT_TEXT_JSON_PASTE_TYPES,

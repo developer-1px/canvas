@@ -1,7 +1,7 @@
 import type {
   DomEditFrameGuideConfig,
 } from '@interactive-os/dom-edit-affordance/react'
-import type { DesignNodeFrame } from '../../../../src/canvas/design-document'
+import type { DesignNodeFrame } from '@interactive-os/canvas/react-design'
 
 export type FigmaCloneResponsiveGuidePreset =
   | 'desktop'

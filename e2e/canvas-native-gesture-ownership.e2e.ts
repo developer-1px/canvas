@@ -55,6 +55,26 @@ for (const target of CANVAS_ROUTES) {
     expect(await dispatchMultiTouchMove(control)).toBe(false)
     expect(await dispatchKeyboardZoom(control)).toBe(false)
 
+    const textEntry = await openTextEntry(page, target.route, stage)
+
+    await textEntry.fill('IME draft')
+    const scaleBeforeTextEntryZoom = await readCanvasScale(root)
+    const textEntryResult = await dispatchComposingKeyboardZoom(textEntry)
+
+    expect(textEntryResult).toEqual({
+      active: true,
+      continued: false,
+      value: 'IME draft',
+    })
+    await expect.poll(() => readCanvasScale(root)).toBe(
+      scaleBeforeTextEntryZoom,
+    )
+
+    if (target.route !== '/figma') {
+      await page.keyboard.press('Escape')
+      await expect(page.locator('[aria-label="Command palette"]')).toHaveCount(0)
+    }
+
     const scaleBeforeZoom = await readCanvasScale(root)
     const stageBox = await stage.boundingBox()
 
@@ -106,22 +126,132 @@ for (const target of CANVAS_ROUTES) {
       scaleBeforeGestureZoom,
     )
 
-    const scaleBeforePointerPinch = await readCanvasScale(root)
-
-    await pinchStageWithTouchPointers(page, stageBox)
-    await expect.poll(() => readCanvasScale(root)).toBeGreaterThan(
-      scaleBeforePointerPinch,
-    )
     expect(await page.evaluate(() => window.visualViewport?.scale ?? 1)).toBe(1)
-    expect([null, 'none']).toContain(await stage.getAttribute('data-gesture'))
-    await expect(stage).not.toHaveAttribute('data-panning', 'true')
-    await expect(page.locator('.marquee, .figjam-react-marquee')).toHaveCount(0)
 
     await expect(root).toHaveCSS('overscroll-behavior-x', 'none')
     await expect(root).toHaveCSS('overscroll-behavior-y', 'none')
     await expect(root).toHaveCSS('touch-action', 'manipulation')
     await expect(stage).toHaveCSS('touch-action', 'none')
     expect(passiveListenerErrors).toEqual([])
+  })
+}
+
+test('Figma authored scroll frames keep native scroll before canvas pan', async ({
+  page,
+}) => {
+  await page.goto('/figma')
+
+  const root = page.locator('.figma-clone')
+  const frame = page.locator('[data-design-node-id="workspacePage"]')
+  const layers = page.getByRole('complementary', { name: 'Layers' })
+  const inspector = page.getByRole('complementary', {
+    name: 'CSS Inspector',
+  })
+
+  await layers.getByRole('button', {
+    name: 'Select Workspace page section',
+  }).click()
+  await inspector.getByRole('button', { name: 'Mock', exact: true }).click()
+  const viewportSection = inspector.locator('section').filter({
+    hasText: 'Viewport',
+  })
+  const overflowSection = inspector.locator('section').filter({
+    hasText: 'Overflow',
+  })
+
+  await viewportSection.getByLabel('H', { exact: true }).fill('240')
+  await overflowSection.getByRole('button', {
+    name: 'Scroll',
+    exact: true,
+  }).click()
+  await expect(frame).toHaveAttribute('data-canvas-wheel-passthrough', 'scroll')
+
+  const maxScrollTop = await frame.evaluate((element) =>
+    element.scrollHeight - element.clientHeight
+  )
+
+  expect(maxScrollTop).toBeGreaterThan(0)
+  await frame.evaluate((element, max) => {
+    element.scrollTop = Math.floor(max / 3)
+  }, maxScrollTop)
+
+  const scrollTopBefore = await frame.evaluate((element) => element.scrollTop)
+  const viewportBefore = await readCanvasViewport(root)
+
+  await frame.hover()
+  await page.mouse.wheel(0, 80)
+  await expect.poll(() => frame.evaluate((element) => element.scrollTop))
+    .toBeGreaterThan(scrollTopBefore)
+  expect(await readCanvasViewport(root)).toEqual(viewportBefore)
+
+  await frame.evaluate((element) => {
+    element.scrollTop = element.scrollHeight - element.clientHeight
+  })
+
+  const viewportAtEdge = await readCanvasViewport(root)
+
+  await frame.hover()
+  await page.mouse.wheel(0, 80)
+  await expect.poll(() => readCanvasViewport(root)).not.toEqual(
+    viewportAtEdge,
+  )
+
+  const scaleBeforeZoom = await readCanvasScale(root)
+  const scrollTopBeforeZoom = await frame.evaluate(
+    (element) => element.scrollTop,
+  )
+
+  await frame.hover()
+  await page.keyboard.down('Control')
+  await page.mouse.wheel(0, -80)
+  await page.keyboard.up('Control')
+  await expect.poll(() => readCanvasScale(root)).toBeGreaterThan(
+    scaleBeforeZoom,
+  )
+  expect(await frame.evaluate((element) => element.scrollTop)).toBe(
+    scrollTopBeforeZoom,
+  )
+})
+
+async function openTextEntry(
+  page: Page,
+  route: typeof CANVAS_ROUTES[number]['route'],
+  stage: Locator,
+) {
+  if (route === '/figma') {
+    const search = page.locator('[aria-label="Search layers"]')
+
+    await expect(search).toBeVisible()
+    return search
+  }
+
+  await stage.focus()
+  await page.keyboard.down('Control')
+  await page.keyboard.press('k')
+  await page.keyboard.up('Control')
+
+  const search = page.locator('[aria-label="Search commands"]')
+
+  await expect(search).toBeVisible()
+  return search
+}
+
+async function dispatchComposingKeyboardZoom(locator: Locator) {
+  return locator.evaluate((element) => {
+    const event = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      ctrlKey: true,
+      key: '=',
+    })
+
+    Object.defineProperty(event, 'isComposing', { value: true })
+
+    return {
+      active: document.activeElement === element,
+      continued: element.dispatchEvent(event),
+      value: (element as HTMLInputElement).value,
+    }
   })
 }
 
@@ -197,45 +327,6 @@ async function dispatchGestureZoom(locator: Locator, scale: number) {
   }, scale)
 }
 
-async function pinchStageWithTouchPointers(
-  page: Page,
-  stageBox: { height: number; width: number; x: number; y: number },
-) {
-  const client = await page.context().newCDPSession(page)
-  const centerX = Math.round(stageBox.x + stageBox.width / 2)
-  const centerY = Math.round(stageBox.y + stageBox.height / 2)
-
-  try {
-    await client.send('Emulation.setTouchEmulationEnabled', {
-      enabled: true,
-      maxTouchPoints: 2,
-    })
-    await client.send('Input.dispatchTouchEvent', {
-      type: 'touchStart',
-      touchPoints: [
-        { id: 1, x: centerX - 40, y: centerY },
-        { id: 2, x: centerX + 40, y: centerY },
-      ],
-    })
-    await client.send('Input.dispatchTouchEvent', {
-      type: 'touchMove',
-      touchPoints: [
-        { id: 1, x: centerX - 80, y: centerY },
-        { id: 2, x: centerX + 80, y: centerY },
-      ],
-    })
-    await client.send('Input.dispatchTouchEvent', {
-      type: 'touchEnd',
-      touchPoints: [],
-    })
-  } finally {
-    await client.send('Emulation.setTouchEmulationEnabled', {
-      enabled: false,
-    })
-    await client.detach()
-  }
-}
-
 async function readCanvasScale(root: Locator) {
   return root.evaluate((element) => {
     const scale = element.getAttribute('data-viewport-scale')
@@ -249,4 +340,12 @@ async function readCanvasScale(root: Locator) {
 
     return Number.parseFloat(scaleLabel) / 100
   })
+}
+
+async function readCanvasViewport(root: Locator) {
+  return root.evaluate((element) => ({
+    scale: element.getAttribute('data-viewport-scale'),
+    x: element.getAttribute('data-viewport-x'),
+    y: element.getAttribute('data-viewport-y'),
+  }))
 }

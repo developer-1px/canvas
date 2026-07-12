@@ -22,6 +22,21 @@ import {
 
 export type EditableCanvasTextItem = CanvasItem
 
+export function canCanvasAppEditTextItem({
+  canComment,
+  canEditDocument,
+  item,
+}: {
+  canComment: boolean
+  canEditDocument: boolean
+  item: CanvasItem | null
+}) {
+  return item !== null && (
+    canEditDocument ||
+    (canComment && item.type === 'comment')
+  )
+}
+
 type CommitCanvasTextEditingArgs = {
   commitItemsChange: CommitCanvasItemsChange
   editing: EditingText | null

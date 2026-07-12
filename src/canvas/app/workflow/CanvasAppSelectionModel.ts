@@ -58,6 +58,7 @@ export type CanvasAppSelectionModel = {
   label: string | null
   rotation: number | null
   canFlip: boolean
+  canEditText: boolean
   canSelectSame: boolean
   canTidy: boolean
   sectionContentsHidden: boolean
@@ -133,6 +134,8 @@ export function getCanvasAppSelectionModel({
     label,
     rotation: getCanvasSelectionRotation(items, selection),
     canFlip: !disabled && canFlipCanvasSelection(items, selection),
+    canEditText: !disabled && selection.length === 1 &&
+      itemReadModel.findTextEditTarget(selection[0] ?? '') !== null,
     canSelectSame: !disabled && canSelectSameTypeCanvasSelection(items, selection),
     canTidy: canTidyCanvasSelection(items, selection),
     sectionContentsHidden: selectedSectionState.contentIds.length > 0 &&
@@ -366,11 +369,13 @@ export function getCanvasAppSelectionModel({
 }
 
 export function editCanvasAppSelectionText({
+  canEditText = () => true,
   disabled = false,
   itemReadModel,
   selection,
   setEditing,
 }: {
+  canEditText?: (item: CanvasItem) => boolean
   disabled?: boolean
   itemReadModel: CanvasAppItemReadModel
   selection: readonly string[]
@@ -383,7 +388,7 @@ export function editCanvasAppSelectionText({
   const [id] = selection
   const item = id ? itemReadModel.findTextEditTarget(id) : null
 
-  if (!item) {
+  if (!item || !canEditText(item)) {
     return false
   }
 

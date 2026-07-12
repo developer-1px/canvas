@@ -5,17 +5,29 @@ export {
   type CanvasAppFoundationExtension,
 } from './CanvasAppFoundationExtensionDescriptors'
 export {
-  getCanvasAppFoundationExtensionCommands,
   type CanvasAppFoundationCommandDescriptor,
-  type CanvasAppFoundationExtensionCommand,
 } from './CanvasAppFoundationExtensionCommands'
 export {
-  getCanvasAppFoundationExtensionRendererSlots,
-  type CanvasAppFoundationExtensionRendererSlot,
   type CanvasAppFoundationRendererSlotDescriptor,
 } from './CanvasAppFoundationExtensionRendererSlots'
 export {
-  getCanvasAppFoundationExtensionTools,
-  type CanvasAppFoundationExtensionTool,
   type CanvasAppFoundationToolDescriptor,
 } from './CanvasAppFoundationExtensionTools'
+export {
+  appendUniqueCanvasAppFoundationExtensionCapabilityAdapters,
+  assertCanvasAppFoundationExtensionRuntime,
+  compileCanvasAppFoundationExtensions,
+  snapshotCanvasAppFoundationExtensionCapabilityAdapters,
+  type CanvasAppFoundationExtensionCapabilityAdapter,
+  type CanvasAppFoundationExtensionEffect,
+  type CanvasAppFoundationExtensionRuntime,
+  type CanvasAppFoundationExtensionToolPlanner,
+} from './CanvasAppFoundationExtensionRuntime'
+export {
+  executeCanvasAppFoundationExtensionEffects,
+  type CanvasAppFoundationExtensionEffectContext,
+} from './CanvasAppFoundationExtensionEffects'
+export {
+  CANVAS_APP_STICKY_NOTE_CAPABILITY_ADAPTER,
+  type CanvasAppStickyNotePlannerInput,
+} from './CanvasAppStickyNoteCapabilityAdapter'

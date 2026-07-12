@@ -3,6 +3,7 @@ import * as z from 'zod'
 import type {
   DesignDocumentSnapshot,
   DesignJSONValue,
+  DesignNode,
 } from './DesignDocumentTypes'
 
 const DesignJSONValueSchema: z.ZodType<DesignJSONValue> = z.lazy(() =>
@@ -58,4 +59,8 @@ export function parseDesignDocumentSnapshot(
   value: unknown,
 ): DesignDocumentSnapshot {
   return DesignDocumentSnapshotSchema.parse(value) as DesignDocumentSnapshot
+}
+
+export function parseDesignNode(value: unknown): DesignNode {
+  return DesignNodeSchema.parse(value) as DesignNode
 }

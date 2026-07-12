@@ -6,42 +6,15 @@ import {
   assertCanvasAppDescriptorObject,
   assertCanvasAppDescriptorStringField,
 } from '../CanvasAppDescriptorContracts'
-import { snapshotCanvasAppArray } from '../CanvasAppDescriptorSnapshot'
 import type { CanvasAppExtensionRegistryOwner } from '../CanvasAppExtensionRegistries'
 
 export type CanvasAppFoundationRendererSlotDescriptor =
   NonNullable<CanvasExtensionDescriptor['rendererSlots']>[number]
 
-export type CanvasAppFoundationExtensionRendererSlot = Readonly<{
-  extensionId: CanvasExtensionDescriptor['id']
-  id: CanvasAppFoundationRendererSlotDescriptor['id']
-  surface: CanvasAppFoundationRendererSlotDescriptor['surface']
-}>
-
 type CanvasAppFoundationExtensionRendererSlotSource = Pick<
   CanvasExtensionDescriptor,
   'id' | 'rendererSlots'
 >
-
-export function getCanvasAppFoundationExtensionRendererSlots(
-  extensions: readonly CanvasAppFoundationExtensionRendererSlotSource[],
-) {
-  assertUniqueCanvasAppFoundationExtensionRendererSlotIds({
-    extensions,
-    owner: 'foundation extension descriptors',
-  })
-
-  return snapshotCanvasAppArray(
-    extensions.flatMap((extension) =>
-      (extension.rendererSlots ?? []).map((slot) =>
-        snapshotCanvasAppFoundationExtensionRendererSlot({
-          extensionId: extension.id,
-          slot,
-        }),
-      ),
-    ),
-  ) as readonly CanvasAppFoundationExtensionRendererSlot[]
-}
 
 export function assertUniqueCanvasAppFoundationExtensionRendererSlotIds({
   extensions,
@@ -103,18 +76,4 @@ export function snapshotCanvasAppFoundationRendererSlotDescriptor(
   slot: CanvasAppFoundationRendererSlotDescriptor,
 ) {
   return Object.freeze({ ...slot })
-}
-
-function snapshotCanvasAppFoundationExtensionRendererSlot({
-  extensionId,
-  slot,
-}: {
-  extensionId: CanvasExtensionDescriptor['id']
-  slot: CanvasAppFoundationRendererSlotDescriptor
-}): CanvasAppFoundationExtensionRendererSlot {
-  return Object.freeze({
-    extensionId,
-    id: slot.id,
-    surface: slot.surface,
-  })
 }

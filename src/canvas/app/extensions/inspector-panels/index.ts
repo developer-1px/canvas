@@ -6,7 +6,6 @@ export {
 } from './CanvasAppInspectorPanelExecution'
 export type {
   CanvasAppInspectorPanel,
-  CanvasAppInspectorPanelCommitItemsChange,
   CanvasAppInspectorPanelContext,
   CanvasAppInspectorPanelView,
 } from './CanvasAppInspectorPanels'

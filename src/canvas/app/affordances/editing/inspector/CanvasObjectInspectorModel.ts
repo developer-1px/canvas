@@ -4,6 +4,7 @@ import type {
 } from '../../../../entities'
 import type { CanvasAffordanceConfig } from '../../../../engine'
 import type { CommitCanvasItemsChange } from '../../../workflow/CanvasWorkflowContract'
+import type { CanvasAppDocumentAuthority } from '../../../workspace/document/CanvasAppDocumentContracts'
 import type { CanvasAppCustomFocus } from '../../../extensions/custom-focus'
 import { getCanvasAppInspectorPanelViews } from '../../../extensions/inspector-panels'
 import type { CanvasAppInspectorPanel } from '../../../extensions/inspector-panels'
@@ -13,9 +14,9 @@ import { getCanvasObjectStyleControls } from './CanvasObjectStyleInspector'
 
 type GetCanvasObjectInspectorModelArgs = {
   bounds: Bounds | null
-  commitItemsChange: CommitCanvasItemsChange
   config: CanvasAffordanceConfig
   customFocus: CanvasAppCustomFocus | null
+  document: CanvasAppDocumentAuthority
   inspectorPanels: readonly CanvasAppInspectorPanel[]
   items?: CanvasItem[]
   selectedItems: CanvasItem[]
@@ -24,25 +25,28 @@ type GetCanvasObjectInspectorModelArgs = {
 
 export function getCanvasObjectInspectorModel({
   bounds,
-  commitItemsChange,
   config,
   customFocus,
+  document,
   inspectorPanels,
   items,
   selectedItems,
   selection,
 }: GetCanvasObjectInspectorModelArgs) {
+  const commitItemsChange: CommitCanvasItemsChange = (change, selection) =>
+    document.commit({ change, selection }).ok
   const label = getCanvasObjectInspectorLabel({
     selectedItems,
     selectionLength: selection.length,
   })
-  const disabled = selectedItems.some((item) => item.locked === true)
+  const selectionLocked = selectedItems.some((item) => item.locked === true)
+  const disabled = selectionLocked || !document.can('editDocument')
 
   return {
     bounds,
     commentThread: getCanvasObjectInspectorCommentThread({
       commitItemsChange,
-      disabled,
+      disabled: selectionLocked || !document.can('comment'),
       items,
       selectedItems,
       selection,
@@ -50,9 +54,9 @@ export function getCanvasObjectInspectorModel({
     customPanels: getCanvasAppInspectorPanelViews({
       context: {
         bounds,
-        commitItemsChange,
         customFocus,
         disabled,
+        document,
         items: items ?? selectedItems,
         label,
         selectedItems,
@@ -65,13 +69,18 @@ export function getCanvasObjectInspectorModel({
     styleControls: getCanvasObjectStyleControls({
       commitItemsChange,
       disabled,
-      enabled: config.overlays.objectStyleControls,
+      enabled:
+        config.overlays.objectStyleControls && document.can('editDocument'),
       items,
       selectedItems,
       selection,
     }),
     onChangeBounds: (nextBounds: Bounds) => {
-      if (selection.length === 0 || !bounds) {
+      if (
+        selection.length === 0 ||
+        !bounds ||
+        !document.can('editDocument')
+      ) {
         return
       }
 

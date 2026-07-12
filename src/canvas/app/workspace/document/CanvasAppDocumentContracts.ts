@@ -4,6 +4,10 @@ import type {
   CanvasSelectionIds,
 } from '../../../core'
 import type { CanvasItem } from '../../../entities'
+import type {
+  CanvasAppCapability,
+  CanvasAppCapabilitySnapshot,
+} from '../../CanvasAppCapabilityContracts'
 
 export type CanvasAppItemsReorderMode =
   | 'bringForward'
@@ -81,3 +85,31 @@ export type CanvasAppCommitItemsChange = (
 export type CanvasAppCommitSelection = (
   action: SetStateAction<string[]>,
 ) => boolean
+
+export type CanvasAppDocumentMutationCapability =
+  | 'comment'
+  | 'editDocument'
+
+export type CanvasAppDocumentMutationResult =
+  | { readonly ok: true }
+  | {
+      readonly code: 'capability-denied'
+      readonly ok: false
+      readonly requiredCapability: CanvasAppDocumentMutationCapability
+    }
+  | {
+      readonly code: 'mutation-rejected'
+      readonly ok: false
+    }
+
+export type CanvasAppDocumentAuthorityRead = {
+  readonly capabilities: CanvasAppCapabilitySnapshot
+  can(capability: CanvasAppCapability): boolean
+}
+
+export type CanvasAppDocumentAuthority = CanvasAppDocumentAuthorityRead & {
+  commit(input: {
+    readonly change: CanvasAppItemsChange
+    readonly selection?: CanvasAppDocumentSelectionHistory
+  }): CanvasAppDocumentMutationResult
+}

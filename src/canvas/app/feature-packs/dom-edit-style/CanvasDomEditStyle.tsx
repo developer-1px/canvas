@@ -155,6 +155,7 @@ export function createCanvasDomEditStyleInspectorPanel({
 }): CanvasAppInspectorPanel {
   return {
     id: `${itemKind}-dom-${targetId}-style`,
+    requiredCapability: 'editDocument',
     isVisible: (context) =>
       context.selectedItems.some((item) =>
         item.type === 'custom' && item.kind === itemKind,
@@ -335,12 +336,15 @@ function commitCanvasDomEditStyleValue({
     value: nextValue,
   })
 
-  context.commitItemsChange({
-    items,
-    type: 'replace-changed',
-  }, {
-    after: context.selection,
-    before: context.selection,
+  context.document.commit({
+    change: {
+      items,
+      type: 'replace-changed',
+    },
+    selection: {
+      after: context.selection,
+      before: context.selection,
+    },
   })
 }
 

@@ -23,6 +23,9 @@ import type {
 } from './CanvasPointerInteractionResultContracts'
 import { startCanvasPointerMarqueeInteraction } from './CanvasPointerMarqueeInteraction'
 import { startCanvasPointerPanInteraction } from './CanvasPointerPanInteraction'
+import type {
+  CanvasAppFoundationExtensionRuntime,
+} from '../../../extensions/foundation-extensions'
 
 export type CanvasPointerInteractionStartInput = {
   componentLibrary: CanvasAppComponentLibrary
@@ -31,6 +34,7 @@ export type CanvasPointerInteractionStartInput = {
   createId: (prefix: string) => string
   customCreationTools: readonly CanvasAppCustomCreationTool[]
   drawingStyles: CanvasDrawingStrokeStyleSet
+  foundationExtensionRuntime: CanvasAppFoundationExtensionRuntime
   input: CanvasAppPointerInput
   itemReadModel: CanvasAppItemReadModel
   scene: CanvasSceneAdapter
@@ -50,6 +54,7 @@ export function startCanvasPointerInteraction({
   createId,
   customCreationTools,
   drawingStyles,
+  foundationExtensionRuntime,
   input,
   itemReadModel,
   scene,
@@ -117,8 +122,10 @@ export function startCanvasPointerInteraction({
     createId,
     customCreationTools,
     drawingStyles,
+    foundationExtensionRuntime,
     input,
     pointerGesture,
+    selection,
     startScreen,
     startWorld,
     targetItemId,

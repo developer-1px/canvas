@@ -130,6 +130,99 @@ describe('CanvasPointerInteractionStartEffects', () => {
     expect(context.setTool).toHaveBeenCalledWith('select')
   })
 
+  it('does not enter editing when immediate creation is rejected', () => {
+    const context = createContext()
+    vi.mocked(context.commitItemsChange).mockReturnValue(false)
+
+    const applied = applyCanvasPointerInteractionStartEffect({
+      context,
+      event: createPointerInput(),
+      start: {
+        capturePointer: false,
+        edit: { id: 'comment-1', value: 'Comment' },
+        item: rect('comment-1'),
+        kind: 'created-item',
+        toolAfterCreate: 'select',
+      },
+    })
+
+    expect(applied).toBe(false)
+    expect(context.setEditing).not.toHaveBeenCalled()
+    expect(context.setTool).not.toHaveBeenCalled()
+  })
+
+  it('executes extension creation through one document transaction before editing', () => {
+    const context = createContext()
+    const event = createPointerInput()
+    const item = rect('sticky-1')
+    const commitItemsChange = vi.mocked(context.commitItemsChange)
+    const setEditing = vi.mocked(context.setEditing)
+
+    const applied = applyCanvasPointerInteractionStartEffect({
+      context,
+      event,
+      start: {
+        capturePointer: false,
+        effects: [
+          {
+            patch: [{ items: [item], type: 'add' }],
+            selection: { after: ['sticky-1'], before: ['rect-1'] },
+            type: 'document-patch',
+          },
+          {
+            editing: { id: 'sticky-1', value: '' },
+            type: 'editing',
+          },
+        ],
+        kind: 'extension-effects',
+      },
+    })
+
+    expect(applied).toBe(true)
+    expect(context.commitItemsChange).toHaveBeenCalledTimes(1)
+    expect(context.commitItemsChange).toHaveBeenCalledWith(
+      { items: [item], type: 'add' },
+      { after: ['sticky-1'], before: ['rect-1'] },
+    )
+    expect(context.setEditing).toHaveBeenCalledWith({
+      id: 'sticky-1',
+      value: '',
+    })
+    expect(commitItemsChange.mock.invocationCallOrder[0]).toBeLessThan(
+      setEditing.mock.invocationCallOrder[0] ?? Infinity,
+    )
+  })
+
+  it('contains extension transaction failure and skips later editing effects', () => {
+    const context = createContext()
+    const event = createPointerInput()
+    vi.mocked(context.commitItemsChange).mockReturnValue(false)
+
+    const applied = applyCanvasPointerInteractionStartEffect({
+      context,
+      event,
+      start: {
+        capturePointer: false,
+        effects: [
+          {
+            patch: [{ items: [rect('sticky-1')], type: 'add' }],
+            selection: { after: ['sticky-1'], before: ['rect-1'] },
+            type: 'document-patch',
+          },
+          {
+            editing: { id: 'sticky-1', value: '' },
+            type: 'editing',
+          },
+        ],
+        kind: 'extension-effects',
+      },
+    })
+
+    expect(applied).toBe(false)
+    expect(context.commitItemsChange).toHaveBeenCalledTimes(1)
+    expect(context.setEditing).not.toHaveBeenCalled()
+  })
+
   it('applies item pointer start state and clears double-click memory', () => {
     const context = createContext()
     const event = createPointerInput()

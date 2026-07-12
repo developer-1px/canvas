@@ -1,6 +1,5 @@
 import type {
   Bounds,
-  CanvasComponentItem,
   CanvasComponentKind,
 } from '../../../../entities'
 import type {
@@ -9,19 +8,15 @@ import type {
 import {
   CANVAS_SECTION_COMPONENT_KIND,
   CANVAS_SECTION_DEFAULT_SIZE,
-  CANVAS_STICKY_COMPONENT_KIND,
-  applyCanvasStickyComponentCreationDefaults,
 } from '../../../../host'
 import type {
   CanvasPointerComponentCreationKind,
 } from './CanvasPointerCreationGrammar'
 
 export type CanvasPointerComponentCreationDescriptor = Readonly<{
-  applyDefaults?: (item: CanvasComponentItem) => CanvasComponentItem
   defaultSize?: Pick<Bounds, 'h' | 'w'>
-  enterTextEdit?: boolean
   isEnabled: (config: CanvasAffordanceConfig) => boolean
-  mode: 'drag' | 'immediate'
+  mode: 'drag'
   templateId: CanvasComponentKind
 }>
 
@@ -32,14 +27,6 @@ const CANVAS_POINTER_COMPONENT_CREATION_DESCRIPTORS = Object.freeze({
       config.gestures.createSection,
     mode: 'drag',
     templateId: CANVAS_SECTION_COMPONENT_KIND,
-  }),
-  'create-sticky': Object.freeze({
-    applyDefaults: applyCanvasStickyComponentCreationDefaults,
-    enterTextEdit: true,
-    isEnabled: (config: CanvasAffordanceConfig) =>
-      config.gestures.createSticky,
-    mode: 'immediate',
-    templateId: CANVAS_STICKY_COMPONENT_KIND,
   }),
 } satisfies Readonly<
   Record<

@@ -30,6 +30,18 @@ describe('DesignDocument', () => {
     ).toEqual(['workspaceStatRevenue', 'workspaceStatConversion'])
   })
 
+  it('fully validates a serialized snapshot before restoring it', () => {
+    const snapshot = createRepresentativeSnapshot()
+    const invalid = {
+      ...snapshot,
+      nodes: snapshot.nodes.filter((node) =>
+        node.id !== 'workspaceHeroTitle'),
+    }
+
+    expect(() => restoreDesignDocument(JSON.stringify(invalid)))
+      .toThrowError('Missing design child: workspaceHeroTitle')
+  })
+
   it('rejects duplicate stable node ids at the Module seam', () => {
     const snapshot = createRepresentativeSnapshot()
 
@@ -413,6 +425,46 @@ describe('DesignDocument', () => {
     })).toEqual({ changed: false, ok: true })
     expect(document.snapshot).toBe(before)
     expect(document.undo()).toBe(false)
+  })
+
+  it.each([
+    [
+      'parent invariants',
+      'workspaceMain',
+      { definition: { kind: 'widget' as const, id: 'invalid-parent' } },
+      'Widget design node cannot have children: workspaceMain',
+    ],
+    [
+      'component slot uniqueness',
+      'workspaceStatConversion',
+      {
+        component: {
+          definitionId: 'workspace-stat-card',
+          instanceId: 'revenue',
+          slotId: 'root',
+        },
+      },
+      'Duplicate component instance slot: workspace-stat-card/revenue/root',
+    ],
+  ])('validates touched-node %s before atomic publication', (
+    _label,
+    nodeId,
+    values,
+    reason,
+  ) => {
+    const document = createDesignDocument(createRepresentativeSnapshot())
+    const before = document.snapshot
+
+    expect(document.execute({
+      label: 'Invalid touched update',
+      changes: [{ type: 'update', nodeId, values }],
+    })).toEqual({
+      code: 'invalid-command',
+      ok: false,
+      reason,
+    })
+    expect(document.snapshot).toBe(before)
+    expect(document.historyStatus().canUndo).toBe(false)
   })
 
   it('treats JSON object key reordering as a no-op', () => {

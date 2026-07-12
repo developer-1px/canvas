@@ -15,6 +15,7 @@ import {
 
 export const CANVAS_ARROW_ROUTING_INSPECTOR_PANEL: CanvasAppInspectorPanel = {
   id: 'arrow-routing-actions',
+  requiredCapability: 'editDocument',
   isVisible: (context) => getSelectedCanvasArrowItem(context) !== null,
   render: (context) => {
     const item = getSelectedCanvasArrowItem(context)
@@ -42,13 +43,16 @@ export function changeCanvasArrowRouting(
     routing,
   )
 
-  return context.commitItemsChange({
-    type: 'replace-changed',
-    items: nextItems,
-  }, {
-    before: context.selection,
-    after: context.selection,
-  })
+  return context.document.commit({
+    change: {
+      type: 'replace-changed',
+      items: nextItems,
+    },
+    selection: {
+      before: context.selection,
+      after: context.selection,
+    },
+  }).ok
 }
 
 function renderCanvasArrowRoutingInspectorPanelContent({

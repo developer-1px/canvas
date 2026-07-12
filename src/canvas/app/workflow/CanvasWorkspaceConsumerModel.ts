@@ -2,8 +2,10 @@ import type {
   CanvasWorkspaceConsumerModel,
   CanvasWorkspaceConsumerModelInput,
 } from './CanvasWorkspaceConsumerContracts'
+import { canCanvasAppEditTextItem } from '../affordances/editing/text-editor/CanvasTextEditingModel'
 
 export function getCanvasWorkspaceConsumerModel({
+  authority,
   createId,
   document,
   itemReadModel,
@@ -13,14 +15,36 @@ export function getCanvasWorkspaceConsumerModel({
   setViewport,
   viewport,
 }: CanvasWorkspaceConsumerModelInput): CanvasWorkspaceConsumerModel {
+  const commitItemsChange: typeof document.commitItemsChange = (
+    change,
+    selection,
+  ) => authority.commit({ change, selection }).ok
+  const canEditText = (item: Parameters<
+    typeof itemReadModel.textTarget.canEdit
+  >[0]) => itemReadModel.textTarget.canEdit(item) &&
+    canCanvasAppEditTextItem({
+      canComment: authority.can('comment'),
+      canEditDocument: authority.can('editDocument'),
+      item,
+    })
+  const redo: typeof document.redo = () =>
+    authority.can('editDocument') ? document.redo() : undefined
+  const replaceDocumentText: typeof document.replaceDocumentText = (
+    searchText,
+    replacement,
+    options,
+  ) => authority.can('editDocument') &&
+    document.replaceDocumentText(searchText, replacement, options)
+  const undo: typeof document.undo = () =>
+    authority.can('editDocument') ? document.undo() : undefined
   const commandDocument = {
-    commitItemsChange: document.commitItemsChange,
+    commitItemsChange,
     commitSelection: document.commitSelection,
     copyItemsToClipboard: document.copyItemsToClipboard,
     getClipboardItems: document.getClipboardItems,
-    redo: document.redo,
+    redo,
     setClipboardItems: document.setClipboardItems,
-    undo: document.undo,
+    undo,
   }
   const selectionContext = {
     selection: document.selection,
@@ -39,7 +63,7 @@ export function getCanvasWorkspaceConsumerModel({
     },
     component: {
       command: {
-        commitItemsChange: document.commitItemsChange,
+        commitItemsChange,
       },
       createId,
       workspace: {
@@ -55,42 +79,43 @@ export function getCanvasWorkspaceConsumerModel({
       ...selectionContext,
     },
     extension: {
-      commitItemsChange: document.commitItemsChange,
       commitSelection: document.commitSelection,
       createId,
+      document: authority,
       items: document.items,
       ...selectionContext,
     },
     inspector: {
-      commitItemsChange: document.commitItemsChange,
+      document: authority,
+      items: document.items,
       itemReadModel,
       selected,
       selection: document.selection,
     },
     image: {
-      commitItemsChange: document.commitItemsChange,
+      commitItemsChange,
       createId,
       itemReadModel,
       ...selectionContext,
     },
     linkPreview: {
-      commitItemsChange: document.commitItemsChange,
+      commitItemsChange,
       createId,
       ...selectionContext,
     },
     stamp: {
-      commitItemsChange: document.commitItemsChange,
+      commitItemsChange,
       createId,
       itemReadModel,
       ...selectionContext,
     },
     table: {
-      commitItemsChange: document.commitItemsChange,
+      commitItemsChange,
       createId,
       ...selectionContext,
     },
     textPaste: {
-      commitItemsChange: document.commitItemsChange,
+      commitItemsChange,
       createId,
       ...selectionContext,
     },
@@ -103,6 +128,7 @@ export function getCanvasWorkspaceConsumerModel({
       selected,
     },
     keyboard: {
+      canEditText,
       command: {
         commitSelection: document.commitSelection,
       },
@@ -110,8 +136,9 @@ export function getCanvasWorkspaceConsumerModel({
       selection: document.selection,
     },
     pointer: {
+      canEditText,
       command: {
-        commitItemsChange: document.commitItemsChange,
+        commitItemsChange,
         commitSelection: document.commitSelection,
       },
       createId,
@@ -127,7 +154,7 @@ export function getCanvasWorkspaceConsumerModel({
       },
     },
     selection: {
-      commitItemsChange: document.commitItemsChange,
+      commitItemsChange,
       commitSelection: document.commitSelection,
       createId,
       itemReadModel,
@@ -139,9 +166,10 @@ export function getCanvasWorkspaceConsumerModel({
     },
     text: {
       document: {
-        commitItemsChange: document.commitItemsChange,
+        can: authority.can,
+        commitItemsChange,
         findDocumentText: document.findDocumentText,
-        replaceDocumentText: document.replaceDocumentText,
+        replaceDocumentText,
       },
       itemReadModel,
       ...selectionContext,

@@ -111,6 +111,10 @@ export type {
   CanvasAppCommitItemsChange,
   CanvasAppCommitSelection,
   CanvasAppDocumentClipboard,
+  CanvasAppDocumentAuthority,
+  CanvasAppDocumentAuthorityRead,
+  CanvasAppDocumentMutationCapability,
+  CanvasAppDocumentMutationResult,
   CanvasAppDocumentSelectionHistory,
   CanvasAppDocumentTextSearch,
   CanvasAppItemsChange,
@@ -282,18 +286,8 @@ export {
 } from '../extensions/CanvasAppExtensionIds'
 export type {
   CanvasAppFoundationExtension,
-} from '../extensions/foundation-extensions'
-export {
-  getCanvasAppFoundationExtensionCommands,
-  type CanvasAppFoundationExtensionCommand,
-} from '../extensions/foundation-extensions'
-export {
-  getCanvasAppFoundationExtensionRendererSlots,
-  type CanvasAppFoundationExtensionRendererSlot,
-} from '../extensions/foundation-extensions'
-export {
-  getCanvasAppFoundationExtensionTools,
-  type CanvasAppFoundationExtensionTool,
+  CanvasAppFoundationExtensionCapabilityAdapter,
+  CanvasAppFoundationExtensionRuntime,
 } from '../extensions/foundation-extensions'
 export {
   CANVAS_APP_FACILITATION_AFFORDANCE_CONFIG,

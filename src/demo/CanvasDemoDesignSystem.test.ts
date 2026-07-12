@@ -42,6 +42,28 @@ describe('Canvas demo design system', () => {
       expect(findRawSpacingValues(css), file).toEqual([])
     }
   })
+
+  it('allows the accessibility spacing required by a complete visually-hidden rule only', () => {
+    expect(
+      findRawSpacingValues(`
+        .announcement {
+          position: absolute;
+          width: 1px;
+          height: 1px;
+          padding: 0;
+          margin: -1px;
+          overflow: hidden;
+          clip: rect(0 0 0 0);
+          white-space: nowrap;
+          border: 0;
+        }
+      `),
+    ).toEqual([])
+
+    expect(findRawSpacingValues('.chrome { margin: -1px; }')).toEqual([
+      'margin: -1px',
+    ])
+  })
 })
 
 function readFixture(path: string) {
@@ -82,9 +104,22 @@ function findRawFontSizes(css: string) {
 function findRawSpacingValues(css: string) {
   const violations: string[] = []
   const spacingDeclaration =
-    /^\s*(gap|row-gap|column-gap|padding(?:-[a-z]+)?|margin(?:-[a-z]+)?)\s*:\s*([^;]+);/gm
+    /(?:^|[;{])\s*(gap|row-gap|column-gap|padding(?:-[a-z]+)?|margin(?:-[a-z]+)?)\s*:\s*([^;]+);/gm
+  const cssWithoutVisuallyHiddenOffsets = css.replace(
+    /\{([^{}]*)\}/g,
+    (rule, declarations: string) => {
+      if (!isCompleteVisuallyHiddenRule(declarations)) {
+        return rule
+      }
 
-  for (const match of css.matchAll(spacingDeclaration)) {
+      return rule.replace(
+        /(^|;)\s*margin\s*:\s*-1px\s*;/gm,
+        (_declaration: string, boundary: string) => `${boundary} margin: 0;`,
+      )
+    },
+  )
+
+  for (const match of cssWithoutVisuallyHiddenOffsets.matchAll(spacingDeclaration)) {
     const property = match[1]
     const value = match[2].trim()
 
@@ -94,4 +129,21 @@ function findRawSpacingValues(css: string) {
   }
 
   return violations
+}
+
+function isCompleteVisuallyHiddenRule(declarations: string) {
+  const hasDeclaration = (property: string, value: string) =>
+    new RegExp(
+      `(?:^|;)\\s*${property}\\s*:\\s*${value}\\s*(?:;|$)`,
+      'i',
+    ).test(declarations)
+
+  return (
+    hasDeclaration('position', 'absolute') &&
+    hasDeclaration('width', '1px') &&
+    hasDeclaration('height', '1px') &&
+    hasDeclaration('overflow', 'hidden') &&
+    (hasDeclaration('clip', 'rect\\([^;]+\\)') ||
+      hasDeclaration('clip-path', 'inset\\([^;]+\\)'))
+  )
 }

@@ -1,6 +1,7 @@
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'
 import type { CanvasItem } from '../../../entities'
+import { createCanvasAppTestDocumentAuthority } from '../../workflow/CanvasAppDocumentAuthorityTestFixtures'
 import {
   CANVAS_ARROW_ROUTING_INSPECTOR_PANEL,
   changeCanvasArrowRouting,
@@ -11,8 +12,8 @@ describe('CanvasArrowRoutingInspectorPanel', () => {
     const markup = renderToStaticMarkup(
       CANVAS_ARROW_ROUTING_INSPECTOR_PANEL.render({
         bounds: createArrowItem(),
-        commitItemsChange: vi.fn(),
         disabled: false,
+        document: createCanvasAppTestDocumentAuthority(),
         items: [createArrowItem()],
         label: 'Connector',
         selectedItems: [createArrowItem()],
@@ -33,8 +34,11 @@ describe('CanvasArrowRoutingInspectorPanel', () => {
 
     expect(changeCanvasArrowRouting({
       bounds: arrow,
-      commitItemsChange,
       disabled: false,
+      document: createCanvasAppTestDocumentAuthority({
+        commitItemsChange,
+        readItems: () => [arrow, createRectItem()],
+      }),
       items: [arrow, createRectItem()],
       label: 'Connector',
       selectedItems: [arrow],

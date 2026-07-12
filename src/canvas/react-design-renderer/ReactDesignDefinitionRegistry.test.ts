@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest'
 
-import { createReactDesignDefinitionRegistry } from './ReactDesignDefinitionRegistry'
+import {
+  defineRegisteredDesignDefinition,
+} from '../editor-engine'
+import {
+  createReactDesignDefinitionRegistry,
+  defineReactDesignDefinition,
+  type ReactDesignDefinitionRenderProps,
+} from './ReactDesignDefinitionRegistry'
 
 describe('ReactDesignDefinitionRegistry', () => {
   it('resolves only explicitly allowlisted intrinsic elements', () => {
@@ -17,11 +24,7 @@ describe('ReactDesignDefinitionRegistry', () => {
   })
 
   it('resolves a registered definition only when its kind and id match', () => {
-    const definition = {
-      id: 'sales-card',
-      kind: 'component' as const,
-      render: () => null,
-    }
+    const definition = createDefinition('sales-card', 'component')
     const registry = createReactDesignDefinitionRegistry({
       intrinsics: [],
       definitions: [definition],
@@ -40,16 +43,16 @@ describe('ReactDesignDefinitionRegistry', () => {
     expect(() => createReactDesignDefinitionRegistry({
       intrinsics: [],
       definitions: [
-        { id: 'note', kind: 'widget', render: () => null },
-        { id: 'note', kind: 'widget', render: () => null },
+        createDefinition('note', 'widget'),
+        createDefinition('note', 'widget'),
       ],
     })).toThrow('Duplicate React design definition: widget:note')
 
     expect(() => createReactDesignDefinitionRegistry({
       intrinsics: [],
       definitions: [
-        { id: 'note', kind: 'component', render: () => null },
-        { id: 'note', kind: 'widget', render: () => null },
+        createDefinition('note', 'component'),
+        createDefinition('note', 'widget'),
       ],
     })).not.toThrow()
   })
@@ -61,24 +64,23 @@ describe('ReactDesignDefinitionRegistry', () => {
 
     expect(() => createReactDesignDefinitionRegistry({
       intrinsics: [],
-      definitions: [{ id: '  ', kind: 'component', render: () => null }],
+      definitions: [{
+        ...createDefinition('valid', 'component'),
+        id: '  ',
+      }],
     })).toThrow('React design definition id must not be empty')
   })
 
   it('snapshots registry inputs so later caller mutations cannot change resolution', () => {
     const intrinsics: Array<'section' | 'span'> = ['section']
-    const definitions = [{
-      id: 'sales-card',
-      kind: 'component' as const,
-      render: () => null,
-    }]
+    const definitions = [createDefinition('sales-card', 'component')]
     const registry = createReactDesignDefinitionRegistry({
       intrinsics,
       definitions,
     })
 
     intrinsics.push('span')
-    definitions[0].id = 'renamed-card'
+    definitions.push(createDefinition('renamed-card', 'component'))
 
     expect(registry.resolve({ kind: 'intrinsic', id: 'span' })).toBeNull()
     expect(registry.resolve({ kind: 'component', id: 'sales-card' }))
@@ -93,3 +95,42 @@ describe('ReactDesignDefinitionRegistry', () => {
     })).toThrow('React design intrinsic is not supported: canvas')
   })
 })
+
+function createDefinition(
+  id: string,
+  kind: 'component' | 'widget',
+  renderer: (props: ReactDesignDefinitionRenderProps) => null = () => null,
+) {
+  return defineReactDesignDefinition({
+    definition: defineRegisteredDesignDefinition({
+      id,
+      kind,
+      props: {
+        defaults: {},
+        safeParse: (value) => (
+          typeof value === 'object' && value !== null && !Array.isArray(value)
+            ? { ok: true as const, value: {} }
+            : { ok: false as const, reason: 'invalid props' }
+        ),
+      },
+      create: ({ nodeId }) => ({
+        id: nodeId,
+        label: id,
+        definition: { id, kind },
+        children: [],
+        props: {},
+        text: null,
+        layout: {},
+        style: {},
+        frame: null,
+        component: null,
+      }),
+      capabilities: {
+        textEdit: false,
+        transform: { move: true, resize: true },
+      },
+    }),
+    renderer,
+    fallback: () => null,
+  })
+}

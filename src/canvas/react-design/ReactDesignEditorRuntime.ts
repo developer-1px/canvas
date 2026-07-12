@@ -21,7 +21,7 @@ import {
   bindCanvasNativeGestureBoundary,
   CANVAS_NATIVE_GESTURE_BOUNDARY_SELECTOR,
   getCanvasNativeKeyboardZoomIntent,
-  isCanvasNativeWheelPassthroughTarget,
+  resolveCanvasNativeWheelOwnership,
 } from '../browser-runtime/CanvasNativeGestureBoundary'
 import {
   bindCanvasPointerPinchGesture,
@@ -174,7 +174,7 @@ export function useReactDesignEditorRuntime(
     }, factor)
   }, [runtime, zoomAtClientPoint])
   const handleStageWheel = useCallback((event: WheelEvent) => {
-    if (isCanvasNativeWheelPassthroughTarget(event.target)) {
+    if (resolveCanvasNativeWheelOwnership(event) === 'native') {
       return
     }
 
@@ -440,7 +440,11 @@ function createRuntimeState({
     getStageElement: stage.read,
     getViewport: viewport.read,
   })
-  const editor = createEditorEngine({ document, projection })
+  const editor = createEditorEngine({
+    definitionResolver: registry,
+    document,
+    projection,
+  })
 
   return {
     document,

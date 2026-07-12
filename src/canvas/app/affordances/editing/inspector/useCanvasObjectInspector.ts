@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
+import type { CanvasItem } from '../../../../entities'
 import type { CanvasAffordanceConfig } from '../../../../engine'
-import type { CommitCanvasItemsChange } from '../../../workflow/CanvasWorkflowContract'
+import type { CanvasAppDocumentAuthority } from '../../../workspace/document/CanvasAppDocumentContracts'
 import type { CanvasAppItemReadModel } from '../../../workflow/CanvasAppItemReadModelContracts'
 import type { CanvasAppCustomFocus } from '../../../extensions/custom-focus'
 import type { CanvasAppInspectorPanel } from '../../../extensions/inspector-panels'
@@ -12,14 +13,16 @@ type UseCanvasObjectInspectorArgs = {
   inspectorPanels: readonly CanvasAppInspectorPanel[]
   selected: Set<string>
   selection: string[]
-  commitItemsChange: CommitCanvasItemsChange
   customFocus: CanvasAppCustomFocus | null
+  document: CanvasAppDocumentAuthority
+  items: CanvasItem[]
 }
 
 export function useCanvasObjectInspector({
-  commitItemsChange,
   config,
   customFocus,
+  document,
+  items,
   itemReadModel,
   inspectorPanels,
   selected,
@@ -33,17 +36,13 @@ export function useCanvasObjectInspector({
     () => itemReadModel.getSelectedItems(selection),
     [itemReadModel, selection],
   )
-  const items = useMemo(
-    () => itemReadModel.getAllItems(),
-    [itemReadModel],
-  )
   const inspectorModel = useMemo(
     () =>
       getCanvasObjectInspectorModel({
         bounds,
-        commitItemsChange,
         config,
         customFocus,
+        document,
         inspectorPanels,
         items,
         selectedItems,
@@ -51,9 +50,9 @@ export function useCanvasObjectInspector({
       }),
     [
       bounds,
-      commitItemsChange,
       config,
       customFocus,
+      document,
       inspectorPanels,
       items,
       selectedItems,

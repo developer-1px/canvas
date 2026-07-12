@@ -10,11 +10,13 @@ import type {
 import type {
   CanvasAppCustomCreationToolState,
 } from '../CanvasAppExtensionStateContracts'
+import type { CanvasAppDocumentAuthorityRead } from '../../workspace/document/CanvasAppDocumentContracts'
 
 export function getCanvasAppCustomCreationToolStates(
   tools: readonly CanvasAppCustomCreationTool[],
+  authority: CanvasAppDocumentAuthorityRead,
 ): CanvasAppCustomCreationToolState[] {
-  return tools.map((tool) => ({
+  return tools.filter((tool) => authority.can(tool.requiredCapability)).map((tool) => ({
     ariaLabel: tool.ariaLabel ?? `${tool.title} tool`,
     id: getCanvasAppCustomToolId(tool.id),
     label: tool.label,

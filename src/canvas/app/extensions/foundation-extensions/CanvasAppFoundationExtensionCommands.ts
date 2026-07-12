@@ -1,7 +1,4 @@
-import type {
-  CanvasExtensionAdapterSlot,
-  CanvasExtensionDescriptor,
-} from '../../../foundation'
+import type { CanvasExtensionDescriptor } from '../../../foundation'
 import {
   assertCanvasAppArray,
   assertCanvasAppDescriptorFunctionField,
@@ -10,41 +7,15 @@ import {
 } from '../CanvasAppDescriptorContracts'
 import { snapshotCanvasAppArray } from '../CanvasAppDescriptorSnapshot'
 import type { CanvasAppExtensionRegistryOwner } from '../CanvasAppExtensionRegistries'
+import { assertCanvasAppRequiredCapability } from '../../CanvasAppCapabilityContracts'
 
 export type CanvasAppFoundationCommandDescriptor =
   NonNullable<CanvasExtensionDescriptor['commands']>[number]
-
-export type CanvasAppFoundationExtensionCommand = Readonly<{
-  extensionId: CanvasExtensionDescriptor['id']
-  id: CanvasAppFoundationCommandDescriptor['id']
-  plan: CanvasAppFoundationCommandDescriptor['plan']
-  requiredAdapters?: readonly CanvasExtensionAdapterSlot[]
-}>
 
 type CanvasAppFoundationExtensionCommandSource = Pick<
   CanvasExtensionDescriptor,
   'commands' | 'id'
 >
-
-export function getCanvasAppFoundationExtensionCommands(
-  extensions: readonly CanvasAppFoundationExtensionCommandSource[],
-) {
-  assertUniqueCanvasAppFoundationExtensionCommandIds({
-    extensions,
-    owner: 'foundation extension descriptors',
-  })
-
-  return snapshotCanvasAppArray(
-    extensions.flatMap((extension) =>
-      (extension.commands ?? []).map((command) =>
-        snapshotCanvasAppFoundationExtensionCommand({
-          command,
-          extensionId: extension.id,
-        }),
-      ),
-    ),
-  ) as readonly CanvasAppFoundationExtensionCommand[]
-}
 
 export function assertUniqueCanvasAppFoundationExtensionCommandIds({
   extensions,
@@ -99,6 +70,15 @@ export function assertCanvasAppFoundationCommandDescriptors(
       owner: 'foundation extension command',
       value: command.plan,
     })
+    assertCanvasAppDescriptorStringField({
+      field: 'requiredCapability',
+      owner: 'foundation extension command',
+      value: command.requiredCapability,
+    })
+    assertCanvasAppRequiredCapability({
+      owner: `foundation extension command ${command.id}`,
+      value: command.requiredCapability,
+    })
     assertOptionalCanvasAppFoundationCommandArray({
       label: 'foundation extension command requiredAdapters',
       value: command.requiredAdapters,
@@ -111,23 +91,6 @@ export function snapshotCanvasAppFoundationCommandDescriptor(
 ) {
   return Object.freeze({
     ...command,
-    ...(command.requiredAdapters ? {
-      requiredAdapters: snapshotCanvasAppArray(command.requiredAdapters),
-    } : {}),
-  })
-}
-
-function snapshotCanvasAppFoundationExtensionCommand({
-  command,
-  extensionId,
-}: {
-  command: CanvasAppFoundationCommandDescriptor
-  extensionId: CanvasExtensionDescriptor['id']
-}): CanvasAppFoundationExtensionCommand {
-  return Object.freeze({
-    extensionId,
-    id: command.id,
-    plan: command.plan,
     ...(command.requiredAdapters ? {
       requiredAdapters: snapshotCanvasAppArray(command.requiredAdapters),
     } : {}),

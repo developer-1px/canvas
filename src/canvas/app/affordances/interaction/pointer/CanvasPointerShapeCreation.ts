@@ -251,14 +251,16 @@ export function commitCanvasPointerShapeCreation({
     interaction: resolvedInteraction,
   })
 
-  commitItemsChange({ type: 'add', items: [item] }, {
+  const committed = commitItemsChange({ type: 'add', items: [item] }, {
     before: selection,
     after: [item.id],
   })
 
-  if (descriptor.selectAfterCommit) {
+  if (committed && descriptor.selectAfterCommit) {
     setTool('select')
   }
+
+  return committed
 }
 
 function attachCanvasPointerShapeCreationEnd({

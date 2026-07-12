@@ -59,7 +59,7 @@ export function commitCanvasPointerCreation({
   textTarget,
 }: CanvasPointerCreationCommitInput) {
   if (isCanvasPointerComponentCreationInteraction(interaction)) {
-    commitCanvasPointerComponentCreation({
+    return commitCanvasPointerComponentCreation({
       commitItemsChange,
       componentLibrary,
       createId,
@@ -67,11 +67,10 @@ export function commitCanvasPointerCreation({
       selection,
       setTool,
     })
-    return
   }
 
   if (isCanvasPointerShapeCreationInteraction(interaction)) {
-    commitCanvasPointerShapeCreation({
+    return commitCanvasPointerShapeCreation({
       commitItemsChange,
       creationAdapter,
       createId,
@@ -80,22 +79,20 @@ export function commitCanvasPointerCreation({
       selection,
       setTool,
     })
-    return
   }
 
   if (isCanvasPointerDrawingCreationInteraction(interaction)) {
-    commitCanvasPointerDrawingCreation({
+    return commitCanvasPointerDrawingCreation({
       commitItemsChange,
       creationAdapter,
       createId,
       interaction,
       selection,
     })
-    return
   }
 
   if (isCanvasPointerCustomCreationInteraction(interaction)) {
-    commitCanvasPointerCustomCreation({
+    return commitCanvasPointerCustomCreation({
       commitItemsChange,
       createId,
       customCreationTools,
@@ -105,4 +102,6 @@ export function commitCanvasPointerCreation({
       textTarget,
     })
   }
+
+  return true
 }

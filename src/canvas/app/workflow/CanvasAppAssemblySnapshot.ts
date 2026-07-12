@@ -15,27 +15,31 @@ import {
   snapshotCanvasAppInstalledFeaturePackIds,
   snapshotCanvasAppFeaturePackViewRenderers,
 } from './CanvasAppFeaturePackAssembly'
+import { createCanvasAppDocumentAuthorityRead } from './CanvasAppDocumentAuthority'
 
 export function snapshotCanvasAppAssembly(
   assembly: CanvasAppAssembly,
 ): CanvasAppAssembly {
   const extensionBundle = snapshotCanvasAppExtensionBundle(assembly)
   const adapterSnapshot = snapshotCanvasAppAssemblyAdapters(assembly)
+  const capabilities = Object.freeze({ ...assembly.capabilities })
 
   return Object.freeze({
     affordanceConfig: snapshotCanvasAppAffordanceConfig(
       assembly.affordanceConfig,
     ),
-    capabilities: Object.freeze({ ...assembly.capabilities }),
+    capabilities,
     componentLibrary: snapshotCanvasAppComponentLibrary(
       assembly.componentLibrary,
     ),
     componentPresentationRenderers: snapshotCanvasAppRecord(
       assembly.componentPresentationRenderers,
     ),
+    documentAuthority: createCanvasAppDocumentAuthorityRead(capabilities),
     featurePackViewRenderers: snapshotCanvasAppFeaturePackViewRenderers(
       assembly.featurePackViewRenderers,
     ),
+    foundationExtensionRuntime: assembly.foundationExtensionRuntime,
     installedFeaturePackIds: snapshotCanvasAppInstalledFeaturePackIds(
       assembly.installedFeaturePackIds,
     ),

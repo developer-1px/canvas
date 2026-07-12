@@ -139,6 +139,18 @@ describe('createReactDesignNodeDomProps', () => {
         heightMode: 'fixed',
       },
     }).style.overflow).toBe('hidden')
+
+    expect(createReactDesignNodeDomProps({
+      ...node,
+      frame: {
+        ...node.frame,
+        heightMode: 'fixed',
+        overflow: 'scroll',
+      },
+    })).toMatchObject({
+      'data-canvas-wheel-passthrough': 'scroll',
+      style: { overflow: 'auto' },
+    })
   })
 
   it('uses internal grid presentation props after inferred flex layout', () => {

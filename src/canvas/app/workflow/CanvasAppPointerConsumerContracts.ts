@@ -35,6 +35,9 @@ import type {
   CommitCanvasItemsChange,
   CommitCanvasSelection,
 } from './CanvasWorkflowContract'
+import type {
+  CanvasAppFoundationExtensionRuntime,
+} from '../extensions/foundation-extensions'
 
 export type CanvasAppPointerItemLayerHandlers = {
   onArrowEndpointPointerDown: (
@@ -122,6 +125,7 @@ export type CanvasAppPointerItemAdapters = {
 }
 
 export type CanvasAppPointerWorkspaceModel = {
+  canEditText: (item: CanvasItem) => boolean
   itemReadModel: CanvasAppItemReadModel
   items: CanvasItem[]
   scene: CanvasSceneAdapter
@@ -141,6 +145,7 @@ export type CanvasAppPointerModelInput = {
   createId: (prefix: string) => string
   customCreationTools: readonly CanvasAppCustomCreationTool[]
   drawingStyles: CanvasDrawingStrokeStyleSet
+  foundationExtensionRuntime: CanvasAppFoundationExtensionRuntime
   interaction: CanvasAppPointerInteractionModel
   itemAdapters: CanvasAppPointerItemAdapters
   stageElement: CanvasAppStageElement

@@ -13,6 +13,7 @@ describe('CanvasFirstPartyExtensions', () => {
       CANVAS_STICKY_NOTE_EXTENSION_ID,
     )
     expect(CANVAS_STICKY_NOTE_EXTENSION.requiredAdapters).toEqual([
+      'capability',
       'creation',
       'document',
       'renderer',
@@ -21,7 +22,13 @@ describe('CanvasFirstPartyExtensions', () => {
     expect(CANVAS_STICKY_NOTE_EXTENSION.tools).toEqual([{
       id: CANVAS_STICKY_NOTE_TOOL_ID,
       kind: 'creation',
-      requiredAdapters: ['creation', 'document', 'text-target'],
+      requiredAdapters: [
+        'capability',
+        'creation',
+        'document',
+        'text-target',
+      ],
+      requiredCapability: 'editDocument',
     }])
     expect(CANVAS_STICKY_NOTE_EXTENSION.rendererSlots).toEqual([{
       id: CANVAS_STICKY_NOTE_RENDERER_SLOT_ID,

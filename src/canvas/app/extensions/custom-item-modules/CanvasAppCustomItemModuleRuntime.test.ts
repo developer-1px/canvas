@@ -11,6 +11,7 @@ describe('CanvasAppCustomItemModules runtime containment', () => {
         {
           id: 'risk',
           label: '!',
+          requiredCapability: 'editDocument',
           title: 'Risk',
           createItem: () => {
             throw new Error('bad custom creation')
@@ -23,6 +24,7 @@ describe('CanvasAppCustomItemModules runtime containment', () => {
         {
           id: 'risk',
           label: '!',
+          requiredCapability: 'editDocument',
           title: 'Risk',
           createItem: ({ startWorld }: CanvasAppCustomCreationToolContext) => ({
             title: 'Risk',
@@ -42,6 +44,7 @@ describe('CanvasAppCustomItemModules runtime containment', () => {
         {
           id: 'risk',
           label: '!',
+          requiredCapability: 'editDocument',
           title: 'Risk',
           createItem: ({ startWorld }) => ({
             title: 'Risk',

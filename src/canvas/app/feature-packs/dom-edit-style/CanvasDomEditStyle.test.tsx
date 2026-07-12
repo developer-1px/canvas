@@ -1,9 +1,10 @@
 import { renderToStaticMarkup } from 'react-dom/server'
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import type {
   CanvasCustomItem,
   CanvasJsonObject,
 } from '../../../entities'
+import { createCanvasAppTestDocumentAuthority } from '../../workflow/CanvasAppDocumentAuthorityTestFixtures'
 import {
   createCanvasDomEditStyleInspectorPanel,
   getCanvasDomEditStyle,
@@ -80,9 +81,9 @@ describe('CanvasDomEditStyle', () => {
     } satisfies CanvasCustomItem
     const context = {
       bounds: item,
-      commitItemsChange: vi.fn(),
       customFocus: null,
       disabled: false,
+      document: createCanvasAppTestDocumentAuthority(),
       items: [item],
       label: 'Todo widget',
       selectedItems: [item],

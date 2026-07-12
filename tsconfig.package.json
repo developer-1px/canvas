@@ -19,6 +19,8 @@
   "exclude": [
     "src/canvas/**/*.test.ts",
     "src/canvas/**/*.test.tsx",
+    "src/canvas/**/*TestFixtures.ts",
+    "src/canvas/**/*TestFixtures.tsx",
     "src/canvas/architecture/**"
   ]
 }

@@ -2,11 +2,14 @@ import {
   createJSONDocument,
   type JSONDocument,
 } from '@interactive-os/json-document'
-import { applyDesignDocumentChanges } from './DesignDocumentChanges'
 import {
   DesignDocumentSnapshotSchema,
   parseDesignDocumentSnapshot,
 } from './DesignDocumentSchema'
+import {
+  freezeDesignDocumentSnapshot,
+  prepareDesignDocumentCommandTransaction,
+} from './DesignDocumentTransaction'
 import { validateAndIndexDesignDocument } from './DesignDocumentValidation'
 import {
   createDesignDocumentPublicationCoordinator,
@@ -26,7 +29,7 @@ export function createDesignDocument(
   initialSnapshot: unknown,
 ): DesignDocument {
   const initial = parseDesignDocumentSnapshot(initialSnapshot)
-  let snapshot = freezeSnapshot(initial)
+  let snapshot = freezeDesignDocumentSnapshot(initial)
   let graph = validateAndIndexDesignDocument(snapshot)
   let previousHistoryGroup: string | null = null
   const listeners = new Set<() => void>()
@@ -53,7 +56,7 @@ export function createDesignDocument(
   }
 
   function synchronizeSnapshot() {
-    const nextSnapshot = freezeSnapshot(
+    const nextSnapshot = freezeDesignDocumentSnapshot(
       parseDesignDocumentSnapshot(store.value),
     )
 
@@ -74,13 +77,14 @@ export function createDesignDocument(
       }
     }
 
-    let nextSnapshot: DesignDocumentSnapshot
+    let transaction
 
     try {
-      nextSnapshot = freezeSnapshot(parseDesignDocumentSnapshot(
-        applyDesignDocumentChanges(snapshot, command.changes),
-      ))
-      validateAndIndexDesignDocument(nextSnapshot)
+      transaction = prepareDesignDocumentCommandTransaction(
+        snapshot,
+        graph,
+        command.changes,
+      )
     } catch (error) {
       return {
         ok: false,
@@ -89,13 +93,13 @@ export function createDesignDocument(
       }
     }
 
-    if (areJSONValuesEqual(nextSnapshot, snapshot)) {
+    if (!transaction.changed) {
       return { ok: true, changed: false }
     }
 
     const result = publications.publish(() => {
       const committed = store.commit(
-        [{ op: 'replace', path: '', value: nextSnapshot }],
+        transaction.storeOperations,
         { label: command.label, origin: 'design-document' },
       )
 
@@ -111,6 +115,13 @@ export function createDesignDocument(
 
       previousHistoryGroup = historyGroup
       return committed
+    }, {
+      operations: transaction.publicationOperations,
+      synchronize() {
+        graph = transaction.graph
+        snapshot = transaction.snapshot
+        notifyListeners(listeners)
+      },
     })
 
     if (!result.ok) {
@@ -234,26 +245,6 @@ function requireNode(
   return node
 }
 
-function freezeSnapshot(snapshot: DesignDocumentSnapshot) {
-  return deepFreeze(
-    JSON.parse(JSON.stringify(snapshot)) as DesignDocumentSnapshot,
-  )
-}
-
-function deepFreeze<T>(value: T): T {
-  if (!value || typeof value !== 'object' || Object.isFrozen(value)) {
-    return value
-  }
-
-  Object.freeze(value)
-
-  for (const child of Object.values(value)) {
-    deepFreeze(child)
-  }
-
-  return value
-}
-
 function notifyListeners(listeners: ReadonlySet<() => void>) {
   for (const listener of listeners) {
     try {
@@ -262,37 +253,4 @@ function notifyListeners(listeners: ReadonlySet<() => void>) {
       // Observers cannot invalidate an authored commit or starve later observers.
     }
   }
-}
-
-function areJSONValuesEqual(left: unknown, right: unknown): boolean {
-  if (Object.is(left, right)) {
-    return true
-  }
-
-  if (Array.isArray(left) || Array.isArray(right)) {
-    return Array.isArray(left) &&
-      Array.isArray(right) &&
-      left.length === right.length &&
-      left.every((value, index) =>
-        areJSONValuesEqual(value, right[index]))
-  }
-
-  if (
-    left === null ||
-    right === null ||
-    typeof left !== 'object' ||
-    typeof right !== 'object'
-  ) {
-    return false
-  }
-
-  const leftRecord = left as Record<string, unknown>
-  const rightRecord = right as Record<string, unknown>
-  const leftKeys = Object.keys(leftRecord)
-  const rightKeys = Object.keys(rightRecord)
-
-  return leftKeys.length === rightKeys.length &&
-    leftKeys.every((key) =>
-      Object.prototype.hasOwnProperty.call(rightRecord, key) &&
-      areJSONValuesEqual(leftRecord[key], rightRecord[key]))
 }

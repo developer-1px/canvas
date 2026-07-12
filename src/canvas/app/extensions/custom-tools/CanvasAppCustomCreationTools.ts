@@ -2,6 +2,7 @@ import type {
   CanvasCustomItem,
   Point,
 } from '../../../entities'
+import type { CanvasAppCapability } from '../../CanvasAppCapabilityContracts'
 
 export type CanvasAppCustomToolShortcut = {
   key: string
@@ -23,6 +24,7 @@ export type CanvasAppCustomCreationTool = {
   enterTextEdit?: boolean
   id: string
   label: string
+  requiredCapability: CanvasAppCapability
   shortcut?: CanvasAppCustomToolShortcut
   statusLabel?: string
   title: string

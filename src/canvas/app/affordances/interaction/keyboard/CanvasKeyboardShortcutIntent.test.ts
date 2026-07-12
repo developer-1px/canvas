@@ -188,6 +188,16 @@ describe('CanvasKeyboardShortcutIntent', () => {
     })
   })
 
+  it('suppresses canvas viewport shortcuts while IME composition owns input', () => {
+    expect(getCanvasKeyboardShortcutIntent(createInput({
+      event: createKeyboardEvent({
+        ctrlKey: true,
+        isComposing: true,
+        key: '=',
+      }),
+    }))).toEqual({ kind: 'none', preventDefault: false })
+  })
+
   it('detects native editing controls and contenteditable targets', () => {
     withTypingTargetConstructor('HTMLInputElement', (target) => {
       expect(isCanvasKeyboardTypingTarget(target)).toBe(true)

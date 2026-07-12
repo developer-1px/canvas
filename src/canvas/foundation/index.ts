@@ -46,6 +46,7 @@ export {
   type CanvasExtensionCommandDescriptor,
   type CanvasExtensionDescriptor,
   type CanvasExtensionDocumentPatchEffect,
+  type CanvasExtensionEditingEffect,
   type CanvasExtensionEffect,
   type CanvasExtensionId,
   type CanvasExtensionPlanner,
@@ -53,6 +54,7 @@ export {
   type CanvasExtensionSelectionEffect,
   type CanvasExtensionSelectionHistory,
   type CanvasExtensionTextPatchUpdate,
+  type CanvasExtensionTextTargetSlot,
   type CanvasExtensionTextTargetContract,
   type CanvasExtensionToolDescriptor,
   type CanvasExtensionToolKind,
@@ -165,6 +167,7 @@ export {
   CANVAS_STICKY_NOTE_EXTENSION,
   CANVAS_STICKY_NOTE_EXTENSION_ID,
   CANVAS_STICKY_NOTE_RENDERER_SLOT_ID,
+  CANVAS_STICKY_NOTE_TEXT_TARGET_SLOT_ID,
   CANVAS_STICKY_NOTE_TOOL_ID,
 } from './CanvasFirstPartyExtensions'
 export {

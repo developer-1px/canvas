@@ -10,6 +10,11 @@ import {
 } from '../../../../host'
 import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
 import { startCanvasPointerCreation } from './CanvasPointerCreationStart'
+import {
+  CANVAS_APP_STICKY_NOTE_CAPABILITY_ADAPTER,
+  compileCanvasAppFoundationExtensions,
+} from '../../../extensions/foundation-extensions'
+import { CANVAS_STICKY_NOTE_EXTENSION } from '../../../../foundation'
 
 const config = createCanvasAffordanceConfig()
 const drawingStyles = createCanvasDrawingStrokeStyleSet()
@@ -123,21 +128,29 @@ describe('CanvasPointerCreationStart', () => {
       tool: 'sticky',
     }))
 
-    expect(result).toMatchObject({
+    expect(result).toEqual({
       capturePointer: false,
-      edit: { id: 'component-1', value: '' },
-      item: {
-        body: '',
-        component: 'sticky',
-        h: 148,
-        id: 'component-1',
-        title: 'Sticky',
-        type: 'component',
-        w: 188,
-        x: 106,
-        y: 226,
-      },
-      kind: 'created-item',
+      effects: [
+        {
+          patch: [{
+            items: [expect.objectContaining({
+              body: '',
+              component: 'sticky',
+              id: 'component-1',
+              x: 106,
+              y: 226,
+            })],
+            type: 'add',
+          }],
+          selection: { after: ['component-1'], before: [] },
+          type: 'document-patch',
+        },
+        {
+          editing: { id: 'component-1', value: '' },
+          type: 'editing',
+        },
+      ],
+      kind: 'extension-effects',
     })
   })
 
@@ -188,15 +201,21 @@ function createInput(
     creationAdapter,
     createId: (prefix) => `${prefix}-1`,
     drawingStyles,
+    foundationExtensionRuntime: compileCanvasAppFoundationExtensions({
+      adapters: [CANVAS_APP_STICKY_NOTE_CAPABILITY_ADAPTER],
+      extensions: [CANVAS_STICKY_NOTE_EXTENSION],
+    }),
     customCreationTools: [
       {
         id: 'risk',
         label: '!',
+        requiredCapability: 'editDocument',
         title: 'Risk',
         createItem: () => null,
       },
     ],
     input: createPointerInput(),
+    selection: [],
     pointerGesture: 'create-shape',
     startScreen: { x: 80, y: 120 },
     startWorld: { x: 80, y: 120 },

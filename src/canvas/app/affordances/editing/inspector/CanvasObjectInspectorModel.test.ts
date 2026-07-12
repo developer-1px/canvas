@@ -5,6 +5,10 @@ import type {
 } from '../../../../entities'
 import { createCanvasAffordanceConfig } from '../../../../engine'
 import { getCanvasObjectInspectorModel } from './CanvasObjectInspectorModel'
+import { createCanvasAppTestDocumentAuthority } from '../../../workflow/CanvasAppDocumentAuthorityTestFixtures'
+import type { CanvasAppCommitItemsChange } from '../../../workspace/document/CanvasAppDocumentContracts'
+import { CANVAS_APP_COMMENT_ONLY_CAPABILITIES } from '../../../workflow/CanvasAppCapabilityAssembly'
+import type { CanvasAppCapabilitySnapshot } from '../../../CanvasAppCapabilityContracts'
 
 describe('CanvasObjectInspectorModel', () => {
   it('derives labels and disabled state from the current selection', () => {
@@ -40,6 +44,7 @@ describe('CanvasObjectInspectorModel', () => {
       inspectorPanels: [
         {
           id: 'meta',
+          requiredCapability: 'view',
           render: ({ bounds, customFocus, disabled, label, selection }) =>
             `${label}:${disabled}:${selection.join(',')}:${bounds?.w}:${
               customFocus?.targetId ?? 'none'
@@ -172,6 +177,39 @@ describe('CanvasObjectInspectorModel', () => {
     )
   })
 
+  it('updates a selected comment inside its owning group', () => {
+    const commitItemsChange = vi.fn()
+    const comment = createCommentItem()
+    const group: CanvasItem = {
+      children: [createRectItem(), comment],
+      h: 160,
+      id: 'group-1',
+      type: 'group',
+      w: 240,
+      x: 0,
+      y: 0,
+    }
+    const model = createModel({
+      commitItemsChange,
+      items: [group],
+      selectedItems: [comment],
+      selection: [comment.id],
+    })
+
+    model.commentThread?.onToggleResolved()
+
+    expect(commitItemsChange).toHaveBeenCalledWith(
+      {
+        type: 'replace-changed',
+        items: [{
+          ...group,
+          children: [createRectItem(), { ...comment, resolved: true }],
+        }],
+      },
+      { before: [comment.id], after: [comment.id] },
+    )
+  })
+
   it('respects the object style controls affordance toggle', () => {
     const model = createModel({
       config: createCanvasAffordanceConfig({
@@ -184,6 +222,31 @@ describe('CanvasObjectInspectorModel', () => {
     })
 
     expect(model.styleControls).toEqual([])
+  })
+
+  it('keeps comment actions enabled without exposing denied document editing controls', () => {
+    const rectCommit = vi.fn()
+    const rectModel = createModel({
+      bounds: { x: 0, y: 0, w: 80, h: 40 },
+      capabilities: CANVAS_APP_COMMENT_ONLY_CAPABILITIES,
+      commitItemsChange: rectCommit,
+      selectedItems: [createRectItem()],
+      selection: ['rect-1'],
+    })
+
+    expect(rectModel.disabled).toBe(true)
+    expect(rectModel.styleControls).toEqual([])
+    rectModel.onChangeBounds({ x: 10, y: 10, w: 100, h: 60 })
+    expect(rectCommit).not.toHaveBeenCalled()
+
+    const comment = createCommentItem()
+    const commentModel = createModel({
+      capabilities: CANVAS_APP_COMMENT_ONLY_CAPABILITIES,
+      selectedItems: [comment],
+      selection: [comment.id],
+    })
+
+    expect(commentModel.commentThread?.disabled).toBe(false)
   })
 
   it('ignores bounds changes when there is no committed selection bounds', () => {
@@ -209,6 +272,7 @@ describe('CanvasObjectInspectorModel', () => {
 
 function createModel({
   bounds = null,
+  capabilities,
   commitItemsChange = vi.fn(),
   config = createCanvasAffordanceConfig(),
   customFocus = null,
@@ -218,9 +282,8 @@ function createModel({
   selection = [],
 }: {
   bounds?: Bounds | null
-  commitItemsChange?: Parameters<
-    typeof getCanvasObjectInspectorModel
-  >[0]['commitItemsChange']
+  capabilities?: CanvasAppCapabilitySnapshot
+  commitItemsChange?: CanvasAppCommitItemsChange
   config?: Parameters<
     typeof getCanvasObjectInspectorModel
   >[0]['config']
@@ -234,11 +297,17 @@ function createModel({
   selectedItems?: CanvasItem[]
   selection?: string[]
 }) {
+  const sourceItems = items ?? selectedItems
+
   return getCanvasObjectInspectorModel({
     bounds,
-    commitItemsChange,
     config,
     customFocus,
+    document: createCanvasAppTestDocumentAuthority({
+      capabilities,
+      commitItemsChange,
+      readItems: () => sourceItems,
+    }),
     inspectorPanels,
     items,
     selectedItems,

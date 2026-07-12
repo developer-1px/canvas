@@ -95,26 +95,14 @@ descriptor. It names sticky note creation as a creation tool and declares the
 creation, document, renderer, and text-target adapter slots without moving whiteboard
 component templates, item schemas, SVG rendering, or app workflow.
 
-`CanvasAppExtensionBundle.foundationExtensions` is the app-owned bridge for
-descriptor metadata. It lets app assembly carry first-party extension
-descriptors such as `CANVAS_STICKY_NOTE_EXTENSION` without executing command
-planners or moving toolbar, rendering, document, or Host item logic.
-
-`getCanvasAppFoundationExtensionTools` is the app-owned discovery index for
-foundation extension tool metadata. It reports tool ids, kinds, adapter
-requirements, and owning extension ids while still leaving toolbar rendering,
-pointer creation, document patches, and renderer slots with their current
-owners.
-
-`getCanvasAppFoundationExtensionCommands` is the app-owned discovery index for
-foundation extension command metadata. It reports command ids, planner
-references, adapter requirements, and owning extension ids without executing
-planners or moving toolbar, keyboard, document effect, or Host patch logic.
-
-`getCanvasAppFoundationExtensionRendererSlots` is the app-owned discovery index
-for foundation extension renderer slot metadata. It reports renderer slot ids,
-surfaces, and owning extension ids without moving item-layer adapters, SVG
-rendering, overlay wiring, or Host item storage.
+`CanvasAppExtensionBundle.foundationExtensions` and
+`foundationExtensionAdapters` are the app-owned assembly inputs. The App
+compiler `compileCanvasAppFoundationExtensions` validates adapter completeness
+and duplicate contributions, then produces executable command/tool planners,
+renderer contributions, and text targets. `executeCanvasAppFoundationExtensionEffects`
+is the single failure-contained App executor for document, selection, viewport,
+and post-create editing effects; Host storage and React rendering remain behind
+the contributed adapters.
 
 ## Guardrails
 

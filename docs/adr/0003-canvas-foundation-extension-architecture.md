@@ -79,24 +79,15 @@ command, and patch-planning grammar that can run through adapters.
 - `CANVAS_STICKY_NOTE_EXTENSION` is the first concrete first-party extension
   descriptor. It names the sticky note creation affordance and adapter slots
   without moving whiteboard component storage, SVG rendering, or App workflow.
-- `CanvasAppExtensionBundle.foundationExtensions` is the App-owned bridge for
-  Foundation descriptor metadata. App assembly can carry descriptors for
-  discovery and future assembly work, but command planner execution, toolbar
-  wiring, renderer adapters, document patches, and Host item storage remain in
-  their current owners.
-- `getCanvasAppFoundationExtensionTools` is the App-owned discovery index for
-  Foundation extension tool descriptors. It can expose tool ids, kinds, adapter
-  requirements, and owning extension ids without moving toolbar rendering,
-  pointer creation, document patching, or renderer slot wiring.
-- `getCanvasAppFoundationExtensionCommands` is the App-owned discovery index
-  for Foundation extension command descriptors. It can expose command ids,
-  planner references, adapter requirements, and owning extension ids without
-  executing planners or moving toolbar, keyboard, document effect, or Host
-  patch logic.
-- `getCanvasAppFoundationExtensionRendererSlots` is the App-owned discovery
-  index for Foundation extension renderer slot descriptors. It can expose slot
-  ids, surfaces, and owning extension ids without moving item-layer adapters,
-  SVG rendering, overlay wiring, or Host item storage.
+- `CanvasAppExtensionBundle.foundationExtensions` and
+  `foundationExtensionAdapters` are App-owned assembly inputs.
+  `compileCanvasAppFoundationExtensions` rejects missing adapters and duplicate
+  contributions, then exposes executable command/tool planners, renderer
+  contributions, and text targets.
+- `executeCanvasAppFoundationExtensionEffects` is the single App-owned,
+  failure-contained executor for document, selection, viewport, and
+  post-create editing effects. Document storage and React renderers remain
+  behind concrete App/Host adapters.
 - `canvas/foundation` is the named public facade for low-risk foundation
   tracer bullets. It can re-export existing headless contracts before broad
   implementation moves.

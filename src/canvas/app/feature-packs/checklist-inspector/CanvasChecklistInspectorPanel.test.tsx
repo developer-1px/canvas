@@ -1,6 +1,7 @@
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'
 import type { CanvasItem } from '../../../entities'
+import { createCanvasAppTestDocumentAuthority } from '../../workflow/CanvasAppDocumentAuthorityTestFixtures'
 import {
   addCanvasChecklistItem,
   CANVAS_CHECKLIST_INSPECTOR_PANEL,
@@ -14,8 +15,8 @@ describe('CanvasChecklistInspectorPanel', () => {
     const markup = renderToStaticMarkup(
       CANVAS_CHECKLIST_INSPECTOR_PANEL.render({
         bounds: checklist,
-        commitItemsChange: vi.fn(),
         disabled: false,
+        document: createCanvasAppTestDocumentAuthority(),
         items: [checklist],
         label: 'Checklist',
         selectedItems: [checklist],
@@ -33,8 +34,11 @@ describe('CanvasChecklistInspectorPanel', () => {
     const commitItemsChange = vi.fn(() => true)
     const context = {
       bounds: checklist,
-      commitItemsChange,
       disabled: false,
+      document: createCanvasAppTestDocumentAuthority({
+        commitItemsChange,
+        readItems: () => [checklist, rect],
+      }),
       items: [checklist, rect],
       label: 'Checklist',
       selectedItems: [checklist],

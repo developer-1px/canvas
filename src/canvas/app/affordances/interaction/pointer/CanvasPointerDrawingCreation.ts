@@ -269,7 +269,7 @@ export function commitCanvasPointerDrawingCreation({
     style: interaction.style,
   })
 
-  commitItemsChange({ type: 'add', items: [item] }, {
+  return commitItemsChange({ type: 'add', items: [item] }, {
     before: selection,
     after: selection,
   })

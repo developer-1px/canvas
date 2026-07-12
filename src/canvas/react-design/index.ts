@@ -3,6 +3,22 @@ export {
   getDesignDocumentPatchPort,
   restoreDesignDocument,
 } from '../design-document'
+
+export {
+  defineRegisteredDesignDefinition,
+} from '../editor-engine'
+export type {
+  RegisteredDesignCapabilities,
+  RegisteredDesignCreateInput,
+  RegisteredDesignDefinition,
+  RegisteredDesignDefinitionInput,
+  RegisteredDesignDefinitionKind,
+  RegisteredDesignDefinitionResolver,
+  RegisteredDesignJSONProps,
+  RegisteredDesignPropsContract,
+  RegisteredDesignPropsParseResult,
+  RegisteredDesignTextEditCapability,
+} from '../editor-engine'
 export type {
   DesignDocument,
   DesignDocumentChange,
@@ -36,15 +52,23 @@ export type {
 export {
   createReactDesignDefinitionRegistry,
   createReactDesignNodeDomProps,
+  defineReactDesignDefinition,
   ReactDesignRenderer,
 } from '../react-design-renderer'
 export type {
   ReactDesignDefinition,
+  ReactDesignDefinitionAdapter,
+  ReactDesignDefinitionRegistration,
   ReactDesignDefinitionRegistry,
   ReactDesignDefinitionRenderProps,
   ReactDesignDefinitionResolution,
   ReactDesignIntrinsicTag,
   ReactDesignNodeDomProps,
+  ReactRegisteredDesignEditProp,
+  ReactRegisteredDesignFallbackProps,
+  ReactRegisteredDesignInspectorProps,
+  ReactRegisteredDesignInspectorRuntimeProps,
+  ReactRegisteredDesignRenderProps,
   ReactDesignRendererProps,
   ReactDesignRootProps,
 } from '../react-design-renderer'

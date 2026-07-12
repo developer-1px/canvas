@@ -327,6 +327,7 @@ function createCanvasAppWidgetCreationTool<
     ariaLabel: tool.ariaLabel ?? `${title} tool`,
     id,
     label,
+    requiredCapability: 'editDocument',
     shortcut: tool.shortcut,
     statusLabel: tool.statusLabel ?? title,
     title: tool.title ?? title,

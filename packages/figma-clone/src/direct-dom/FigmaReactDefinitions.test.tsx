@@ -5,8 +5,8 @@ import { describe, expect, it } from 'vitest'
 import {
   createReactDesignDefinitionRegistry,
   ReactDesignRenderer,
-} from '../../../../src/canvas/react-design-renderer'
-import type { DomProjection } from '../../../../src/canvas/dom-projection'
+  type DomProjection,
+} from '@interactive-os/canvas/react-design'
 import {
   createFigmaDesignDocument,
   FIGMA_WIDGET_DEFINITION_ID,

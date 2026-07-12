@@ -17,6 +17,7 @@ import type {
   CommitCanvasItemsChange,
   CommitCanvasSelection,
 } from './CanvasWorkflowContract'
+import type { CanvasAppDocumentAuthority } from '../workspace/document/CanvasAppDocumentContracts'
 
 export type CanvasWorkspaceDocumentModel = {
   canRedo: boolean
@@ -37,6 +38,7 @@ export type CanvasWorkspaceDocumentModel = {
 }
 
 export type CanvasWorkspaceConsumerModelInput = {
+  authority: CanvasAppDocumentAuthority
   createId: (prefix: string) => string
   document: CanvasWorkspaceDocumentModel
   itemReadModel: CanvasAppItemReadModel
@@ -88,14 +90,15 @@ export type CanvasWorkspaceControlContext =
 
 export type CanvasWorkspaceExtensionContext =
   CanvasWorkspaceSelectionContext & {
-    commitItemsChange: CommitCanvasItemsChange
     commitSelection: CommitCanvasSelection
     createId: (prefix: string) => string
+    document: CanvasAppDocumentAuthority
     items: CanvasItem[]
   }
 
 export type CanvasWorkspaceInspectorContext = {
-  commitItemsChange: CommitCanvasItemsChange
+  document: CanvasAppDocumentAuthority
+  items: CanvasItem[]
   itemReadModel: CanvasAppItemReadModel
   selected: Set<string>
   selection: string[]
@@ -153,6 +156,7 @@ export type CanvasWorkspaceItemLayerContext = {
 }
 
 export type CanvasWorkspaceKeyboardContext = {
+  canEditText: (item: CanvasItem) => boolean
   command: {
     commitSelection: CommitCanvasSelection
   }
@@ -161,6 +165,7 @@ export type CanvasWorkspaceKeyboardContext = {
 }
 
 export type CanvasWorkspacePointerContext = {
+  canEditText: (item: CanvasItem) => boolean
   command: {
     commitItemsChange: CommitCanvasItemsChange
     commitSelection: CommitCanvasSelection
@@ -184,6 +189,7 @@ export type CanvasWorkspaceStageContext = {
 export type CanvasWorkspaceTextContext =
   CanvasWorkspaceSelectionContext & {
     document: {
+      can: CanvasAppDocumentAuthority['can']
       commitItemsChange: CommitCanvasItemsChange
       findDocumentText: CanvasDocumentTextSearch['findDocumentText']
       replaceDocumentText: CanvasDocumentTextSearch['replaceDocumentText']

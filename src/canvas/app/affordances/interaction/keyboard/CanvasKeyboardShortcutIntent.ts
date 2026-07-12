@@ -1,4 +1,5 @@
 import type { CanvasAffordanceConfig } from '../../../../engine'
+import { isCanvasNativeTextEntryTarget } from '../../../../browser-runtime/CanvasNativeGestureBoundary'
 import type {
   CanvasAppCustomCommandState,
   CanvasAppCustomCreationToolState,
@@ -32,6 +33,10 @@ export function getCanvasKeyboardShortcutIntent({
   event,
   selection,
 }: CanvasKeyboardShortcutIntentInput): CanvasKeyboardShortcutIntent {
+  if (event.isComposing) {
+    return { kind: 'none', preventDefault: false }
+  }
+
   const key = event.key.toLowerCase()
   const mod = event.metaKey || event.ctrlKey
 
@@ -118,15 +123,5 @@ export function getCanvasKeyboardShortcutIntent({
 }
 
 export function isCanvasKeyboardTypingTarget(target: EventTarget | null) {
-  return (
-    (typeof HTMLInputElement !== 'undefined' &&
-      target instanceof HTMLInputElement) ||
-    (typeof HTMLTextAreaElement !== 'undefined' &&
-      target instanceof HTMLTextAreaElement) ||
-    (typeof HTMLSelectElement !== 'undefined' &&
-      target instanceof HTMLSelectElement) ||
-    (typeof HTMLElement !== 'undefined' &&
-      target instanceof HTMLElement &&
-      target.isContentEditable)
-  )
+  return isCanvasNativeTextEntryTarget(target)
 }

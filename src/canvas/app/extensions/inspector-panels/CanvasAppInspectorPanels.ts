@@ -4,20 +4,18 @@ import type {
   CanvasItem,
 } from '../../../entities'
 import type {
-  CanvasAppCommitItemsChange,
+  CanvasAppDocumentAuthority,
 } from '../../workspace/document/CanvasAppDocumentContracts'
+import type { CanvasAppCapability } from '../../CanvasAppCapabilityContracts'
 import type {
   CanvasAppCustomFocus,
 } from '../custom-focus'
 
-export type CanvasAppInspectorPanelCommitItemsChange =
-  CanvasAppCommitItemsChange
-
 export type CanvasAppInspectorPanelContext = {
   bounds: Bounds | null
-  commitItemsChange: CanvasAppInspectorPanelCommitItemsChange
   customFocus?: CanvasAppCustomFocus | null
   disabled: boolean
+  document: CanvasAppDocumentAuthority
   items?: CanvasItem[]
   label: string | null
   selectedItems: CanvasItem[]
@@ -27,6 +25,7 @@ export type CanvasAppInspectorPanelContext = {
 export type CanvasAppInspectorPanel = {
   id: string
   isVisible?: (context: CanvasAppInspectorPanelContext) => boolean
+  requiredCapability: CanvasAppCapability
   render: (context: CanvasAppInspectorPanelContext) => ReactNode
 }
 

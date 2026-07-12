@@ -18,6 +18,7 @@ describe('CanvasExtensionContracts', () => {
                 type: 'document-patch',
               }]
             : [],
+        requiredCapability: 'editDocument',
         requiredAdapters: ['document', 'scene'],
       }],
       id: 'whiteboard-grouping',
@@ -29,6 +30,7 @@ describe('CanvasExtensionContracts', () => {
       tools: [{
         id: 'sticky',
         kind: 'creation',
+        requiredCapability: 'editDocument',
         requiredAdapters: ['creation', 'document'],
       }],
     } satisfies CanvasExtensionDescriptor)
@@ -38,6 +40,7 @@ describe('CanvasExtensionContracts', () => {
     expect(extension.tools).toEqual([{
       id: 'sticky',
       kind: 'creation',
+      requiredCapability: 'editDocument',
       requiredAdapters: ['creation', 'document'],
     }])
     expect(extension.commands?.[0].plan({ selection: ['a', 'b'] })).toEqual([{

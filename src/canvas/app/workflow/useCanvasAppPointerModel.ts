@@ -10,12 +10,14 @@ export function useCanvasAppPointerModel({
   createId,
   customCreationTools,
   drawingStyles,
+  foundationExtensionRuntime,
   interaction,
   itemAdapters,
   stageElement,
   workspace,
 }: CanvasAppPointerModelInput) {
   const downHandlers = useCanvasPointerDownHandlers({
+    canEditText: workspace.canEditText,
     cloneItems: command.cloneItems,
     componentLibrary,
     commitItemsChange: command.commitItemsChange,
@@ -25,6 +27,7 @@ export function useCanvasAppPointerModel({
     creationAdapter: itemAdapters.creation,
     customCreationTools,
     drawingStyles,
+    foundationExtensionRuntime,
     interactionRef: interaction.interactionRef,
     itemReadModel: workspace.itemReadModel,
     items: workspace.items,

@@ -32,11 +32,10 @@ export function commitCanvasPointerTransformInteraction({
     !interaction.moved &&
     interaction.clickSelection
   ) {
-    commitSelection(interaction.clickSelection)
-    return
+    return commitSelection(interaction.clickSelection)
   }
 
-  commitItemsChange(
+  const committed = commitItemsChange(
     {
       type: 'transform',
       beforeItems: interaction.historyItems,
@@ -48,21 +47,33 @@ export function commitCanvasPointerTransformInteraction({
     },
   )
 
+  if (!committed) {
+    return false
+  }
+
   if (interaction.kind === 'move' && !interaction.moved && interaction.edit) {
     commitSelection([interaction.edit.id])
     setEditing(interaction.edit)
     setTool('select')
   }
+
+  return true
 }
 
 export function cancelCanvasPointerTransformInteraction({
   interaction,
   setLiveItems,
+  setSelection,
 }: {
   interaction: CanvasPointerTransformInteraction
   setLiveItems: (items: CanvasItem[]) => void
+  setSelection: (selection: string[]) => void
 }) {
   setLiveItems(interaction.historyItems)
+
+  if (interaction.kind === 'move') {
+    setSelection(interaction.historySelection)
+  }
 }
 
 function getCanvasPointerTransformHistorySelection(

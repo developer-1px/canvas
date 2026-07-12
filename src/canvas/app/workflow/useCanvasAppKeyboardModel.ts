@@ -29,6 +29,7 @@ export function useCanvasAppKeyboardModel({
     duplicateSelection: command.duplicateSelection,
     editSelection: () =>
       editCanvasAppSelectionText({
+        canEditText: workspace.canEditText,
         itemReadModel: workspace.itemReadModel,
         selection: workspace.selection,
         setEditing: interaction.setEditing,

@@ -1,49 +1,45 @@
-import type { DesignNode } from '@interactive-os/canvas/react-design'
+import type {
+  DesignNode,
+  ReactDesignDefinitionRegistration,
+} from '@interactive-os/canvas/react-design'
 
 import {
-  FIGJAM_CHECKLIST_DEFINITION_ID,
-  FIGJAM_KANBAN_DEFINITION_ID,
-  FIGJAM_LINK_PREVIEW_DEFINITION_ID,
-  FIGJAM_TABLE_DEFINITION_ID,
+  FIGJAM_CHECKLIST_DEFINITION,
+  FIGJAM_KANBAN_DEFINITION,
+  FIGJAM_LINK_PREVIEW_DEFINITION,
+  FIGJAM_TABLE_DEFINITION,
   createFigJamChecklistNode,
-  createFigJamKanbanNode,
-  createFigJamLinkPreviewNode,
-  createFigJamTableNode,
 } from './FigJamCollectionDefinitions'
 import {
-  FIGJAM_COMMENT_DEFINITION_ID,
-  createFigJamCommentNode,
+  FIGJAM_COMMENT_DEFINITION,
 } from './FigJamCommentDefinition'
 import {
-  FIGJAM_CONNECTOR_DEFINITION_ID,
+  FIGJAM_CONNECTOR_DEFINITION,
   createFigJamConnectorNode,
 } from './FigJamConnectorDefinition'
 import {
-  FIGJAM_DRAWING_DEFINITION_ID,
+  FIGJAM_DRAWING_DEFINITION,
   createFigJamDrawingNode,
 } from './FigJamDrawingDefinition'
 import {
-  FIGJAM_IMAGE_DEFINITION_ID,
+  FIGJAM_IMAGE_DEFINITION,
   createFigJamImageNode,
 } from './FigJamImageDefinition'
 import {
-  FIGJAM_SHAPE_DEFINITION_ID,
-  createFigJamShapeNode,
+  FIGJAM_SHAPE_DEFINITION,
 } from './FigJamShapeDefinition'
 import {
-  FIGJAM_STAMP_DEFINITION_ID,
+  FIGJAM_STAMP_DEFINITION,
   createFigJamStampNode,
 } from './FigJamStampDefinition'
 import {
-  FIGJAM_STICKY_NOTE_DEFINITION_ID,
-  createFigJamStickyNoteNode,
+  FIGJAM_STICKY_NOTE_DEFINITION,
 } from './FigJamStickyNoteDefinition'
 import {
-  FIGJAM_SECTION_DEFINITION_ID,
-  createFigJamSectionNode,
+  FIGJAM_SECTION_DEFINITION,
 } from './FigJamStructuralDefinitions'
 import {
-  FIGJAM_TEXT_DEFINITION_ID,
+  FIGJAM_TEXT_DEFINITION,
   createFigJamTextNode,
 } from './FigJamTextDefinition'
 import type { FigJamPlacementInput } from './FigJamWidgetPrimitives'
@@ -82,31 +78,27 @@ export type FigJamInsertionDescriptor = Readonly<{
 }>
 
 export const FIGJAM_INSERTION_DESCRIPTORS = Object.freeze([
-  descriptor('sticky', 'Sticky note', FIGJAM_STICKY_NOTE_DEFINITION_ID,
-    createFigJamStickyNoteNode),
-  descriptor('shape', 'Shape', FIGJAM_SHAPE_DEFINITION_ID,
-    createFigJamShapeNode),
-  descriptor('text', 'Text', FIGJAM_TEXT_DEFINITION_ID,
-    createFigJamTextNode),
-  descriptor('label', 'Label', FIGJAM_TEXT_DEFINITION_ID,
+  descriptor('sticky', 'Sticky note', FIGJAM_STICKY_NOTE_DEFINITION),
+  descriptor('shape', 'Shape', FIGJAM_SHAPE_DEFINITION),
+  descriptor('text', 'Text', FIGJAM_TEXT_DEFINITION),
+  descriptor('label', 'Label', FIGJAM_TEXT_DEFINITION,
     (input) => createFigJamTextNode({ ...input, variant: 'label' })),
-  descriptor('card', 'Card', FIGJAM_TEXT_DEFINITION_ID,
+  descriptor('card', 'Card', FIGJAM_TEXT_DEFINITION,
     (input) => createFigJamTextNode({ ...input, variant: 'card' })),
-  descriptor('section', 'Section', FIGJAM_SECTION_DEFINITION_ID,
-    createFigJamSectionNode),
-  descriptor('drawing-marker', 'Marker', FIGJAM_DRAWING_DEFINITION_ID,
+  descriptor('section', 'Section', FIGJAM_SECTION_DEFINITION),
+  descriptor('drawing-marker', 'Marker', FIGJAM_DRAWING_DEFINITION,
     (input) => createFigJamDrawingNode({
       ...input,
       geometry: { kind: 'points', points: [{ x: 0, y: 0 }, { x: 80, y: 24 }] },
       variant: 'marker',
     })),
-  descriptor('drawing-highlight', 'Highlighter', FIGJAM_DRAWING_DEFINITION_ID,
+  descriptor('drawing-highlight', 'Highlighter', FIGJAM_DRAWING_DEFINITION,
     (input) => createFigJamDrawingNode({
       ...input,
       geometry: { kind: 'points', points: [{ x: 0, y: 12 }, { x: 96, y: 12 }] },
       variant: 'highlight',
     })),
-  descriptor('drawing-path', 'Pen path', FIGJAM_DRAWING_DEFINITION_ID,
+  descriptor('drawing-path', 'Pen path', FIGJAM_DRAWING_DEFINITION,
     (input) => createFigJamDrawingNode({
       ...input,
       geometry: {
@@ -118,31 +110,24 @@ export const FIGJAM_INSERTION_DESCRIPTORS = Object.freeze([
       },
       variant: 'path',
     })),
-  descriptor('connector', 'Connector', FIGJAM_CONNECTOR_DEFINITION_ID,
+  descriptor('connector', 'Connector', FIGJAM_CONNECTOR_DEFINITION,
     createDefaultConnector),
   descriptor('legacy-connector', 'Bounded connector',
-    FIGJAM_CONNECTOR_DEFINITION_ID, createDefaultConnector),
-  descriptor('comment', 'Comment', FIGJAM_COMMENT_DEFINITION_ID,
-    createFigJamCommentNode),
-  descriptor('stamp', 'Stamp', FIGJAM_STAMP_DEFINITION_ID,
-    createFigJamStampNode),
-  descriptor('vote', 'Vote', FIGJAM_STAMP_DEFINITION_ID,
+    FIGJAM_CONNECTOR_DEFINITION, createDefaultConnector),
+  descriptor('comment', 'Comment', FIGJAM_COMMENT_DEFINITION),
+  descriptor('stamp', 'Stamp', FIGJAM_STAMP_DEFINITION),
+  descriptor('vote', 'Vote', FIGJAM_STAMP_DEFINITION,
     (input) => createFigJamStampNode({ ...input, stamp: 'vote', label: '+1' })),
-  descriptor('image', 'Image', FIGJAM_IMAGE_DEFINITION_ID,
-    createFigJamImageNode),
+  descriptor('image', 'Image', FIGJAM_IMAGE_DEFINITION),
   descriptor('image-placeholder', 'Image placeholder',
-    FIGJAM_IMAGE_DEFINITION_ID,
+    FIGJAM_IMAGE_DEFINITION,
     (input) => createFigJamImageNode({ ...input, src: null })),
-  descriptor('checklist', 'Checklist', FIGJAM_CHECKLIST_DEFINITION_ID,
-    createFigJamChecklistNode),
-  descriptor('todo', 'Todo', FIGJAM_CHECKLIST_DEFINITION_ID,
+  descriptor('checklist', 'Checklist', FIGJAM_CHECKLIST_DEFINITION),
+  descriptor('todo', 'Todo', FIGJAM_CHECKLIST_DEFINITION,
     (input) => createFigJamChecklistNode({ ...input, title: 'Todo' })),
-  descriptor('kanban', 'Kanban', FIGJAM_KANBAN_DEFINITION_ID,
-    createFigJamKanbanNode),
-  descriptor('table', 'Table', FIGJAM_TABLE_DEFINITION_ID,
-    createFigJamTableNode),
-  descriptor('link-preview', 'Link preview', FIGJAM_LINK_PREVIEW_DEFINITION_ID,
-    createFigJamLinkPreviewNode),
+  descriptor('kanban', 'Kanban', FIGJAM_KANBAN_DEFINITION),
+  descriptor('table', 'Table', FIGJAM_TABLE_DEFINITION),
+  descriptor('link-preview', 'Link preview', FIGJAM_LINK_PREVIEW_DEFINITION),
 ] satisfies readonly FigJamInsertionDescriptor[])
 
 const insertionById = new Map(
@@ -165,10 +150,20 @@ export function createFigJamInsertion(
 function descriptor(
   id: FigJamInsertionId,
   label: string,
-  definitionId: string,
-  create: (input: FigJamPlacementInput) => DesignNode,
+  definition: ReactDesignDefinitionRegistration,
+  create?: (input: FigJamPlacementInput) => DesignNode,
 ): FigJamInsertionDescriptor {
-  return Object.freeze({ create, definitionId, id, label })
+  return Object.freeze({
+    create: create
+      ? (input: FigJamPlacementInput) => definition.ownCreatedNode(
+          input,
+          () => create(input),
+        )
+      : (input: FigJamPlacementInput) => definition.create(input),
+    definitionId: definition.id,
+    id,
+    label,
+  })
 }
 
 function createDefaultConnector(input: FigJamPlacementInput) {

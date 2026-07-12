@@ -12,8 +12,10 @@ import type {
   CanvasDocumentTextSearch,
   CommitCanvasItemsChange,
 } from './CanvasWorkflowContract'
+import type { CanvasAppCapability } from '../CanvasAppCapabilityContracts'
 
 export type CanvasAppTextDocumentModel = {
+  can(capability: CanvasAppCapability): boolean
   commitItemsChange: CommitCanvasItemsChange
   findDocumentText: CanvasDocumentTextSearch['findDocumentText']
   replaceDocumentText: CanvasDocumentTextSearch['replaceDocumentText']

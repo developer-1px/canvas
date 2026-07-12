@@ -18,6 +18,10 @@ import {
   registerEditorEngineDocumentHost,
   type EditorEngineDocumentHost,
 } from './EditorEngineDocumentHost'
+import type {
+  RegisteredDesignDefinition,
+  RegisteredDesignDefinitionResolver,
+} from './RegisteredDesignDefinition'
 
 type EditorEngineNumericLayoutField =
   | 'gap'
@@ -162,9 +166,11 @@ type EditorEngineActivePreview = {
 }
 
 export function createEditorEngine({
+  definitionResolver,
   document,
   projection,
 }: {
+  readonly definitionResolver?: RegisteredDesignDefinitionResolver
   readonly document: DesignDocument
   readonly projection: DomProjection
 }): EditorEngine {
@@ -310,7 +316,13 @@ export function createEditorEngine({
       document.read.node(command.node.id) !== null ||
       command.node.children.length > 0 ||
       !Number.isInteger(command.index) ||
-      command.index < 0
+      command.index < 0 ||
+      !validateRegisteredDefinitionChanges([{
+        type: 'add',
+        index: command.index,
+        node: command.node,
+        parentId: command.parentId,
+      }]).ok
     ) {
       return false
     }
@@ -344,7 +356,9 @@ export function createEditorEngine({
       case 'selection.parent':
         return selection.length > 0
       case 'document.apply':
-        return command.changes.length > 0 && command.label.trim().length > 0
+        return command.changes.length > 0 &&
+          command.label.trim().length > 0 &&
+          validateRegisteredDefinitionChanges(command.changes).ok
       case 'history.undo':
         return document.historyStatus().canUndo
       case 'history.redo':
@@ -712,6 +726,15 @@ export function createEditorEngine({
       })
     }
 
+    const validation = validateRegisteredDefinitionChanges(changes)
+
+    if (!validation.ok) {
+      return {
+        ok: false,
+        result: failure('invalid-command', validation.reason),
+      }
+    }
+
     return { changes, ok: true }
   }
 
@@ -749,19 +772,35 @@ export function createEditorEngine({
       return values
     }
 
+    const change = {
+      type: 'update' as const,
+      nodeId: node.id,
+      values: { frame: { ...node.frame, ...values.values } },
+    }
+    const validation = validateRegisteredDefinitionChanges([change])
+
+    if (!validation.ok) {
+      return {
+        ok: false,
+        result: failure('invalid-command', validation.reason),
+      }
+    }
+
     return {
       ok: true,
-      change: {
-        type: 'update',
-        nodeId: node.id,
-        values: { frame: { ...node.frame, ...values.values } },
-      },
+      change,
     }
   }
 
   function executeDocumentCommand(
     command: Parameters<DesignDocument['execute']>[0],
   ): EditorEngineCommandResult {
+    const validation = validateRegisteredDefinitionChanges(command.changes)
+
+    if (!validation.ok) {
+      return failure('invalid-command', validation.reason)
+    }
+
     mutatingDocument = true
     documentChangedDuringMutation = false
     let result: ReturnType<DesignDocument['execute']>
@@ -782,6 +821,219 @@ export function createEditorEngine({
     }
 
     return result
+  }
+
+  function validateRegisteredDefinitionChanges(
+    changes: readonly DesignDocumentChange[],
+  ): { readonly ok: true } | { readonly ok: false; readonly reason: string } {
+    if (!definitionResolver) {
+      return { ok: true }
+    }
+
+    const nodes = new Map(document.snapshot.nodes.map((node) => [node.id, node]))
+    const baselineNodes = new Map(nodes)
+
+    for (const change of changes) {
+      if (change.type === 'remove') {
+        nodes.delete(change.nodeId)
+        continue
+      }
+
+      if (change.type === 'move') {
+        const node = nodes.get(change.nodeId)
+        const baselineNode = baselineNodes.get(change.nodeId)
+
+        if (!node) {
+          continue
+        }
+
+        for (const candidate of [baselineNode, node]) {
+          if (!candidate || candidate.definition.kind === 'intrinsic') {
+            continue
+          }
+
+          const definition = definitionResolver.resolveRegistered(
+            candidate.definition,
+          )
+
+          if (!definition) {
+            return {
+              ok: false,
+              reason: `Unknown registered design definition: ${candidate.definition.kind}:${candidate.definition.id}`,
+            }
+          }
+
+          if (!definition.capabilities.transform.move) {
+            return {
+              ok: false,
+              reason: `Registered design definition ${definition.id} does not support moving`,
+            }
+          }
+        }
+
+        continue
+      }
+
+      if (change.type === 'add') {
+        const validation = validateRegisteredDefinitionNode(
+          change.node,
+          null,
+          null,
+        )
+
+        if (!validation.ok) {
+          return validation
+        }
+
+        nodes.set(change.node.id, change.node)
+        continue
+      }
+
+      const node = nodes.get(change.nodeId)
+
+      if (!node) {
+        continue
+      }
+
+      const nextNode = { ...node, ...change.values }
+      nodes.set(node.id, nextNode)
+
+      const validation = validateRegisteredDefinitionNode(
+        nextNode,
+        node,
+        baselineNodes.get(node.id) ?? node,
+      )
+
+      if (!validation.ok) {
+        return validation
+      }
+    }
+
+    return { ok: true }
+  }
+
+  function validateRegisteredDefinitionNode(
+    node: DesignNode,
+    previousNode: DesignNode | null,
+    baselineNode: DesignNode | null,
+  ): { readonly ok: true } | { readonly ok: false; readonly reason: string } {
+    if (
+      baselineNode &&
+      baselineNode !== previousNode &&
+      baselineNode.definition.kind !== 'intrinsic'
+    ) {
+      const baselineDefinition = definitionResolver?.resolveRegistered(
+        baselineNode.definition,
+      )
+
+      if (!baselineDefinition) {
+        return {
+          ok: false,
+          reason: `Unknown registered design definition: ${baselineNode.definition.kind}:${baselineNode.definition.id}`,
+        }
+      }
+
+      const baselineTransformValidation = validateRegisteredDesignTransform(
+        baselineDefinition,
+        baselineNode,
+        node,
+      )
+
+      if (!baselineTransformValidation.ok) {
+        return baselineTransformValidation
+      }
+    }
+
+    if (previousNode && previousNode.definition.kind !== 'intrinsic') {
+      const previousDefinition = definitionResolver?.resolveRegistered(
+        previousNode.definition,
+      )
+
+      if (!previousDefinition) {
+        return {
+          ok: false,
+          reason: `Unknown registered design definition: ${previousNode.definition.kind}:${previousNode.definition.id}`,
+        }
+      }
+
+      const previousTransformValidation = validateRegisteredDesignTransform(
+        previousDefinition,
+        previousNode,
+        node,
+      )
+
+      if (!previousTransformValidation.ok) {
+        return previousTransformValidation
+      }
+    }
+
+    if (node.definition.kind === 'intrinsic') {
+      return { ok: true }
+    }
+
+    const definition = definitionResolver?.resolveRegistered(node.definition)
+
+    if (!definition) {
+      return {
+        ok: false,
+        reason: `Unknown registered design definition: ${node.definition.kind}:${node.definition.id}`,
+      }
+    }
+
+    const parsed = definition.props.safeParse(node.props)
+
+    if (!parsed.ok) {
+      return {
+        ok: false,
+        reason: `Invalid props for registered design definition ${definition.id}: ${parsed.reason}`,
+      }
+    }
+
+    if (
+      definition.capabilities.textEdit === false &&
+      node.text !== null
+    ) {
+      return {
+        ok: false,
+        reason: `Registered design definition ${definition.id} does not support text editing`,
+      }
+    }
+
+    if (
+      definition.capabilities.textEdit !== false &&
+      typeof node.text !== 'string'
+    ) {
+      return {
+        ok: false,
+        reason: `Registered design definition ${definition.id} requires node text`,
+      }
+    }
+
+    if (
+      definition.capabilities.textEdit !== false &&
+      !definition.capabilities.textEdit.multiline &&
+      typeof node.text === 'string' &&
+      /[\r\n]/.test(node.text)
+    ) {
+      return {
+        ok: false,
+        reason: `Registered design definition ${definition.id} requires single-line text`,
+      }
+    }
+
+    if (previousNode) {
+      const transformValidation = validateRegisteredDesignTransform(
+        definition,
+        previousNode,
+        node,
+      )
+
+      if (!transformValidation.ok) {
+        return transformValidation
+      }
+    }
+
+    return { ok: true }
   }
 
   const documentHost: EditorEngineDocumentHost | null = documentPublications
@@ -890,6 +1142,54 @@ export function createEditorEngine({
     registerEditorEngineDocumentHost(engine, documentHost)
   }
   return engine
+}
+
+function validateRegisteredDesignTransform(
+  definition: RegisteredDesignDefinition<object>,
+  previousNode: DesignNode,
+  node: DesignNode,
+): { readonly ok: true } | { readonly ok: false; readonly reason: string } {
+  const transform = definition.capabilities.transform
+
+  if (!transform.move && hasRegisteredDesignNodeMoved(previousNode, node)) {
+    return {
+      ok: false,
+      reason: `Registered design definition ${definition.id} does not support moving`,
+    }
+  }
+
+  if (!transform.resize && hasRegisteredDesignNodeResized(previousNode, node)) {
+    return {
+      ok: false,
+      reason: `Registered design definition ${definition.id} does not support resizing`,
+    }
+  }
+
+  return { ok: true }
+}
+
+function hasRegisteredDesignNodeMoved(
+  previous: DesignNode,
+  next: DesignNode,
+) {
+  return previous.frame?.x !== next.frame?.x ||
+    previous.frame?.y !== next.frame?.y ||
+    previous.layout.x !== next.layout.x ||
+    previous.layout.y !== next.layout.y
+}
+
+function hasRegisteredDesignNodeResized(
+  previous: DesignNode,
+  next: DesignNode,
+) {
+  return previous.frame?.width !== next.frame?.width ||
+    previous.frame?.height !== next.frame?.height ||
+    previous.frame?.widthMode !== next.frame?.widthMode ||
+    previous.frame?.heightMode !== next.frame?.heightMode ||
+    previous.layout.w !== next.layout.w ||
+    previous.layout.h !== next.layout.h ||
+    previous.layout.widthMode !== next.layout.widthMode ||
+    previous.layout.heightMode !== next.layout.heightMode
 }
 
 function normalizeFrameEditValues(

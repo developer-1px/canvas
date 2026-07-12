@@ -77,17 +77,20 @@
     }
   },
   "scripts": {
+    "benchmark:design-document": "CANVAS_DESIGN_DOCUMENT_BENCHMARK=1 vitest run src/canvas/design-document/DesignDocumentPerformance.test.ts --maxWorkers=1",
     "dev": "vite",
-    "build": "npm run build:package && tsc -b && vite build && npm run build:package",
+    "build": "pnpm build:package && tsc -b && vite build && pnpm build:package",
     "build:package": "rm -rf dist/package && tsc -p tsconfig.package.json && node scripts/copy-package-assets.mjs && node scripts/resolve-package-imports.mjs",
     "lint": "eslint .",
     "pack:dry-run": "npm pack --dry-run",
     "prepack": "npm run build:package",
     "preview": "vite preview",
-    "release:check": "npm run build:package && npm run smoke:package && npm run test -- src/canvas/host/document src/canvas/architecture && npm run build",
+    "release:check": "pnpm verify",
     "smoke:package": "node scripts/smoke-package.mjs",
+    "smoke:package:tarball": "node scripts/smoke-packed-package.mjs",
     "test": "vitest run",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "verify": "pnpm lint && pnpm test && pnpm build && pnpm smoke:package && pnpm smoke:package:tarball"
   },
   "dependencies": {
     "@interactive-os/interaction": "^0.1.0",

@@ -55,10 +55,10 @@ export function getCanvasObjectInspectorCommentThread({
 
       commitItemsChange({
         type: 'replace-changed',
-        items: (items ?? selectedItems).map((candidate) =>
-          selectedIds.has(candidate.id) && isCanvasCommentItem(candidate)
-            ? setCanvasCommentResolved(candidate, nextResolved)
-            : candidate,
+        items: updateCanvasCommentResolved(
+          items ?? selectedItems,
+          selectedIds,
+          nextResolved,
         ),
       }, {
         before: selection,
@@ -66,4 +66,27 @@ export function getCanvasObjectInspectorCommentThread({
       })
     },
   }
+}
+
+function updateCanvasCommentResolved(
+  items: readonly CanvasItem[],
+  selectedIds: ReadonlySet<string>,
+  resolved: boolean,
+): CanvasItem[] {
+  return items.map((item) => {
+    if (selectedIds.has(item.id) && isCanvasCommentItem(item)) {
+      return setCanvasCommentResolved(item, resolved)
+    }
+
+    return item.type === 'group'
+      ? {
+          ...item,
+          children: updateCanvasCommentResolved(
+            item.children,
+            selectedIds,
+            resolved,
+          ),
+        }
+      : item
+  })
 }

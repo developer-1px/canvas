@@ -16,6 +16,9 @@ import type { Interaction } from './CanvasInteractionState'
 import type {
   CanvasPointerCreationInteraction,
 } from './CanvasPointerCreationGrammar'
+import type {
+  CanvasAppFoundationExtensionEffect,
+} from '../../../extensions/foundation-extensions'
 
 export type CanvasPointerCreationStartResult =
   | { kind: 'none' }
@@ -29,6 +32,11 @@ export type CanvasPointerCreationStartResult =
       gesture: Interaction['kind']
       interaction: Interaction
       laserTrail?: CanvasLaserTrailOverlay
+    }
+  | {
+      kind: 'extension-effects'
+      capturePointer: false
+      effects: readonly CanvasAppFoundationExtensionEffect[]
     }
   | {
       kind: 'created-item'

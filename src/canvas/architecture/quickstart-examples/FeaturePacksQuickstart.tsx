@@ -22,6 +22,7 @@ const kpiCardModule = defineCanvasAppCustomItemModule({
     enterTextEdit: true,
     id: 'kpi-card-tool',
     label: 'K',
+    requiredCapability: 'editDocument',
     shortcut: { key: 'k' },
     title: 'KPI card',
   }],

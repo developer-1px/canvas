@@ -29,8 +29,8 @@ import {
 import {
   CANVAS_TOOLBAR_ITEM_PROPS,
   useCanvasToolbarRovingFocus,
-} from '../../../src/canvas/app'
-import type { Viewport } from '../../../src/canvas/core'
+} from '@interactive-os/canvas/app'
+import type { Viewport } from '@interactive-os/canvas/core'
 import {
   createFigmaDesignDocument,
 } from './design-document'
@@ -395,7 +395,11 @@ export function FigmaCloneApp() {
           <h1>CSS</h1>
         </header>
         <div className="figma-inspector-body">
-          <FigmaCloneInspector editor={editor} snapshot={editorSnapshot} />
+          <FigmaCloneInspector
+            editor={editor}
+            registry={registry}
+            snapshot={editorSnapshot}
+          />
         </div>
       </aside>
 

@@ -11,6 +11,7 @@ describe('CanvasAppCustomItemModules validation', () => {
         {
           id: 'risk',
           label: '!',
+          requiredCapability: 'editDocument',
           title: 'Risk',
           createItem: ({ startWorld }: CanvasAppCustomCreationToolContext) => ({
             title: 'Risk',
@@ -28,6 +29,7 @@ describe('CanvasAppCustomItemModules validation', () => {
         {
           id: 'risk',
           label: '?',
+          requiredCapability: 'editDocument',
           title: 'Duplicate risk',
           createItem: () => null,
         },
@@ -162,6 +164,7 @@ describe('CanvasAppCustomItemModules validation', () => {
         {
           id: 'risk',
           label: '!',
+          requiredCapability: 'editDocument',
           title: 'Risk',
           shortcut: { key: 'k', shiftKey: true },
           createItem: () => null,
@@ -173,6 +176,7 @@ describe('CanvasAppCustomItemModules validation', () => {
         {
           id: 'dependency',
           label: 'D',
+          requiredCapability: 'editDocument',
           title: 'Dependency',
           shortcut: { key: 'k', shiftKey: true },
           createItem: () => null,

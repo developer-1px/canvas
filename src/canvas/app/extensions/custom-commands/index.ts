@@ -7,7 +7,6 @@ export {
 } from './CanvasAppCustomCommandExecution'
 export type {
   CanvasAppCustomCommand,
-  CanvasAppCustomCommandCommitItemsChange,
   CanvasAppCustomCommandCommitSelection,
   CanvasAppCustomCommandContext,
 } from './CanvasAppCustomCommands'

@@ -55,6 +55,7 @@ function createExtensionRuntime(): CanvasAppExtensionRuntime {
       createItem: vi.fn(() => null),
       id: 'risk',
       label: 'R',
+      requiredCapability: 'editDocument',
       title: 'Risk',
     }],
     runCustomCommand: vi.fn(() => true),

@@ -46,6 +46,9 @@ export function createReactDesignNodeDomProps(
 
   return {
     ...props,
+    ...(node.frame?.heightMode === 'fixed' && node.frame.overflow === 'scroll'
+      ? { 'data-canvas-wheel-passthrough': 'scroll' }
+      : {}),
     style: createReactDesignNodeStyle(node, parent),
   } as ReactDesignNodeDomProps
 }

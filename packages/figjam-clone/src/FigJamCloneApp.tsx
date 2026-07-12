@@ -47,8 +47,6 @@ import {
   FIGJAM_PRODUCT_PACK,
   FIGJAM_SECTION_DEFINITION_ID,
   FIGJAM_STICKY_NOTE_DEFINITION_ID,
-  FIGJAM_STICKY_NOTE_TONES,
-  FIGJAM_WIDGET_PACK,
   createFigJamCommentNode,
   createFigJamConnectorNode,
   createFigJamDrawingNode,
@@ -60,7 +58,6 @@ import {
   createFigJamTableNode,
   createFigJamTextNode,
   type FigJamInsertionId,
-  type FigJamStickyNoteTone,
   type FigJamDrawingVariant,
 } from '@interactive-os/figjam-pack'
 import '@interactive-os/figjam-pack/style.css'
@@ -69,6 +66,13 @@ import {
   FIGJAM_BOARD_NODE_ID,
   restoreFigJamDesignDocument,
 } from './FigJamDesignDocument'
+import {
+  resolveFigJamStickyQuickCreateContribution,
+} from './FigJamStickyQuickCreateContribution'
+import {
+  ownFigJamCreatedNode,
+  ownFigJamDocumentPlanCreatedNodes,
+} from './FigJamCreationOwnership'
 import {
   captureFigJamClipboard,
   planFigJamClipboardInsert,
@@ -211,15 +215,15 @@ export function FigJamCloneApp() {
   const selection = snapshot.selection.nodeIds
   const selectedNodeId = snapshot.selection.primaryNodeId
   const selectedNode = selectedNodeId ? editor.read.node(selectedNodeId) : null
-  const selectedDefinition = getFigJamWidgetDefinition(selectedNode)
-  const selectedWidgetProps = selectedNode && selectedDefinition
-    ? FIGJAM_WIDGET_PACK.parseProps(selectedDefinition.id, selectedNode.props)
+  const selectedDefinition = selectedNode
+    ? registry.resolveRegistered(selectedNode.definition)
     : null
-  const Inspector = selectedDefinition?.Inspector
+  const stickyQuickCreate =
+    resolveFigJamStickyQuickCreateContribution(selectedNode)
   const transformableNodeId = selectedNodeId === FIGJAM_BOARD_NODE_ID
     ? null
     : selectedNodeId
-  const transformCapabilities = selectedNode?.definition.kind === 'widget'
+  const transformCapabilities = selectedNode?.definition.kind !== 'intrinsic'
     ? selectedDefinition?.capabilities.transform ?? {
         move: false,
         resize: false,
@@ -247,8 +251,17 @@ export function FigJamCloneApp() {
       return false
     }
 
+    let ownedPlan: FigJamDocumentPlan
+
+    try {
+      ownedPlan = ownFigJamDocumentPlanCreatedNodes(plan, registry)
+    } catch (error) {
+      setLastError(error instanceof Error ? error.message : String(error))
+      return false
+    }
+
     const result = editor.commands.execute({
-      changes: plan.changes,
+      changes: ownedPlan.changes,
       label,
       type: 'document.apply',
     })
@@ -258,16 +271,28 @@ export function FigJamCloneApp() {
       return false
     }
 
-    editor.commands.execute({ type: 'selection.set', nodeIds: plan.selection })
+    editor.commands.execute({
+      type: 'selection.set',
+      nodeIds: ownedPlan.selection,
+    })
     setLastError(null)
     return true
-  }, [editor])
+  }, [editor, registry])
 
   const insertNode = useCallback((node: DesignNode, label: string) => {
+    let ownedNode: DesignNode
+
+    try {
+      ownedNode = ownFigJamCreatedNode(node, registry)
+    } catch (error) {
+      setLastError(error instanceof Error ? error.message : String(error))
+      return false
+    }
+
     const result = editor.commands.execute({
       index: editor.read.children(FIGJAM_BOARD_NODE_ID).length,
       label,
-      node,
+      node: ownedNode,
       parentId: FIGJAM_BOARD_NODE_ID,
       type: 'node.create',
     })
@@ -280,7 +305,7 @@ export function FigJamCloneApp() {
     editor.commands.execute({ type: 'selection.replace', nodeId: node.id })
     setLastError(null)
     return true
-  }, [editor])
+  }, [editor, registry])
 
   const createAtPoint = useCallback((
     kind: FigJamInsertKind,
@@ -391,7 +416,7 @@ export function FigJamCloneApp() {
   ) => {
     if (
       !selectedNode ||
-      selectedNode.definition.id !== FIGJAM_STICKY_NOTE_DEFINITION_ID
+      !stickyQuickCreate
     ) {
       return false
     }
@@ -406,7 +431,7 @@ export function FigJamCloneApp() {
     const target = readQuickCreatePlacement(sourceBounds, direction, gap)
     const nodeId = createId('sticky')
     const connectorId = createId('connector')
-    const tone = readStickyTone(selectedNode.props.tone)
+    const tone = stickyQuickCreate.tone
     const sticky = createFigJamStickyNoteNode({
       height: sourceBounds.h,
       nodeId,
@@ -455,11 +480,13 @@ export function FigJamCloneApp() {
       ],
       selection: [sticky.id],
     }, 'Quick create sticky note')
-  }, [createId, editor.read, executePlan, selectedNode])
+  }, [createId, editor.read, executePlan, selectedNode, stickyQuickCreate])
 
   const beginTextEditForNode = useCallback((nodeId: DesignNodeId) => {
     const node = editor.read.node(nodeId)
-    const definition = getFigJamWidgetDefinition(node)
+    const definition = node
+      ? registry.resolveRegistered(node.definition)
+      : null
 
     if (
       !node ||
@@ -490,7 +517,7 @@ export function FigJamCloneApp() {
       session,
     })
     return true
-  }, [editor, textEdit])
+  }, [editor, registry, textEdit])
 
   const finishTextEdit = useCallback((commit: boolean) => {
     if (!textEdit) {
@@ -532,20 +559,8 @@ export function FigJamCloneApp() {
       return
     }
 
-    const parsed = FIGJAM_WIDGET_PACK.parseProps(
-      selectedDefinition.id,
-      { ...selectedNode.props, [field]: value },
-    )
-
-    if (!parsed.ok || parsed.value[field] === undefined) {
-      setLastError(parsed.ok
-        ? `Widget props omitted edited field: ${field}`
-        : parsed.reason)
-      return
-    }
-
     const result = editor.commands.execute({
-      edits: [{ field, target: 'props', value: parsed.value[field] }],
+      edits: [{ field, target: 'props', value }],
       label,
       nodeId: selectedNode.id,
       type: 'node.edit',
@@ -1363,8 +1378,7 @@ export function FigJamCloneApp() {
             }}
           >
             <ReactDesignEditorRenderer runtime={runtime} />
-            {selectedNode?.definition.id ===
-            FIGJAM_STICKY_NOTE_DEFINITION_ID ? (
+            {selectedNode && stickyQuickCreate ? (
               <FigJamStickyQuickCreate
                 bounds={readFigJamNodeWorldBounds(
                   editor.read,
@@ -1489,13 +1503,11 @@ export function FigJamCloneApp() {
           ) : null}
           <button type="button" onClick={addStampToSelection}>React</button>
           <button type="button" onClick={applySelectionRemoval}>Delete</button>
-          {Inspector && selectedWidgetProps?.ok ? (
-            <Inspector
-              editProp={editWidgetProp}
-              node={selectedNode}
-              props={selectedWidgetProps.value}
-            />
-          ) : null}
+          {selectedDefinition?.renderInspector?.({
+            editor,
+            editProp: editWidgetProp,
+            node: selectedNode,
+          })}
         </div>
       ) : null}
 
@@ -1664,12 +1676,6 @@ function createFigJamRegistry() {
   })
 }
 
-function getFigJamWidgetDefinition(node: DesignNode | null) {
-  return node?.definition.kind === 'widget'
-    ? FIGJAM_WIDGET_PACK.resolve(node.definition.id)
-    : null
-}
-
 function toDrawingVariant(tool: FigJamTool): FigJamDrawingVariant | null {
   if (tool === 'marker' || tool === 'highlight') {
     return tool
@@ -1803,13 +1809,6 @@ function readConnectorPlacement(
     x: Math.min(start.x, end.x) - (w - dx) / 2,
     y: Math.min(start.y, end.y) - (h - dy) / 2,
   }
-}
-
-function readStickyTone(value: unknown): FigJamStickyNoteTone {
-  return typeof value === 'string' &&
-    (FIGJAM_STICKY_NOTE_TONES as readonly string[]).includes(value)
-    ? value as FigJamStickyNoteTone
-    : 'yellow'
 }
 
 function readNudge(event: KeyboardEvent) {

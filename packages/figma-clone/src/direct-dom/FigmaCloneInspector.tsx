@@ -2,13 +2,11 @@ import type {
   EditorEngine,
   EditorEngineSnapshot,
 } from '@interactive-os/canvas/editor'
+import type {
+  DesignNodeFrame,
+  ReactDesignDefinitionRegistry,
+} from '@interactive-os/canvas/react-design'
 import { DomEditEditorInspector } from '@interactive-os/dom-edit-affordance/react'
-import type { DesignNodeFrame } from '../../../../src/canvas/design-document'
-
-import {
-  FIGMA_HOME_COMPONENT_METADATA,
-  getFigmaWorkspaceComponentMetadata,
-} from '../design-document'
 
 const FIGMA_FRAME_PRESETS = [
   { id: 'desktop', label: 'Desktop', width: 1440, height: 900 },
@@ -19,14 +17,19 @@ const FIGMA_FRAME_PRESETS = [
 
 export function FigmaCloneInspector({
   editor,
+  registry,
   snapshot,
 }: {
   readonly editor: EditorEngine
+  readonly registry: ReactDesignDefinitionRegistry
   readonly snapshot: EditorEngineSnapshot
 }) {
   const selectedNodeId = snapshot.selection.primaryNodeId
   const selectedNode = selectedNodeId
     ? editor.read.node(selectedNodeId)
+    : null
+  const definition = selectedNode
+    ? registry.resolveRegistered(selectedNode.definition)
     : null
 
   return (
@@ -39,15 +42,20 @@ export function FigmaCloneInspector({
         />
       ) : null}
       <DomEditEditorInspector editor={editor} />
-      {selectedNode?.component ? (
-        <FigmaCloneComponentInspector
-          editor={editor}
-          nodeId={selectedNode.id}
-          definitionId={selectedNode.component.definitionId}
-          instanceId={selectedNode.component.instanceId}
-          slotId={selectedNode.component.slotId}
-        />
-      ) : null}
+      {selectedNode && definition?.renderInspector
+        ? definition.renderInspector({
+            editor,
+            node: selectedNode,
+            editProp: (field, value, label) => {
+              editor.commands.execute({
+                edits: [{ field, target: 'props', value }],
+                label,
+                nodeId: selectedNode.id,
+                type: 'node.edit',
+              })
+            },
+          })
+        : null}
     </>
   )
 }
@@ -210,72 +218,5 @@ function FigmaCloneFrameNumberField({
         onChange={(event) => onChange(Number(event.currentTarget.value))}
       />
     </label>
-  )
-}
-
-function FigmaCloneComponentInspector({
-  definitionId,
-  editor,
-  instanceId,
-  nodeId,
-  slotId,
-}: {
-  readonly definitionId: string
-  readonly editor: EditorEngine
-  readonly instanceId: string
-  readonly nodeId: string
-  readonly slotId: string
-}) {
-  const metadata = getFigmaWorkspaceComponentMetadata(definitionId)
-    ?? FIGMA_HOME_COMPONENT_METADATA.find((candidate) =>
-      candidate.id === definitionId)
-
-  if (!metadata) {
-    return null
-  }
-
-  const instance = metadata.instances.find((candidate) =>
-    candidate.id === instanceId)
-  const peers = editor.read.componentPeers(nodeId)
-
-  return (
-    <section className="figma-panel-section figma-panel-section--component">
-      <h2>Component</h2>
-      <dl className="figma-context-meta">
-        <div>
-          <dt>Set</dt>
-          <dd>{metadata.label}</dd>
-        </div>
-        <div>
-          <dt>Instance</dt>
-          <dd>{instance?.label ?? instanceId}</dd>
-        </div>
-        <div>
-          <dt>Slot</dt>
-          <dd>{slotId}</dd>
-        </div>
-      </dl>
-      <div
-        aria-label={`${metadata.label} synced instances`}
-        className="figma-component-instances"
-      >
-        {peers.map((peer) => (
-          <button
-            aria-pressed={peer.id === nodeId}
-            key={peer.id}
-            type="button"
-            onClick={() => editor.commands.execute({
-              type: 'selection.replace',
-              nodeId: peer.id,
-            })}
-          >
-            {peer.label}
-          </button>
-        ))}
-      </div>
-      <p className="figma-component-sync-note">
-        {metadata.syncDescription}
-      </p>
-    </section>
   )
 }

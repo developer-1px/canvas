@@ -232,7 +232,9 @@ describe('Canvas pointer creation boundaries', () => {
       'export function applyCanvasItemPointerInteractionStartEffect',
     )
     expect(effectsFile.source).toContain('capturePointer(')
-    expect(effectsFile.source).toContain("commitItemsChange({ type: 'add'")
+    expect(effectsFile.source).toMatch(
+      /commitItemsChange\(\{\s*type: 'add'/,
+    )
     expect(effectsFile.source).toContain("setTool('select')")
     expect(effectsFile.source).not.toContain('Pick<')
   })

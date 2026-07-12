@@ -33,21 +33,24 @@ import type {
   CanvasMediaImporter,
   CanvasTextPasteImporter,
 } from '../feature-packs'
-import type { CanvasAppCapabilitySnapshot } from './CanvasAppCapabilityAssembly'
 import type { CanvasAppPresenceProvider } from './CanvasAppCollaborationAssembly'
+import type { CanvasAppDocumentAuthorityRead } from '../workspace/document/CanvasAppDocumentContracts'
+import type {
+  CanvasAppFoundationExtensionRuntime,
+} from '../extensions/foundation-extensions'
 
 export type CanvasAppAssemblyAffordanceModel = {
   config: CanvasAffordanceConfig
 }
 
 export type CanvasAppAssemblyCommandModel = {
-  capabilities: CanvasAppCapabilitySnapshot
   commandAdapter: CanvasCommandAdapter<CanvasItem>
 }
 
 export type CanvasAppAssemblyComponentModel = {
   componentLibrary: CanvasAppComponentLibrary
   creationAdapter: CanvasCreationAdapter<CanvasItem>
+  foundationExtensionRuntime: CanvasAppFoundationExtensionRuntime
 }
 
 export type CanvasAppAssemblyControlModel = {
@@ -81,6 +84,7 @@ export type CanvasAppAssemblyPointerItemAdapters = {
 
 export type CanvasAppAssemblyPointerModel = {
   componentLibrary: CanvasAppComponentLibrary
+  foundationExtensionRuntime: CanvasAppFoundationExtensionRuntime
   itemAdapters: CanvasAppAssemblyPointerItemAdapters
 }
 
@@ -95,6 +99,8 @@ export type CanvasAppAssemblyRenderingModel = {
 export type CanvasAppAssemblyWorkspaceModel = {
   customItemTextTargets: CanvasAppCustomItemTextTargets
   customItemValidators: CanvasAppCustomItemValidators
+  documentAuthority: CanvasAppDocumentAuthorityRead
+  foundationExtensionRuntime: CanvasAppFoundationExtensionRuntime
   initialItems: CanvasItem[]
   initialSelection: readonly string[]
   storageProvider: CanvasWorkspaceStorageProvider

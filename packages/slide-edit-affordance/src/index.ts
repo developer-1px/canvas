@@ -3,8 +3,8 @@ import type {
   CanvasSelectionIds,
   Point,
   Viewport,
-} from '../../../src/canvas/core'
-import type { CanvasExtensionEffect } from '../../../src/canvas/foundation'
+} from '@interactive-os/canvas/core'
+import type { CanvasExtensionEffect } from '@interactive-os/canvas/foundation'
 
 export {
   getSlideEditFrameGuideGeometry,

@@ -19,6 +19,17 @@ import type {
 } from './index'
 
 describe('CanvasAppAssembly validation', () => {
+  it('rejects foundation descriptors with missing concrete adapters', () => {
+    expect(() => createCanvasAppAssembly({
+      foundationExtensions: [defineCanvasExtension({
+        id: 'canvas.risk-note',
+        requiredAdapters: ['creation'],
+      })],
+    })).toThrow(
+      'Canvas foundation extension canvas.risk-note is missing creation adapter',
+    )
+  })
+
   it('rejects duplicate command ids across modules and direct input', () => {
     const riskModule = defineRiskModule()
 
@@ -29,6 +40,7 @@ describe('CanvasAppAssembly validation', () => {
           {
             id: 'publish',
             label: 'Pub',
+            requiredCapability: 'editDocument',
             title: 'Publish risk',
             run: () => undefined,
           },
@@ -109,6 +121,7 @@ describe('CanvasAppAssembly validation', () => {
           {
             id: 'Publish Risk',
             label: 'Pub',
+            requiredCapability: 'editDocument',
             title: 'Publish risk',
             run: () => undefined,
           },
@@ -219,12 +232,24 @@ describe('CanvasAppAssembly validation', () => {
 
     expect(() =>
       createCanvasAppAssembly({
+        foundationExtensions: [{
+          id: 'canvas.missing-capability',
+          tools: [{ id: 'risk', kind: 'creation' }],
+        } as never],
+      }),
+    ).toThrow(
+      'Canvas app foundation extension tool requires requiredCapability',
+    )
+
+    expect(() =>
+      createCanvasAppAssembly({
         foundationExtensions: [
           defineCanvasExtension({
             id: 'canvas.duplicate-sticky-tool',
             tools: [{
               id: 'sticky',
               kind: 'creation',
+              requiredCapability: 'editDocument',
             }],
           }),
         ],
@@ -298,6 +323,15 @@ describe('CanvasAppAssembly validation', () => {
     expect(() =>
       assertCanvasAppAssembly({
         ...assembly,
+        foundationExtensionRuntime: {},
+      } as unknown as CanvasAppAssembly),
+    ).toThrow(
+      'Canvas app foundation extension runtime componentPresentationRenderers descriptor must be an object',
+    )
+
+    expect(() =>
+      assertCanvasAppAssembly({
+        ...assembly,
         initialSelection: ['missing'],
       } as unknown as CanvasAppAssembly),
     ).toThrow('Invalid assembly initial selection: missing')
@@ -328,6 +362,7 @@ function defineRiskModule() {
       {
         id: 'publish',
         label: 'Pub',
+        requiredCapability: 'editDocument',
         title: 'Publish risk',
         run: () => undefined,
       },

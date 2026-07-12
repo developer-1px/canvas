@@ -25,15 +25,24 @@ jobs:
           version: 10.26.2
 
       - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
-      - name: Verify json-document registry contract
-        run: >-
-          pnpm exec vitest run src/canvas/host/document
-          src/canvas/architecture/CanvasPackageManifest.test.ts
+      - name: Verify
+        run: pnpm verify
 
       - name: Install Playwright
-        run: pnpm exec playwright install --with-deps chromium
+        run: pnpm exec playwright install --with-deps chromium webkit
 
       - name: Run e2e
         run: pnpm test:e2e
+
+      - name: Upload Playwright failure artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-failure-artifacts
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore
+          retention-days: 7

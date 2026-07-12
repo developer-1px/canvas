@@ -17,7 +17,7 @@ import {
   moveCanvasItemToTargetPlacement,
   type CanvasItemTargetPlacement,
 } from '@interactive-os/canvas/foundation'
-import type { DesignNode } from '../../../../src/canvas/design-document'
+import type { DesignNode } from '@interactive-os/canvas/react-design'
 
 const FIGMA_LAYER_BUTTON_SELECTOR = '[data-figma-layer-tree-button]'
 

@@ -20,6 +20,8 @@ export function useCanvasAppTextModel({
     setEditing,
     textEditor,
   } = useCanvasTextEditorModel({
+    canComment: document.can('comment'),
+    canEditDocument: document.can('editDocument'),
     commitItemsChange: document.commitItemsChange,
     config,
     editorRef,

@@ -2,9 +2,10 @@ import { useCanvasObjectInspector } from '../affordances/editing/inspector/useCa
 import type { CanvasAppInspectorModelInput } from './CanvasAppInspectorConsumerContracts'
 
 export function useCanvasAppInspectorModel({
-  commitItemsChange,
   config,
   customFocus,
+  document,
+  items,
   inspectorPanels,
   itemReadModel,
   selected,
@@ -12,9 +13,10 @@ export function useCanvasAppInspectorModel({
 }: CanvasAppInspectorModelInput) {
   return {
     ...useCanvasObjectInspector({
-      commitItemsChange,
       config,
       customFocus,
+      document,
+      items,
       inspectorPanels,
       itemReadModel,
       selected,

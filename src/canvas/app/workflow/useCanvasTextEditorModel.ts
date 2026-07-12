@@ -13,6 +13,7 @@ import type {
 import type { CanvasAffordanceConfig } from '../../engine'
 import { useCanvasTextEditing } from '../affordances/editing/text-editor/useCanvasTextEditing'
 import {
+  canCanvasAppEditTextItem,
   shouldUseCanvasContentEditableText,
   type CanvasTextEditorStyle,
 } from '../affordances/editing/text-editor/CanvasTextEditingModel'
@@ -23,6 +24,8 @@ import type { CanvasAppItemReadModel } from './CanvasAppItemReadModelContracts'
 import type { CommitCanvasItemsChange } from './CanvasWorkflowContract'
 
 type UseCanvasTextEditorModelArgs = {
+  canComment: boolean
+  canEditDocument: boolean
   commitItemsChange: CommitCanvasItemsChange
   config: CanvasAffordanceConfig
   editorRef: RefObject<HTMLElement | null>
@@ -49,6 +52,8 @@ type CanvasTextEditorModel = {
 }
 
 export function useCanvasTextEditorModel({
+  canComment,
+  canEditDocument,
   commitItemsChange,
   config,
   editorRef,
@@ -56,19 +61,54 @@ export function useCanvasTextEditorModel({
   selection,
   viewport,
 }: UseCanvasTextEditorModelArgs): CanvasTextEditorModel {
-  const [editing, setEditing] = useState<EditingText | null>(null)
+  const [requestedEditing, setEditingState] = useState<EditingText | null>(null)
   const [dismissedInlineTextId, setDismissedInlineTextId] =
     useState<string | null>(null)
-  const editingItem = editing
-    ? itemReadModel.findTextEditTarget(editing.id)
+  const unresolvedEditingItem = requestedEditing
+    ? itemReadModel.findTextEditTarget(requestedEditing.id)
     : null
-  const selectedInlineTextItem = selection.length === 1
+  const editingItem = canCanvasAppEditTextItem({
+    canComment,
+    canEditDocument,
+    item: unresolvedEditingItem,
+  }) ? unresolvedEditingItem : null
+  const editing = editingItem ? requestedEditing : null
+  const unresolvedSelectedInlineTextItem = selection.length === 1
     ? itemReadModel.findTextEditTarget(selection[0] ?? '')
     : null
+  const selectedInlineTextItem = canCanvasAppEditTextItem({
+    canComment,
+    canEditDocument,
+    item: unresolvedSelectedInlineTextItem,
+  }) ? unresolvedSelectedInlineTextItem : null
   const selectedInlineTextId =
     shouldUseCanvasContentEditableText(selectedInlineTextItem)
       ? selectedInlineTextItem.id
       : null
+  const setEditing = useCallback<Dispatch<SetStateAction<EditingText | null>>>(
+    (action) => {
+      setEditingState((current) => {
+        const next = typeof action === 'function' ? action(current) : action
+
+        if (!next) {
+          return null
+        }
+
+        const item = itemReadModel.findTextEditTarget(next.id)
+
+        if (!item) {
+          return canComment || canEditDocument ? next : current
+        }
+
+        return canCanvasAppEditTextItem({
+          canComment,
+          canEditDocument,
+          item,
+        }) ? next : current
+      })
+    },
+    [canComment, canEditDocument, itemReadModel],
+  )
 
   const {
     blurTextEditor,
@@ -122,6 +162,7 @@ export function useCanvasTextEditorModel({
     config.overlays.textEditor,
     dismissedInlineTextId,
     itemReadModel.textTarget,
+    setEditing,
     selectedInlineTextId,
     selectedInlineTextItem,
   ])

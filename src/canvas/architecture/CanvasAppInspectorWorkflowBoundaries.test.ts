@@ -122,8 +122,12 @@ describe('Canvas App inspector workflow boundaries', () => {
     expect(descriptorFile.source).toContain(
       "from '../../workspace/document/CanvasAppDocumentContracts'",
     )
+    expect(descriptorFile.source).toContain('CanvasAppDocumentAuthority')
     expect(descriptorFile.source).toContain(
-      'export type CanvasAppInspectorPanelCommitItemsChange',
+      'document: CanvasAppDocumentAuthority',
+    )
+    expect(descriptorFile.source).not.toContain(
+      'CanvasAppInspectorPanelCommitItemsChange',
     )
     expect(descriptorFile.source).not.toContain('panel.render(')
     expect(descriptorFile.source).not.toContain('panel.isVisible(')

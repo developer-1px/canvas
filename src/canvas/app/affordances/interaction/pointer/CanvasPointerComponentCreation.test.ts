@@ -30,7 +30,7 @@ const sectionTemplate = {
 }
 
 describe('CanvasPointerComponentCreation', () => {
-  it('creates the built-in sticky component centered on the pointer', () => {
+  it('leaves sticky creation to the compiled foundation extension runtime', () => {
     const componentLibrary = createComponentLibrary()
     const result = startCanvasPointerComponentCreation({
       componentLibrary,
@@ -42,30 +42,8 @@ describe('CanvasPointerComponentCreation', () => {
       startWorld: { x: 200, y: 300 },
     })
 
-    expect(componentLibrary.createItem).toHaveBeenCalledWith({
-      id: 'component-1',
-      point: { x: 106, y: 226 },
-      templateId: 'sticky',
-    })
-    expect(result).toEqual({
-      capturePointer: false,
-      edit: { id: 'component-1', value: '' },
-      item: {
-        accent: '#ca8a04',
-        body: '',
-        component: 'sticky',
-        fill: '#fef3c7',
-        h: 148,
-        id: 'component-1',
-        stroke: '#eab308',
-        title: 'Sticky',
-        type: 'component',
-        w: 188,
-        x: 106,
-        y: 226,
-      },
-      kind: 'created-item',
-    })
+    expect(result).toBeNull()
+    expect(componentLibrary.createItem).not.toHaveBeenCalled()
   })
 
   it('starts section creation with a default square draft', () => {
@@ -109,7 +87,7 @@ describe('CanvasPointerComponentCreation', () => {
       startWorld: { x: 200, y: 300 },
     })
 
-    expect(result).toEqual({ kind: 'none' })
+    expect(result).toBeNull()
     expect(componentLibrary.createItem).not.toHaveBeenCalled()
   })
 
@@ -131,7 +109,7 @@ describe('CanvasPointerComponentCreation', () => {
     expect(componentLibrary.createItem).not.toHaveBeenCalled()
   })
 
-  it('returns none when the component library has no sticky template', () => {
+  it('does not inspect sticky templates outside the extension runtime', () => {
     const componentLibrary = createComponentLibrary({ includeSticky: false })
     const result = startCanvasPointerComponentCreation({
       componentLibrary,
@@ -143,7 +121,7 @@ describe('CanvasPointerComponentCreation', () => {
       startWorld: { x: 200, y: 300 },
     })
 
-    expect(result).toEqual({ kind: 'none' })
+    expect(result).toBeNull()
     expect(componentLibrary.createItem).not.toHaveBeenCalled()
   })
 

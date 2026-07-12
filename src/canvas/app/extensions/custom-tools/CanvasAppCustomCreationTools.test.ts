@@ -11,10 +11,20 @@ import {
   getCanvasAppCustomCreationTool,
   getCanvasAppCustomCreationToolStates,
 } from './CanvasAppCustomCreationToolRuntime'
+import {
+  CANVAS_APP_EDITOR_CAPABILITIES,
+  CANVAS_APP_READ_ONLY_CAPABILITIES,
+} from '../../workflow/CanvasAppCapabilityAssembly'
+import { createCanvasAppDocumentAuthorityRead } from '../../workflow/CanvasAppDocumentAuthority'
+
+const editorAuthority = createCanvasAppDocumentAuthorityRead(
+  CANVAS_APP_EDITOR_CAPABILITIES,
+)
 
 const tool: CanvasAppCustomCreationTool = {
   id: 'risk',
   label: '!',
+  requiredCapability: 'editDocument',
   title: 'Risk',
   shortcut: { key: 'k', shiftKey: true },
   createItem: ({ createId, startWorld }) => ({
@@ -33,7 +43,7 @@ const tool: CanvasAppCustomCreationTool = {
 
 describe('CanvasAppCustomCreationTools', () => {
   it('creates externally usable custom tool states', () => {
-    expect(getCanvasAppCustomCreationToolStates([tool])).toEqual([
+    expect(getCanvasAppCustomCreationToolStates([tool], editorAuthority)).toEqual([
       {
         ariaLabel: 'Risk tool',
         id: 'custom:risk',
@@ -43,6 +53,15 @@ describe('CanvasAppCustomCreationTools', () => {
         title: 'Risk (Shift+K)',
       },
     ])
+  })
+
+  it('omits custom tools whose required capability is denied', () => {
+    expect(getCanvasAppCustomCreationToolStates(
+      [tool],
+      createCanvasAppDocumentAuthorityRead(
+        CANVAS_APP_READ_ONLY_CAPABILITIES,
+      ),
+    )).toEqual([])
   })
 
   it('looks up custom creation tools by prefixed tool id', () => {
@@ -164,6 +183,17 @@ describe('CanvasAppCustomCreationTools', () => {
         } as unknown as CanvasAppCustomCreationTool,
       ]),
     ).toThrow('Canvas app custom creation tool risk requires shortcut.shiftKey')
+
+    expect(() =>
+      assertCanvasAppCustomCreationTools([
+        {
+          ...tool,
+          requiredCapability: undefined,
+        } as unknown as CanvasAppCustomCreationTool,
+      ]),
+    ).toThrow(
+      'Canvas app custom creation tool risk requires requiredCapability',
+    )
   })
 
   it('rejects built-in canvas shortcut conflicts', () => {

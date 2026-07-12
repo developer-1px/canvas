@@ -16,6 +16,7 @@ import type {
 
 export const CANVAS_CHECKLIST_INSPECTOR_PANEL: CanvasAppInspectorPanel = {
   id: 'checklist-actions',
+  requiredCapability: 'editDocument',
   isVisible: (context) => getSelectedCanvasChecklistItem(context) !== null,
   render: (context) => {
     const item = getSelectedCanvasChecklistItem(context)
@@ -190,13 +191,16 @@ function commitCanvasChecklistItems(
   context: CanvasAppInspectorPanelContext,
   items: CanvasItem[],
 ) {
-  return context.commitItemsChange({
-    type: 'replace-changed',
-    items,
-  }, {
-    before: context.selection,
-    after: context.selection,
-  })
+  return context.document.commit({
+    change: {
+      type: 'replace-changed',
+      items,
+    },
+    selection: {
+      before: context.selection,
+      after: context.selection,
+    },
+  }).ok
 }
 
 function handleCanvasChecklistItemTextKeyDown(

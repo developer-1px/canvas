@@ -36,8 +36,12 @@ describe('Canvas App command execution boundaries', () => {
     expect(descriptorFile.source).toContain(
       "from '../../workspace/document/CanvasAppDocumentContracts'",
     )
+    expect(descriptorFile.source).toContain('CanvasAppDocumentAuthority')
     expect(descriptorFile.source).toContain(
-      'export type CanvasAppCustomCommandCommitItemsChange',
+      'document: CanvasAppDocumentAuthority',
+    )
+    expect(descriptorFile.source).not.toContain(
+      'CanvasAppCustomCommandCommitItemsChange',
     )
     expect(descriptorFile.source).toContain(
       'export type CanvasAppCustomCommandCommitSelection',

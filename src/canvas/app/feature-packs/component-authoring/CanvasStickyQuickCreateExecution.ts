@@ -14,6 +14,7 @@ import {
 import {
   getCanvasViewportScreenPoint,
 } from '../../../core'
+import { CANVAS_STICKY_NOTE_TOOL_ID } from '../../../foundation'
 import {
   CANVAS_SECTION_COMPONENT_KIND,
   CANVAS_STICKY_COMPONENT_KIND,
@@ -23,17 +24,34 @@ import {
 import type { CanvasAppComponentLibrary } from '../../workflow/CanvasAppComponentAssemblyContracts'
 import type { CanvasAppItemReadModel } from '../../workflow/CanvasAppItemReadModelContracts'
 import type { CommitCanvasItemsChange } from '../../workflow/CanvasWorkflowContract'
+import {
+  executeCanvasAppFoundationExtensionEffects,
+  type CanvasAppFoundationExtensionRuntime,
+} from '../../extensions/foundation-extensions'
 
 type QuickCreateCanvasStickyArgs = {
+  runtime: CanvasAppFoundationExtensionRuntime
+  commitSelection?: (selection: string[]) => boolean
+  setViewport?: (viewport: Viewport) => void
+} & CanvasStickyQuickCreatePlanInput & {
   componentLibrary: CanvasAppComponentLibrary
   commitItemsChange: CommitCanvasItemsChange
+  setEditing: (nextEditing: EditingText | null) => void
+  setTool: (nextTool: Tool) => void
+}
+
+export type CanvasStickyQuickCreatePlanInput = {
+  componentLibrary: CanvasAppComponentLibrary
   creationAdapter: CanvasCreationAdapter<CanvasItem>
   createId: (prefix: string) => string
   direction?: CanvasSide
   itemReadModel: CanvasAppItemReadModel
   selection: string[]
-  setEditing: (nextEditing: EditingText | null) => void
-  setTool: (nextTool: Tool) => void
+}
+
+export type CanvasStickyQuickCreatePlan = {
+  item: CanvasComponentItem
+  items: CanvasItem[]
 }
 
 export type CanvasStickyQuickCreateControlPointInput = {
@@ -66,22 +84,65 @@ const CANVAS_STICKY_QUICK_CREATE_DIRECTIONS = [
 
 export function quickCreateCanvasSticky({
   componentLibrary,
+  commitSelection,
   commitItemsChange,
   creationAdapter,
   createId,
   direction = 'right',
   itemReadModel,
+  runtime,
   selection,
   setEditing,
   setTool,
+  setViewport,
 }: QuickCreateCanvasStickyArgs) {
+  const effects = runtime.planTool(CANVAS_STICKY_NOTE_TOOL_ID, {
+    componentLibrary,
+    creationAdapter,
+    createId,
+    direction,
+    itemReadModel,
+    selection,
+    surface: 'quick-create',
+  })
+
+  if (!effects || effects.length === 0) {
+    return false
+  }
+
+  if (!executeCanvasAppFoundationExtensionEffects({
+    context: {
+      commitDocumentPatch: (patch, history) => patch.length === 1 &&
+        commitItemsChange(patch[0], history),
+      commitSelection,
+      setEditing,
+      setViewport,
+    },
+    effects,
+  })) {
+    return false
+  }
+
+  setTool('select')
+
+  return true
+}
+
+export function createCanvasStickyQuickCreatePlan({
+  componentLibrary,
+  creationAdapter,
+  createId,
+  direction = 'right',
+  itemReadModel,
+  selection,
+}: CanvasStickyQuickCreatePlanInput): CanvasStickyQuickCreatePlan | null {
   const source = getCanvasStickyQuickCreateSource({
     itemReadModel,
     selection,
   })
 
   if (!source) {
-    return false
+    return null
   }
 
   const sourceBounds = itemReadModel.getItemBounds(source)
@@ -112,19 +173,8 @@ export function quickCreateCanvasSticky({
     targetId: item.id,
     targetBounds: item,
   })
-  const didCommit = commitItemsChange({ type: 'add', items: [connector, item] }, {
-    before: selection,
-    after: [item.id],
-  })
 
-  if (!didCommit) {
-    return false
-  }
-
-  setEditing({ id: item.id, value: item.body ?? '' })
-  setTool('select')
-
-  return true
+  return { item, items: [connector, item] }
 }
 
 function applyCanvasStickyQuickCreateSourceStyle(

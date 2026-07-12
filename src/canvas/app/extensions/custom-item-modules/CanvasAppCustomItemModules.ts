@@ -18,6 +18,7 @@ import {
   type CanvasAppCustomCreationToolContext,
   type CanvasAppCustomToolShortcut,
 } from '../custom-tools/CanvasAppCustomCreationTools'
+import type { CanvasAppCapability } from '../../CanvasAppCapabilityContracts'
 import {
   assertCanvasAppCustomItemModule,
 } from './CanvasAppCustomItemModuleContracts'
@@ -45,6 +46,7 @@ export type CanvasAppCustomItemModuleCreationTool = {
   enterTextEdit?: boolean
   id: string
   label: string
+  requiredCapability: CanvasAppCapability
   shortcut?: CanvasAppCustomToolShortcut
   statusLabel?: string
   title: string

@@ -10,6 +10,11 @@ import {
   createCanvasComponentLibrary,
   createCanvasDrawingStrokeStyleSet,
 } from '../../../../host'
+import { CANVAS_STICKY_NOTE_EXTENSION } from '../../../../foundation'
+import {
+  CANVAS_APP_STICKY_NOTE_CAPABILITY_ADAPTER,
+  compileCanvasAppFoundationExtensions,
+} from '../../../extensions/foundation-extensions'
 import type { CanvasAppItemReadModel } from '../../../workflow/CanvasAppItemReadModelContracts'
 import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
 import { startCanvasPointerInteraction } from './CanvasPointerInteractionStart'
@@ -134,19 +139,29 @@ describe('CanvasPointerInteractionStart', () => {
       tool: 'sticky',
     }))
 
-    expect(result).toMatchObject({
+    expect(result).toEqual({
       capturePointer: false,
-      edit: { id: 'component-1', value: '' },
-      item: {
-        body: '',
-        component: 'sticky',
-        id: 'component-1',
-        title: 'Sticky',
-        type: 'component',
-        x: 106,
-        y: 226,
-      },
-      kind: 'created-item',
+      effects: [
+        {
+          patch: [{
+            items: [expect.objectContaining({
+              body: '',
+              component: 'sticky',
+              id: 'component-1',
+              x: 106,
+              y: 226,
+            })],
+            type: 'add',
+          }],
+          selection: { after: ['component-1'], before: [] },
+          type: 'document-patch',
+        },
+        {
+          editing: { id: 'component-1', value: '' },
+          type: 'editing',
+        },
+      ],
+      kind: 'extension-effects',
     })
   })
 
@@ -202,10 +217,15 @@ function createInput(
     creationAdapter,
     createId: (prefix) => `${prefix}-1`,
     drawingStyles,
+    foundationExtensionRuntime: compileCanvasAppFoundationExtensions({
+      adapters: [CANVAS_APP_STICKY_NOTE_CAPABILITY_ADAPTER],
+      extensions: [CANVAS_STICKY_NOTE_EXTENSION],
+    }),
     customCreationTools: [
       {
         id: 'risk',
         label: '!',
+        requiredCapability: 'editDocument',
         title: 'Risk',
         createItem: () => null,
       },

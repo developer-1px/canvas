@@ -11,11 +11,20 @@ const files = await listSourceFiles(packageRoot)
 
 for (const filePath of files) {
   const source = await readFile(filePath, 'utf8')
-  const rewritten = rewriteModuleSpecifiers(filePath, source)
+  const rewritten = filePath.endsWith('.d.ts')
+    ? removeRuntimeStyleImports(rewriteModuleSpecifiers(filePath, source))
+    : rewriteModuleSpecifiers(filePath, source)
 
   if (rewritten !== source) {
     await writeFile(filePath, rewritten)
   }
+}
+
+function removeRuntimeStyleImports(source) {
+  return source.replace(
+    /^\s*import\s*['"][^'"]+\.css['"];?\s*$/gm,
+    '',
+  )
 }
 
 async function listSourceFiles(directory) {
@@ -51,19 +60,19 @@ function rewriteModuleSpecifiers(filePath, source) {
   let rewritten = source
 
   rewritten = rewritten.replace(
-    /(\bfrom\s*['"])(\.{1,2}\/[^'"]+)(['"])/g,
+    /(\bfrom\s*['"])(\.{1,2}(?:\/[^'"]*)?)(['"])/g,
     (_match, prefix, specifier, suffix) =>
       `${prefix}${resolveModuleSpecifier(filePath, specifier)}${suffix}`,
   )
 
   rewritten = rewritten.replace(
-    /(\bimport\s*\(\s*['"])(\.{1,2}\/[^'"]+)(['"]\s*\))/g,
+    /(\bimport\s*\(\s*['"])(\.{1,2}(?:\/[^'"]*)?)(['"]\s*\))/g,
     (_match, prefix, specifier, suffix) =>
       `${prefix}${resolveModuleSpecifier(filePath, specifier)}${suffix}`,
   )
 
   rewritten = rewritten.replace(
-    /(\bimport\s*['"])(\.{1,2}\/[^'"]+)(['"])/g,
+    /(\bimport\s*['"])(\.{1,2}(?:\/[^'"]*)?)(['"])/g,
     (_match, prefix, specifier, suffix) =>
       `${prefix}${resolveModuleSpecifier(filePath, specifier)}${suffix}`,
   )

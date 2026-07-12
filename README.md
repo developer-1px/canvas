@@ -16,9 +16,18 @@ Route `/engine` remains available as the same demo path for existing checks.
 ## Check
 
 ```sh
-pnpm lint
-pnpm build
+pnpm verify
 ```
+
+`verify` runs lint, the full Vitest suite, the app and package builds, the
+repository-local package smoke, and a clean tarball consumer smoke. The clean
+smoke creates the actual npm `.tgz`, installs it with its peers in an empty
+temporary project, checks every public runtime, type, and style export plus
+runtime dependency declarations, and removes the temporary artifact afterward.
+
+Run the browser suite separately with `pnpm test:e2e`. CI uses a frozen
+lockfile and requires both `pnpm verify` and the existing browser suite on pull
+requests.
 
 ## Quickstart
 
@@ -66,6 +75,7 @@ const kpiCardModule = defineCanvasAppCustomItemModule({
     enterTextEdit: true,
     id: 'kpi-card-tool',
     label: 'K',
+    requiredCapability: 'editDocument',
     shortcut: { key: 'k' },
     title: 'KPI card',
   }],
@@ -136,6 +146,7 @@ const analyticsFeaturePack = defineCanvasAppFeaturePack({
       id: 'log-selection',
       isEnabled: ({ selection }) => selection.length > 0,
       label: 'Log selection',
+      requiredCapability: 'view',
       run: ({ selection }) => {
         console.info('Selected canvas items', selection)
       },

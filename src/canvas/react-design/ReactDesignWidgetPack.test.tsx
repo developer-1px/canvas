@@ -170,7 +170,7 @@ describe('ReactDesignWidgetPack', () => {
     expect(Object.isFrozen(settings.labels)).toBe(true)
     expect(pack.parseProps('external.nested-card', 'sparse')).toEqual({
       ok: false,
-      reason: 'Widget props must be a JSON object',
+      reason: 'Registered definition props must be a JSON object',
     })
   })
 
@@ -223,7 +223,7 @@ describe('ReactDesignWidgetPack', () => {
     expect(() => defineReactDesignWidget({
       ...createBadgeDefinition(),
       id: 'External..badge',
-    })).toThrow('Invalid React design widget definition id: External..badge')
+    })).toThrow('Invalid registered design definition id: External..badge')
     expect(() => defineReactDesignWidget({
       ...createBadgeDefinition(),
       props: {
@@ -231,7 +231,7 @@ describe('ReactDesignWidgetPack', () => {
         safeParse: () => ({ ok: false, reason: 'invalid defaults' }),
       },
     })).toThrow(
-      'Invalid React design widget defaults for external.badge: invalid defaults',
+      'Invalid registered design definition defaults for external.badge: invalid defaults',
     )
 
     const definition = createBadgeDefinition()
@@ -252,7 +252,7 @@ describe('ReactDesignWidgetPack', () => {
       ({ x, y }: ReactDesignWidgetCreateInput) => ({
         ...createBadgeNode({ nodeId: 'changed-id', x, y }),
       }),
-      'React design widget creator changed node id: badge-invalid',
+      'Registered design definition external.badge creator changed node id: badge-invalid',
     ],
     [
       'definition type',
@@ -260,7 +260,7 @@ describe('ReactDesignWidgetPack', () => {
         ...createBadgeNode(input),
         definition: { id: 'external.other', kind: 'widget' as const },
       }),
-      'React design widget creator returned the wrong definition: external.badge',
+      'Registered design definition external.badge creator returned the wrong definition',
     ],
     [
       'leaf structure',
@@ -268,7 +268,7 @@ describe('ReactDesignWidgetPack', () => {
         ...createBadgeNode(input),
         children: ['nested'],
       }),
-      'React design widget creator must return a leaf node',
+      'Registered design definition external.badge creator must return a leaf node',
     ],
     [
       'text capability',
@@ -276,7 +276,7 @@ describe('ReactDesignWidgetPack', () => {
         ...createBadgeNode(input),
         text: 'unexpected',
       }),
-      'React design widget without text editing must use null node text',
+      'Registered design definition external.badge without text editing must use null node text',
     ],
     [
       'JSON props',
@@ -284,7 +284,7 @@ describe('ReactDesignWidgetPack', () => {
         ...createBadgeNode(input),
         props: { tone: 'danger' },
       }),
-      'Invalid React design widget creator props: tone must be info or warning',
+      'Invalid registered design definition external.badge creator props: tone must be info or warning',
     ],
     [
       'non-JSON props',
@@ -292,7 +292,7 @@ describe('ReactDesignWidgetPack', () => {
         ...createBadgeNode(input),
         props: { tone: 'info', callback: () => undefined } as never,
       }),
-      'React design widget creator props must be a JSON object',
+      'Registered design definition external.badge creator props must be a JSON object',
     ],
   ] as const)(
     'contains invalid creator output for %s',

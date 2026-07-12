@@ -4,6 +4,14 @@ import type { CanvasSceneAdapter } from '../../engine'
 import type { CanvasItem } from '../../entities'
 import type { CanvasAppItemReadModel } from './CanvasAppItemReadModelContracts'
 import { getCanvasWorkspaceConsumerModel } from './CanvasWorkspaceConsumerModel'
+import {
+  createCanvasAppDocumentAuthority,
+  createCanvasAppDocumentAuthorityRead,
+} from './CanvasAppDocumentAuthority'
+import {
+  CANVAS_APP_EDITOR_CAPABILITIES,
+  CANVAS_APP_READ_ONLY_CAPABILITIES,
+} from './CanvasAppCapabilityAssembly'
 
 describe('CanvasWorkspaceConsumerModel', () => {
   it('builds consumer contexts from one workspace document contract', () => {
@@ -13,13 +21,13 @@ describe('CanvasWorkspaceConsumerModel', () => {
     expect(model.command).toMatchObject({
       createId: input.createId,
       document: {
-        commitItemsChange: input.document.commitItemsChange,
+        commitItemsChange: expect.any(Function),
         commitSelection: input.document.commitSelection,
         copyItemsToClipboard: input.document.copyItemsToClipboard,
         getClipboardItems: input.document.getClipboardItems,
-        redo: input.document.redo,
+        redo: expect.any(Function),
         setClipboardItems: input.document.setClipboardItems,
-        undo: input.document.undo,
+        undo: expect.any(Function),
       },
       workspace: {
         items: input.document.items,
@@ -39,6 +47,7 @@ describe('CanvasWorkspaceConsumerModel', () => {
     expect(model.keyboard.command.commitSelection).toBe(
       input.document.commitSelection,
     )
+    expect(model.keyboard.canEditText(input.document.items[0]!)).toBe(true)
     expect(model.keyboard.itemReadModel).toBe(input.itemReadModel)
     expect(model.component.workspace).toMatchObject({
       itemReadModel: input.itemReadModel,
@@ -46,33 +55,33 @@ describe('CanvasWorkspaceConsumerModel', () => {
       viewport: input.viewport,
     })
     expect(model.image).toMatchObject({
-      commitItemsChange: input.document.commitItemsChange,
+      commitItemsChange: expect.any(Function),
       createId: input.createId,
       itemReadModel: input.itemReadModel,
       selection: input.document.selection,
       viewport: input.viewport,
     })
     expect(model.linkPreview).toMatchObject({
-      commitItemsChange: input.document.commitItemsChange,
+      commitItemsChange: expect.any(Function),
       createId: input.createId,
       selection: input.document.selection,
       viewport: input.viewport,
     })
     expect(model.stamp).toMatchObject({
-      commitItemsChange: input.document.commitItemsChange,
+      commitItemsChange: expect.any(Function),
       createId: input.createId,
       itemReadModel: input.itemReadModel,
       selection: input.document.selection,
       viewport: input.viewport,
     })
     expect(model.table).toMatchObject({
-      commitItemsChange: input.document.commitItemsChange,
+      commitItemsChange: expect.any(Function),
       createId: input.createId,
       selection: input.document.selection,
       viewport: input.viewport,
     })
     expect(model.textPaste).toMatchObject({
-      commitItemsChange: input.document.commitItemsChange,
+      commitItemsChange: expect.any(Function),
       createId: input.createId,
       selection: input.document.selection,
       viewport: input.viewport,
@@ -84,7 +93,8 @@ describe('CanvasWorkspaceConsumerModel', () => {
     const model = getCanvasWorkspaceConsumerModel(input)
 
     expect(model.inspector).toMatchObject({
-      commitItemsChange: input.document.commitItemsChange,
+      document: input.authority,
+      items: input.document.items,
       itemReadModel: input.itemReadModel,
       selected: input.selected,
       selection: input.document.selection,
@@ -105,7 +115,7 @@ describe('CanvasWorkspaceConsumerModel', () => {
       selected: input.selected,
     })
     expect(model.selection).toEqual({
-      commitItemsChange: input.document.commitItemsChange,
+      commitItemsChange: expect.any(Function),
       commitSelection: input.document.commitSelection,
       createId: input.createId,
       itemReadModel: input.itemReadModel,
@@ -120,9 +130,9 @@ describe('CanvasWorkspaceConsumerModel', () => {
 
     expect(model.text).toMatchObject({
       document: {
-        commitItemsChange: input.document.commitItemsChange,
+        commitItemsChange: expect.any(Function),
         findDocumentText: input.document.findDocumentText,
-        replaceDocumentText: input.document.replaceDocumentText,
+        replaceDocumentText: expect.any(Function),
       },
       itemReadModel: input.itemReadModel,
       selection: input.document.selection,
@@ -133,6 +143,27 @@ describe('CanvasWorkspaceConsumerModel', () => {
       setViewport: input.setViewport,
     })
     expect(model.stage).toEqual({ viewport: input.viewport })
+  })
+
+  it('denies direct built-in document mutations through the shared authority', () => {
+    const input = createInput()
+    const authority = createCanvasAppDocumentAuthority({
+      commitItemsChange: input.document.commitItemsChange,
+      read: createCanvasAppDocumentAuthorityRead(
+        CANVAS_APP_READ_ONLY_CAPABILITIES,
+      ),
+      readItems: () => input.document.items,
+    })
+    const model = getCanvasWorkspaceConsumerModel({ ...input, authority })
+
+    expect(model.command.document.undo()).toBeUndefined()
+    expect(model.command.document.redo()).toBeUndefined()
+    expect(model.text.document.replaceDocumentText('before', 'after'))
+      .toBe(false)
+    expect(input.document.undo).not.toHaveBeenCalled()
+    expect(input.document.redo).not.toHaveBeenCalled()
+    expect(input.document.replaceDocumentText).not.toHaveBeenCalled()
+    expect(model.pointer.canEditText(input.document.items[0]!)).toBe(false)
   })
 })
 
@@ -153,26 +184,35 @@ function createInput(
   const scene = createSceneAdapter()
   const itemReadModel = createItemReadModel({ items })
   const selectedBounds = { h: 40, w: 80, x: 10, y: 20 }
+  const document = {
+    canRedo: false,
+    canUndo: true,
+    commitItemsChange: vi.fn(() => true),
+    commitSelection: vi.fn(() => true),
+    copyItemsToClipboard: vi.fn(() => true),
+    findDocumentText: vi.fn(() => []),
+    getClipboardItems: vi.fn(() => []),
+    items,
+    redo: vi.fn(() => undefined),
+    replaceDocumentText: vi.fn(() => true),
+    selection,
+    setClipboardItems: vi.fn(() => true),
+    setLiveItems: vi.fn(),
+    setSelection: vi.fn(),
+    undo: vi.fn(() => selection),
+  }
+  const authority = createCanvasAppDocumentAuthority({
+    commitItemsChange: document.commitItemsChange,
+    read: createCanvasAppDocumentAuthorityRead(
+      CANVAS_APP_EDITOR_CAPABILITIES,
+    ),
+    readItems: () => items,
+  })
 
   return {
+    authority,
     createId: vi.fn((prefix: string) => `${prefix}-2`),
-    document: {
-      canRedo: false,
-      canUndo: true,
-      commitItemsChange: vi.fn(() => true),
-      commitSelection: vi.fn(() => true),
-      copyItemsToClipboard: vi.fn(() => true),
-      findDocumentText: vi.fn(() => []),
-      getClipboardItems: vi.fn(() => []),
-      items,
-      redo: vi.fn(() => undefined),
-      replaceDocumentText: vi.fn(() => true),
-      selection,
-      setClipboardItems: vi.fn(() => true),
-      setLiveItems: vi.fn(),
-      setSelection: vi.fn(),
-      undo: vi.fn(() => selection),
-    },
+    document,
     itemReadModel,
     scene,
     selected: new Set(selection),

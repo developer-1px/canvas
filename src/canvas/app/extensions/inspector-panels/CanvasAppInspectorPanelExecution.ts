@@ -24,6 +24,10 @@ function getCanvasAppInspectorPanelViewSafely({
   panel: CanvasAppInspectorPanel
 }): CanvasAppInspectorPanelView[] {
   try {
+    if (!context.document.can(panel.requiredCapability)) {
+      return []
+    }
+
     if (panel.isVisible && !panel.isVisible(context)) {
       return []
     }

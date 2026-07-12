@@ -311,6 +311,7 @@ function renderCanvasWhiteboardSvgStampItemRoute({
 }
 
 function renderCanvasWhiteboardSvgRectTextItemRoute({
+  canEditText,
   item,
   onTextDoubleClick,
 }: CanvasWhiteboardSvgItemRenderRouteInput & {
@@ -318,7 +319,9 @@ function renderCanvasWhiteboardSvgRectTextItemRoute({
 }): CanvasWhiteboardSvgItemRenderRoute {
   return {
     children: renderCanvasWhiteboardSvgRectTextItem({ item }),
-    onDoubleClick: () => onTextDoubleClick(item),
+    onDoubleClick: canEditText(item)
+      ? () => onTextDoubleClick(item)
+      : undefined,
   }
 }
 

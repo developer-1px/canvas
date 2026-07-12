@@ -22,16 +22,25 @@ import {
   getCanvasWorkspaceInitialState,
   getCanvasWorkspaceRuntimeModel,
 } from './CanvasWorkspaceRuntimeModel'
+import type { CanvasAppDocumentAuthorityRead } from '../workspace/document/CanvasAppDocumentContracts'
+import { createCanvasAppDocumentAuthority } from './CanvasAppDocumentAuthority'
+import type {
+  CanvasAppFoundationExtensionRuntime,
+} from '../extensions/foundation-extensions'
 
 export function useCanvasWorkspaceModel({
   customItemTextTargets,
   customItemValidators,
+  documentAuthority,
+  foundationExtensionRuntime,
   initialItems,
   initialSelection,
   storageProvider,
 }: {
   customItemTextTargets?: CanvasAppCustomItemTextTargets
   customItemValidators?: CanvasAppCustomItemValidators
+  documentAuthority: CanvasAppDocumentAuthorityRead
+  foundationExtensionRuntime: CanvasAppFoundationExtensionRuntime
   initialItems: CanvasItem[]
   initialSelection: readonly string[]
   storageProvider: CanvasWorkspaceStorageProvider
@@ -41,8 +50,11 @@ export function useCanvasWorkspaceModel({
     [customItemValidators],
   )
   const textTarget = useMemo(
-    () => createCanvasAppTextTarget(customItemTextTargets),
-    [customItemTextTargets],
+    () => createCanvasAppTextTarget(
+      customItemTextTargets,
+      foundationExtensionRuntime.textTargets,
+    ),
+    [customItemTextTargets, foundationExtensionRuntime.textTargets],
   )
   const storedWorkspace = useMemo(
     () => readStoredCanvasWorkspace(storageProvider(), validation),
@@ -62,6 +74,14 @@ export function useCanvasWorkspaceModel({
     validation,
     textTarget,
   )
+  const authority = useMemo(
+    () => createCanvasAppDocumentAuthority({
+      commitItemsChange: document.commitItemsChange,
+      read: documentAuthority,
+      readItems: document.readItems,
+    }),
+    [document.commitItemsChange, document.readItems, documentAuthority],
+  )
   const [viewport, setViewport] = useState(() => initialState.viewport)
   const {
     itemReadModel,
@@ -79,14 +99,15 @@ export function useCanvasWorkspaceModel({
   )
 
   useCanvasWorkspacePersistence({
-    items: document.items,
-    selection: document.selection,
+    items: document.committedItems,
+    selection: document.committedSelection,
     storageProvider,
     validation,
     viewport,
   })
 
   return getCanvasWorkspaceConsumerModel({
+    authority,
     createId,
     document,
     itemReadModel,

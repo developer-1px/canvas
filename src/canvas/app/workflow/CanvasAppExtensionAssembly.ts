@@ -40,6 +40,7 @@ export function createCanvasAppExtensionAssembly(
     current: moduleExtensionAssembly,
     entries: createCanvasAppExtensionBundle({
       customCommands: input.customCommands,
+      foundationExtensionAdapters: input.foundationExtensionAdapters,
       foundationExtensions: input.foundationExtensions,
       inspectorPanels: input.inspectorPanels,
       mediaImporters: input.mediaImporters,

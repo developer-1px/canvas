@@ -20,7 +20,7 @@ describe('CanvasPointerInteractionLifecycle', () => {
     const commitItemsChange = vi.fn<CommitCanvasItemsChange>(() => true)
     const setTool = vi.fn()
 
-    commitCanvasPointerInteraction(createCommitInput({
+    expect(commitCanvasPointerInteraction(createCommitInput({
       commitItemsChange,
       interaction: {
         kind: 'create-shape',
@@ -32,7 +32,7 @@ describe('CanvasPointerInteractionLifecycle', () => {
         moved: true,
       },
       setTool,
-    }))
+    }))).toBe(true)
 
     expect(commitItemsChange).toHaveBeenCalledWith(
       {
@@ -60,7 +60,7 @@ describe('CanvasPointerInteractionLifecycle', () => {
     const afterItem = createRectItem('rect-1', { x: 40, y: 30 })
     const commitItemsChange = vi.fn<CommitCanvasItemsChange>(() => true)
 
-    commitCanvasPointerInteraction(createCommitInput({
+    expect(commitCanvasPointerInteraction(createCommitInput({
       commitItemsChange,
       interaction: {
         kind: 'move',
@@ -75,7 +75,7 @@ describe('CanvasPointerInteractionLifecycle', () => {
         historyItems: [beforeItem],
         moved: true,
       },
-    }))
+    }))).toBe(true)
 
     expect(commitItemsChange).toHaveBeenCalledWith(
       {
@@ -117,6 +117,34 @@ describe('CanvasPointerInteractionLifecycle', () => {
 
     expect(setSelection).toHaveBeenCalledWith(['existing'])
     expect(commitSelection).toHaveBeenCalledWith(['existing', 'rect-1'])
+  })
+
+  it('reports a rejected transform without applying post-commit effects', () => {
+    const beforeItem = createRectItem('rect-1', { x: 0, y: 0 })
+    const afterItem = createRectItem('rect-1', { x: 40, y: 30 })
+    const setEditing = vi.fn()
+    const setTool = vi.fn()
+
+    expect(commitCanvasPointerInteraction(createCommitInput({
+      commitItemsChange: () => false,
+      interaction: {
+        kind: 'move',
+        pointerId: 1,
+        startScreen: { x: 0, y: 0 },
+        startWorld: { x: 0, y: 0 },
+        ids: ['rect-1'],
+        bounds: { x: 0, y: 0, w: 80, h: 60 },
+        historySelection: ['rect-1'],
+        startItems: [beforeItem],
+        currentItems: [afterItem],
+        historyItems: [beforeItem],
+        moved: true,
+      },
+      setEditing,
+      setTool,
+    }))).toBe(false)
+    expect(setEditing).not.toHaveBeenCalled()
+    expect(setTool).not.toHaveBeenCalled()
   })
 
   it('restores live items and marquee selection on cancel', () => {

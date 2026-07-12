@@ -10,6 +10,7 @@ const analyticsFeaturePack = defineCanvasAppFeaturePack({
       id: 'log-selection',
       isEnabled: ({ selection }) => selection.length > 0,
       label: 'Log selection',
+      requiredCapability: 'view',
       run: ({ selection }) => {
         console.info('Selected canvas items', selection)
       },

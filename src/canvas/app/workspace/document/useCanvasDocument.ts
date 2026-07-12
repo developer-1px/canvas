@@ -43,7 +43,13 @@ export function useCanvasDocument(
     ),
   )
   const [items, setItemsState] = useState(() => document.readItems())
+  const [committedItems, setCommittedItemsState] = useState(
+    () => document.readItems(),
+  )
   const [selection, setSelectionState] = useState(() => document.readSelection())
+  const [committedSelection, setCommittedSelectionState] = useState(
+    () => document.readSelection(),
+  )
   const [historyAvailability, setHistoryAvailability] =
     useState(() => document.readHistoryAvailability())
   const itemsRef = useRef(items)
@@ -60,6 +66,7 @@ export function useCanvasDocument(
   }) => {
     itemsRef.current = state.items
     setItemsState(state.items)
+    setCommittedItemsState(state.items)
     setHistoryAvailability(state.historyAvailability)
   }, [])
 
@@ -99,6 +106,7 @@ export function useCanvasDocument(
         })
         setSelectionState(document.readSelection())
       }
+      setCommittedSelectionState(document.readSelection())
 
       return true
     },
@@ -124,6 +132,7 @@ export function useCanvasDocument(
 
     if (nextHistoryAvailability) {
       setHistoryAvailability(nextHistoryAvailability)
+      setCommittedSelectionState(document.readSelection())
     }
 
     return nextHistoryAvailability !== null
@@ -139,6 +148,8 @@ export function useCanvasDocument(
     () => document.readClipboardItems(),
     [document],
   )
+
+  const readItems = useCallback(() => itemsRef.current, [])
 
   const setClipboardItems = useCallback(
     (items: CanvasItem[]) =>
@@ -165,6 +176,7 @@ export function useCanvasDocument(
       }
 
       syncCommittedState(committedState)
+      setCommittedSelectionState(document.readSelection())
       return true
     }, [document, syncCommittedState])
 
@@ -179,6 +191,7 @@ export function useCanvasDocument(
     }
 
     syncCommittedState(result)
+    setCommittedSelectionState(result.selection)
     return result.selection
   }, [document, syncCommittedState])
 
@@ -193,17 +206,21 @@ export function useCanvasDocument(
     }
 
     syncCommittedState(result)
+    setCommittedSelectionState(result.selection)
     return result.selection
   }, [document, syncCommittedState])
 
   return {
     ...historyAvailability,
+    committedItems,
+    committedSelection,
     commitSelection,
     commitItemsChange,
     copyItemsToClipboard,
     findDocumentText,
     getClipboardItems,
     items,
+    readItems,
     redo,
     replaceDocumentText,
     selection,

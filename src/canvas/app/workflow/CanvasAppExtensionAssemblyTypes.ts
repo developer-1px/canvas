@@ -6,6 +6,9 @@ import type {
 import type { CanvasAppCustomItemModule } from '../extensions/custom-item-modules/CanvasAppCustomItemModules'
 import type { CanvasAppFoundationExtension } from '../extensions/foundation-extensions'
 import type {
+  CanvasAppFoundationExtensionCapabilityAdapter,
+} from '../extensions/foundation-extensions'
+import type {
   CanvasMediaImporter,
   CanvasTextPasteImporter,
 } from '../feature-packs'
@@ -15,6 +18,8 @@ export type CanvasAppExtensionAssemblyInput = {
   customItemModules?: readonly CanvasAppCustomItemModule[]
   disabledCustomItemModuleIds?: CanvasAppCustomItemModuleAssemblyOptions['disabledModuleIds']
   foundationExtensions?: readonly CanvasAppFoundationExtension[]
+  foundationExtensionAdapters?:
+    readonly CanvasAppFoundationExtensionCapabilityAdapter[]
   inspectorPanels?: readonly CanvasAppInspectorPanel[]
   mediaImporters?: readonly CanvasMediaImporter[]
   textPasteImporters?: readonly CanvasTextPasteImporter[]

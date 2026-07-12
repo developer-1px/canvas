@@ -7,11 +7,6 @@ import {
   snapshotCanvasAppExtensionBundle,
 } from './CanvasAppExtensionBundle'
 import type { CanvasAppFoundationExtension } from './foundation-extensions'
-import { getCanvasAppFoundationExtensionCommands } from './foundation-extensions'
-import {
-  getCanvasAppFoundationExtensionRendererSlots,
-} from './foundation-extensions'
-import { getCanvasAppFoundationExtensionTools } from './foundation-extensions'
 import type { CanvasMediaImporter } from '../feature-packs/media-import'
 import type { CanvasTextPasteImporter } from '../feature-packs/text-paste-import'
 
@@ -23,6 +18,7 @@ describe('CanvasAppExtensionBundle', () => {
       customItemRenderers: {},
       customItemTextTargets: {},
       customItemValidators: {},
+      foundationExtensionAdapters: [],
       foundationExtensions: [],
       inspectorPanels: [],
       mediaImporters: [],
@@ -277,36 +273,11 @@ describe('CanvasAppExtensionBundle', () => {
       .toBe('item-layer')
     expect(snapshot.foundationExtensions[0]?.tools?.[0]?.requiredAdapters)
       .toEqual(['creation'])
-    const foundationCommands = getCanvasAppFoundationExtensionCommands(
-      snapshot.foundationExtensions,
-    )
-    const foundationTools = getCanvasAppFoundationExtensionTools(
-      snapshot.foundationExtensions,
-    )
-    const foundationRendererSlots =
-      getCanvasAppFoundationExtensionRendererSlots(
-        snapshot.foundationExtensions,
-      )
-
-    expect(foundationCommands[0]).toMatchObject({
-      extensionId: 'canvas.risk',
-      id: 'canvas.risk.command',
-      requiredAdapters: ['command'],
-    })
-    expect(foundationCommands[0]?.plan({} as never)).toEqual([{
+    expect(snapshot.foundationExtensions[0]?.commands?.[0]?.plan(
+      {} as never,
+    )).toEqual([{
       selection: [],
       type: 'selection',
-    }])
-    expect(foundationTools).toEqual([{
-      extensionId: 'canvas.risk',
-      id: 'canvas.risk.tool',
-      kind: 'creation',
-      requiredAdapters: ['creation'],
-    }])
-    expect(foundationRendererSlots).toEqual([{
-      extensionId: 'canvas.risk',
-      id: 'canvas.risk.renderer',
-      surface: 'item-layer',
     }])
     expect(snapshot.customItemRenderers.risk).toBe(renderRisk)
     expect(snapshot.customItemValidators.risk).toBe(validateRisk)
@@ -329,14 +300,6 @@ describe('CanvasAppExtensionBundle', () => {
     )).toBe(true)
     expect(Object.isFrozen(snapshot.foundationExtensions[0]?.tools?.[0]))
       .toBe(true)
-    expect(Object.isFrozen(foundationCommands)).toBe(true)
-    expect(Object.isFrozen(foundationCommands[0])).toBe(true)
-    expect(Object.isFrozen(foundationCommands[0]?.requiredAdapters)).toBe(true)
-    expect(Object.isFrozen(foundationRendererSlots)).toBe(true)
-    expect(Object.isFrozen(foundationRendererSlots[0])).toBe(true)
-    expect(Object.isFrozen(foundationTools)).toBe(true)
-    expect(Object.isFrozen(foundationTools[0])).toBe(true)
-    expect(Object.isFrozen(foundationTools[0]?.requiredAdapters)).toBe(true)
     expect(Object.isFrozen(snapshot.customItemRenderers)).toBe(true)
     expect(Object.isFrozen(snapshot.customItemValidators)).toBe(true)
     expect(Object.isFrozen(snapshot.inspectorPanels[0])).toBe(true)
@@ -345,59 +308,11 @@ describe('CanvasAppExtensionBundle', () => {
   })
 })
 
-describe('CanvasAppFoundationExtensionCommands', () => {
-  it('indexes registered foundation extension commands with owning extension ids', () => {
-    expect(getCanvasAppFoundationExtensionCommands([])).toEqual([])
-
-    const commands = getCanvasAppFoundationExtensionCommands([
-      createFoundationExtension('canvas.risk'),
-    ])
-
-    expect(commands[0]).toMatchObject({
-      extensionId: 'canvas.risk',
-      id: 'canvas.risk.command',
-      requiredAdapters: ['command'],
-    })
-    expect(commands[0]?.plan({} as never)).toEqual([{
-      selection: [],
-      type: 'selection',
-    }])
-  })
-})
-
-describe('CanvasAppFoundationExtensionTools', () => {
-  it('indexes registered foundation extension tools with owning extension ids', () => {
-    expect(getCanvasAppFoundationExtensionTools([])).toEqual([])
-
-    expect(getCanvasAppFoundationExtensionTools([
-      createFoundationExtension('canvas.risk'),
-    ])).toEqual([{
-      extensionId: 'canvas.risk',
-      id: 'canvas.risk.tool',
-      kind: 'creation',
-      requiredAdapters: ['creation'],
-    }])
-  })
-})
-
-describe('CanvasAppFoundationExtensionRendererSlots', () => {
-  it('indexes registered foundation extension renderer slots with owning extension ids', () => {
-    expect(getCanvasAppFoundationExtensionRendererSlots([])).toEqual([])
-
-    expect(getCanvasAppFoundationExtensionRendererSlots([
-      createFoundationExtension('canvas.risk'),
-    ])).toEqual([{
-      extensionId: 'canvas.risk',
-      id: 'canvas.risk.renderer',
-      surface: 'item-layer',
-    }])
-  })
-})
-
 function createCommand(id: string) {
   return {
     id,
     label: id,
+    requiredCapability: 'editDocument' as const,
     run: () => undefined,
     title: id,
   }
@@ -408,6 +323,7 @@ function createTool(id: string) {
     createItem: () => null,
     id,
     label: id,
+    requiredCapability: 'editDocument' as const,
     shortcut: undefined as { key: string } | undefined,
     title: id,
   }
@@ -423,6 +339,7 @@ function createFoundationExtension(
     commands: [{
       id: commandId,
       plan: () => [{ selection: [], type: 'selection' as const }],
+      requiredCapability: 'editDocument',
       requiredAdapters: ['command'],
     }],
     id,
@@ -434,6 +351,7 @@ function createFoundationExtension(
     tools: [{
       id: toolId,
       kind: 'creation',
+      requiredCapability: 'editDocument',
       requiredAdapters: ['creation'],
     }],
   })
@@ -442,6 +360,7 @@ function createFoundationExtension(
 function createPanel(id: string) {
   return {
     id,
+    requiredCapability: 'view' as const,
     render: () => null,
   }
 }

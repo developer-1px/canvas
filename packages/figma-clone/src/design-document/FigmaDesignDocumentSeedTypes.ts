@@ -1,4 +1,4 @@
-import type { DesignJSONObject } from '../../../../src/canvas/design-document'
+import type { DesignJSONObject } from '@interactive-os/canvas/react-design'
 
 export type FigmaDesignNodeState = {
   readonly align: 'auto' | 'center' | 'end' | 'start' | 'stretch'

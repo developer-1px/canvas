@@ -158,6 +158,34 @@ describe('DesignDocumentPatchPort', () => {
     expect(listener).toHaveBeenCalledTimes(1)
   })
 
+  it('publishes one frozen canonical root replacement for an internal transaction', () => {
+    const document = createDesignDocument(createSnapshot())
+    const port = getDesignDocumentPatchPort(document)
+    const publication = vi.fn()
+
+    port.subscribe(publication)
+
+    expect(document.execute({
+      changes: [{
+        nodeId: 'leaf',
+        type: 'update',
+        values: { text: 'Local' },
+      }],
+      label: 'Local text',
+    })).toEqual({ changed: true, ok: true })
+
+    const operations = publication.mock.calls[0]?.[0]
+    expect(operations).toHaveLength(1)
+    expect(operations[0]).toMatchObject({ op: 'replace', path: '' })
+    expect(operations[0]?.value).toBe(document.snapshot)
+    expect(Object.isFrozen(operations)).toBe(true)
+    expect(Object.isFrozen(operations[0])).toBe(true)
+    expect(publication.mock.calls[0]?.[1]).toEqual({
+      label: 'Local text',
+      origin: 'design-document',
+    })
+  })
+
   it('rejects a patch reentered from the synchronous publication turn', () => {
     const document = createDesignDocument(createSnapshot())
     const port = getDesignDocumentPatchPort(document)

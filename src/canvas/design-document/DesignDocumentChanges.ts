@@ -127,7 +127,7 @@ function updateDesignNode(
   }
 }
 
-function applyDesignNodeUpdate(
+export function applyDesignNodeUpdate(
   node: DesignNode,
   values: DesignNodeUpdateValues,
 ): DesignNode {
@@ -216,14 +216,27 @@ function collectSubtreeIds(
   nodeId: string,
   nodeIds: Set<string>,
 ) {
-  if (nodeIds.has(nodeId)) {
-    return
-  }
+  const nodeById = new Map(snapshot.nodes.map((node) => [node.id, node]))
+  const pending = [nodeId]
 
-  nodeIds.add(nodeId)
+  while (pending.length > 0) {
+    const currentId = pending.pop()
 
-  for (const childId of requireDesignNode(snapshot, nodeId).children) {
-    collectSubtreeIds(snapshot, childId, nodeIds)
+    if (currentId === undefined || nodeIds.has(currentId)) {
+      continue
+    }
+
+    const node = nodeById.get(currentId)
+
+    if (!node) {
+      throw new Error(`Unknown design node: ${currentId}`)
+    }
+
+    nodeIds.add(currentId)
+
+    for (const childId of node.children) {
+      pending.push(childId)
+    }
   }
 }
 

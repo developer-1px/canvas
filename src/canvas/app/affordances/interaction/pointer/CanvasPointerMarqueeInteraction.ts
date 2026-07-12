@@ -138,14 +138,15 @@ export function commitCanvasPointerMarqueeInteraction({
     })
 
     setSelection(interaction.baseSelection)
-    commitSelection(nextSelection)
-    return
+    return commitSelection(nextSelection)
   }
 
   if (!interaction.additive) {
     setSelection(interaction.baseSelection)
-    commitSelection([])
+    return commitSelection([])
   }
+
+  return true
 }
 
 export function cancelCanvasPointerMarqueeInteraction({

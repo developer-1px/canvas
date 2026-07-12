@@ -161,6 +161,9 @@ describe('Canvas rendering item boundaries', () => {
     const rendererRegistryContractsFile = getSourceFile(
       'src/canvas/app/rendering/CanvasAppRendererRegistryContracts.ts',
     )
+    const stickyAdapterFile = getSourceFile(
+      'src/canvas/app/extensions/foundation-extensions/CanvasAppStickyNoteCapabilityAdapter.ts',
+    )
 
     expect(registryFile.source).toContain(
       "from './CanvasWhiteboardSvgBuiltInComponentPresentationRenderers'",
@@ -178,7 +181,8 @@ describe('Canvas rendering item boundaries', () => {
       'DEFAULT_CANVAS_WHITEBOARD_SVG_COMPONENT_PRESENTATION_RENDERERS',
     )
     expect(defaultsFile.source).toContain('CanvasWhiteboardSvgChecklistComponent')
-    expect(defaultsFile.source).toContain("'note-card'")
+    expect(defaultsFile.source).not.toContain("'note-card'")
+    expect(stickyAdapterFile.source).toContain("presentation: 'note-card'")
     expect(contractsFile.source).toContain(
       'export function assertCanvasWhiteboardSvgComponentPresentationRenderers',
     )

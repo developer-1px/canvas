@@ -1,6 +1,7 @@
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'
 import type { CanvasItem } from '../../../entities'
+import { createCanvasAppTestDocumentAuthority } from '../../workflow/CanvasAppDocumentAuthorityTestFixtures'
 import {
   addCanvasKanbanCard,
   CANVAS_KANBAN_INSPECTOR_PANEL,
@@ -14,8 +15,8 @@ describe('CanvasKanbanInspectorPanel', () => {
     const markup = renderToStaticMarkup(
       CANVAS_KANBAN_INSPECTOR_PANEL.render({
         bounds: kanban,
-        commitItemsChange: vi.fn(),
         disabled: false,
+        document: createCanvasAppTestDocumentAuthority(),
         items: [kanban],
         label: 'Queue',
         selectedItems: [kanban],
@@ -34,8 +35,11 @@ describe('CanvasKanbanInspectorPanel', () => {
     const commitItemsChange = vi.fn(() => true)
     const context = {
       bounds: kanban,
-      commitItemsChange,
       disabled: false,
+      document: createCanvasAppTestDocumentAuthority({
+        commitItemsChange,
+        readItems: () => [kanban, rect],
+      }),
       items: [kanban, rect],
       label: 'Queue',
       selectedItems: [kanban],

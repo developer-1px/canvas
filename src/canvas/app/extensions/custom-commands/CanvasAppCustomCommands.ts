@@ -5,25 +5,23 @@ import type {
   Viewport,
 } from '../../../entities'
 import type {
-  CanvasAppCommitItemsChange,
   CanvasAppCommitSelection,
+  CanvasAppDocumentAuthority,
 } from '../../workspace/document/CanvasAppDocumentContracts'
 import type {
   CanvasKeyboardShortcutChord,
 } from '../../affordances/interaction/keyboard/CanvasKeyboardShortcutChords'
+import type { CanvasAppCapability } from '../../CanvasAppCapabilityContracts'
 
 export type CanvasAppCustomCommandShortcut = CanvasKeyboardShortcutChord
-
-export type CanvasAppCustomCommandCommitItemsChange =
-  CanvasAppCommitItemsChange
 
 export type CanvasAppCustomCommandCommitSelection =
   CanvasAppCommitSelection
 
 export type CanvasAppCustomCommandContext = {
-  commitItemsChange: CanvasAppCustomCommandCommitItemsChange
   commitSelection: CanvasAppCustomCommandCommitSelection
   createId: (prefix: string) => string
+  document: CanvasAppDocumentAuthority
   items: CanvasItem[]
   selection: string[]
   setEditing: Dispatch<SetStateAction<EditingText | null>>
@@ -35,6 +33,7 @@ export type CanvasAppCustomCommand = {
   id: string
   isEnabled?: (context: CanvasAppCustomCommandContext) => boolean
   label: string
+  requiredCapability: CanvasAppCapability
   run: (context: CanvasAppCustomCommandContext) => void
   shortcut?: CanvasAppCustomCommandShortcut
   title: string

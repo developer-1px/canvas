@@ -56,7 +56,10 @@ export function useCanvasAppPreviewModel({
   )
   const stageElement = useCanvasAppStageElement()
   const workspace = useCanvasWorkspaceModel({
+    customItemTextTargets: assembly.customItemTextTargets,
     customItemValidators: assembly.customItemValidators,
+    documentAuthority: assembly.documentAuthority,
+    foundationExtensionRuntime: assembly.foundationExtensionRuntime,
     initialItems: assembly.initialItems,
     initialSelection: assembly.initialSelection,
     storageProvider: assembly.workspaceStorageProvider,

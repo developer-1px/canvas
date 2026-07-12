@@ -19,6 +19,9 @@ import type { CanvasAppComponentLibrary } from './CanvasAppComponentAssemblyCont
 import type { CanvasAppItemReadModel } from './CanvasAppItemReadModelContracts'
 import type { CanvasAppStageElement } from '../rendering/stage/CanvasAppStageElement'
 import type { CommitCanvasItemsChange } from './CanvasWorkflowContract'
+import type {
+  CanvasAppFoundationExtensionRuntime,
+} from '../extensions/foundation-extensions'
 
 export type CanvasAppComponentCommandModel = {
   commitItemsChange: CommitCanvasItemsChange
@@ -41,6 +44,7 @@ export type CanvasAppComponentModelInput = {
   config: CanvasAffordanceConfig
   creationAdapter: CanvasCreationAdapter<CanvasItem>
   createId: (prefix: string) => string
+  foundationExtensionRuntime: CanvasAppFoundationExtensionRuntime
   interaction: CanvasAppComponentInteractionModel
   stageElement: CanvasAppStageElement
   workspace: CanvasAppComponentWorkspaceModel

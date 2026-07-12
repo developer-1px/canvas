@@ -4,6 +4,8 @@ import {
   createCanvasLinkPreviewComponentItem,
 } from '../../../host'
 import type { CanvasAppInspectorPanelContext } from '../../extensions/inspector-panels'
+import type { CanvasAppCommitItemsChange } from '../../workspace/document/CanvasAppDocumentContracts'
+import { createCanvasAppTestDocumentAuthority } from '../../workflow/CanvasAppDocumentAuthorityTestFixtures'
 import {
   CANVAS_LINK_PREVIEW_INSPECTOR_PANEL,
   changeCanvasLinkPreviewBackToText,
@@ -90,15 +92,24 @@ describe('CanvasLinkPreviewInspectorPanel', () => {
 })
 
 function createContext(
-  overrides: Partial<CanvasAppInspectorPanelContext> = {},
+  {
+    commitItemsChange = vi.fn(() => true),
+    ...overrides
+  }: Partial<CanvasAppInspectorPanelContext> & {
+    commitItemsChange?: CanvasAppCommitItemsChange
+  } = {},
 ): CanvasAppInspectorPanelContext {
   const linkPreviewItem = createLinkPreviewItem()
+  const items = [createRectItem(), linkPreviewItem]
 
   return {
     bounds: linkPreviewItem,
-    commitItemsChange: vi.fn(() => true),
     disabled: false,
-    items: [createRectItem(), linkPreviewItem],
+    document: createCanvasAppTestDocumentAuthority({
+      commitItemsChange,
+      readItems: () => items,
+    }),
+    items,
     label: 'Link preview',
     selectedItems: [linkPreviewItem],
     selection: [linkPreviewItem.id],

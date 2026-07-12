@@ -476,6 +476,8 @@ describe('FigJam product pack', () => {
       })
 
       expect(definitionIds.has(node.definition.id)).toBe(true)
+      expect(Object.isFrozen(node)).toBe(true)
+      expect(Object.isFrozen(node.props)).toBe(true)
       expect(JSON.parse(JSON.stringify(node))).toEqual(node)
       expect(renderProductNode(node)).not.toMatch(/<canvas|foreignObject/)
       expect(() => createDesignDocument({

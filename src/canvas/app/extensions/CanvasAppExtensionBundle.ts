@@ -8,7 +8,10 @@ import type {
 } from './custom-item-modules/CanvasAppCustomItemValidatorContracts'
 import {
   appendUniqueCanvasAppFoundationExtensions,
+  appendUniqueCanvasAppFoundationExtensionCapabilityAdapters,
   snapshotCanvasAppFoundationExtensions,
+  snapshotCanvasAppFoundationExtensionCapabilityAdapters,
+  type CanvasAppFoundationExtensionCapabilityAdapter,
   type CanvasAppFoundationExtension,
 } from './foundation-extensions'
 import type { CanvasAppCustomItemRenderers } from '../rendering/CanvasAppRenderingContracts'
@@ -33,6 +36,8 @@ export type CanvasAppExtensionBundle = {
   customItemTextTargets: CanvasAppCustomItemTextTargets
   customItemValidators: CanvasAppCustomItemValidators
   foundationExtensions: readonly CanvasAppFoundationExtension[]
+  foundationExtensionAdapters:
+    readonly CanvasAppFoundationExtensionCapabilityAdapter[]
   inspectorPanels: readonly CanvasAppInspectorPanel[]
   mediaImporters: readonly CanvasMediaImporter[]
   textPasteImporters: readonly CanvasTextPasteImporter[]
@@ -45,6 +50,8 @@ export type CanvasAppExtensionBundleInput = {
   customItemTextTargets?: CanvasAppCustomItemTextTargets
   customItemValidators?: CanvasAppCustomItemValidators
   foundationExtensions?: readonly CanvasAppFoundationExtension[]
+  foundationExtensionAdapters?:
+    readonly CanvasAppFoundationExtensionCapabilityAdapter[]
   inspectorPanels?: readonly CanvasAppInspectorPanel[]
   mediaImporters?: readonly CanvasMediaImporter[]
   textPasteImporters?: readonly CanvasTextPasteImporter[]
@@ -58,6 +65,7 @@ export function createEmptyCanvasAppExtensionBundle(): CanvasAppExtensionBundle 
     customItemTextTargets: {},
     customItemValidators: {},
     foundationExtensions: [],
+    foundationExtensionAdapters: [],
     inspectorPanels: [],
     mediaImporters: [],
     textPasteImporters: [],
@@ -71,6 +79,7 @@ export function createCanvasAppExtensionBundle({
   customItemTextTargets = {},
   customItemValidators = {},
   foundationExtensions = [],
+  foundationExtensionAdapters = [],
   inspectorPanels = [],
   mediaImporters = [],
   textPasteImporters = [],
@@ -82,6 +91,7 @@ export function createCanvasAppExtensionBundle({
     customItemTextTargets,
     customItemValidators,
     foundationExtensions,
+    foundationExtensionAdapters,
     inspectorPanels,
     mediaImporters,
     textPasteImporters,
@@ -133,6 +143,12 @@ export function mergeCanvasAppExtensionBundle({
       entries: entries.foundationExtensions,
       owner,
     }),
+    foundationExtensionAdapters:
+      appendUniqueCanvasAppFoundationExtensionCapabilityAdapters({
+        current: current.foundationExtensionAdapters,
+        entries: entries.foundationExtensionAdapters,
+        owner,
+      }),
     inspectorPanels: appendUniqueCanvasAppExtensionEntries({
       current: current.inspectorPanels,
       entries: entries.inspectorPanels,
@@ -165,6 +181,10 @@ export function snapshotCanvasAppExtensionBundle(
     foundationExtensions: snapshotCanvasAppFoundationExtensions(
       bundle.foundationExtensions,
     ),
+    foundationExtensionAdapters:
+      snapshotCanvasAppFoundationExtensionCapabilityAdapters(
+        bundle.foundationExtensionAdapters,
+      ),
     customItemRenderers: snapshotCanvasAppRecord(bundle.customItemRenderers),
     customItemTextTargets: snapshotCanvasAppRecord(bundle.customItemTextTargets),
     customItemValidators: snapshotCanvasAppRecord(bundle.customItemValidators),

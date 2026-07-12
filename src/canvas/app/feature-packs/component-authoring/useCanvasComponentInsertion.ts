@@ -21,12 +21,16 @@ import {
   getCanvasStickyQuickCreateControlPoints,
   quickCreateCanvasSticky,
 } from './CanvasStickyQuickCreateExecution'
+import type {
+  CanvasAppFoundationExtensionRuntime,
+} from '../../extensions/foundation-extensions'
 
 type UseCanvasComponentInsertionArgs = {
   componentLibrary: CanvasAppComponentLibrary
   commitItemsChange: CommitCanvasItemsChange
   creationAdapter: CanvasCreationAdapter<CanvasItem>
   createId: (prefix: string) => string
+  foundationExtensionRuntime: CanvasAppFoundationExtensionRuntime
   itemReadModel: CanvasAppItemReadModel
   selection: string[]
   setEditing: Dispatch<SetStateAction<EditingText | null>>
@@ -39,6 +43,7 @@ export function useCanvasComponentInsertion({
   componentLibrary,
   commitItemsChange,
   createId,
+  foundationExtensionRuntime,
   selection,
   setEditing,
   setTool,
@@ -52,6 +57,7 @@ export function useCanvasComponentInsertion({
         component,
         componentLibrary,
         createId,
+        runtime: foundationExtensionRuntime,
         selection,
         setEditing,
         setTool,
@@ -63,6 +69,7 @@ export function useCanvasComponentInsertion({
       componentLibrary,
       commitItemsChange,
       createId,
+      foundationExtensionRuntime,
       selection,
       setEditing,
       setTool,
@@ -77,6 +84,7 @@ export function useCanvasStickyQuickCreate({
   commitItemsChange,
   creationAdapter,
   createId,
+  foundationExtensionRuntime,
   itemReadModel,
   selection,
   setEditing,
@@ -91,6 +99,7 @@ export function useCanvasStickyQuickCreate({
         createId,
         direction,
         itemReadModel,
+        runtime: foundationExtensionRuntime,
         selection,
         setEditing,
         setTool,
@@ -100,6 +109,7 @@ export function useCanvasStickyQuickCreate({
       commitItemsChange,
       creationAdapter,
       createId,
+      foundationExtensionRuntime,
       itemReadModel,
       selection,
       setEditing,

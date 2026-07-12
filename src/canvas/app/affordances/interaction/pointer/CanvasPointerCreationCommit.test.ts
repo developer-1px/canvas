@@ -129,6 +129,7 @@ describe('CanvasPointerCreationCommit', () => {
         {
           id: 'risk',
           label: 'Risk',
+          requiredCapability: 'editDocument',
           title: 'Risk',
           createItem: ({ createId }) => ({
             id: createId('risk'),

@@ -247,6 +247,38 @@ describe('ReactDesignEditorRuntime', () => {
     }))).toBe(true)
     expect(runtime!.viewport.read()).toBe(viewportBeforePassthrough)
 
+    const authoredScroll = document.createElement('div')
+    const authoredScrollChild = document.createElement('span')
+
+    authoredScroll.dataset.canvasWheelPassthrough = 'scroll'
+    authoredScroll.append(authoredScrollChild)
+    stage!.append(authoredScroll)
+    Object.defineProperties(authoredScroll, {
+      clientHeight: { value: 100 },
+      scrollHeight: { value: 300 },
+    })
+    authoredScroll.scrollTop = 40
+
+    expect(authoredScrollChild.dispatchEvent(new WheelEvent('wheel', {
+      bubbles: true,
+      cancelable: true,
+      deltaY: 12,
+    }))).toBe(true)
+    expect(runtime!.viewport.read()).toBe(viewportBeforePassthrough)
+
+    authoredScroll.scrollTop = 200
+
+    await act(async () => {
+      expect(authoredScrollChild.dispatchEvent(new WheelEvent('wheel', {
+        bubbles: true,
+        cancelable: true,
+        deltaY: 12,
+      }))).toBe(false)
+    })
+    expect(runtime!.viewport.read()).not.toBe(viewportBeforePassthrough)
+
+    await act(async () => runtime!.viewport.reset())
+
     let didCancelPan = false
 
     await act(async () => {

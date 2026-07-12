@@ -3,7 +3,6 @@ import type { CanvasAppAssemblyModel } from './CanvasAppAssemblyModelContracts'
 
 export function getCanvasAppAssemblyModel({
   affordanceConfig,
-  capabilities,
   componentLibrary,
   componentPresentationRenderers,
   customCommands,
@@ -11,7 +10,9 @@ export function getCanvasAppAssemblyModel({
   customItemRenderers,
   customItemTextTargets,
   customItemValidators,
+  documentAuthority,
   featurePackViewRenderers,
+  foundationExtensionRuntime,
   installedFeaturePackIds,
   inspectorPanels,
   initialItems,
@@ -29,7 +30,6 @@ export function getCanvasAppAssemblyModel({
       config: affordanceConfig,
     },
     command: {
-      capabilities,
       commandAdapter: itemAdapters.command,
     },
     collaboration: {
@@ -38,6 +38,7 @@ export function getCanvasAppAssemblyModel({
     component: {
       componentLibrary,
       creationAdapter: itemAdapters.creation,
+      foundationExtensionRuntime,
     },
     control: {
       components: componentLibrary.templates,
@@ -57,6 +58,7 @@ export function getCanvasAppAssemblyModel({
     },
     pointer: {
       componentLibrary,
+      foundationExtensionRuntime,
       itemAdapters: {
         creation: itemAdapters.creation,
         transform: itemAdapters.transform,
@@ -72,6 +74,8 @@ export function getCanvasAppAssemblyModel({
     workspace: {
       customItemTextTargets,
       customItemValidators,
+      documentAuthority,
+      foundationExtensionRuntime,
       initialItems,
       initialSelection,
       storageProvider: workspaceStorageProvider,

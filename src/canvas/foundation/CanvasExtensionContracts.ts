@@ -38,8 +38,17 @@ export type CanvasExtensionViewportEffect = {
   viewport: Viewport
 }
 
+export type CanvasExtensionEditingEffect = {
+  editing: {
+    id: string
+    value: string
+  }
+  type: 'editing'
+}
+
 export type CanvasExtensionEffect<TPatch = unknown> =
   | CanvasExtensionDocumentPatchEffect<TPatch>
+  | CanvasExtensionEditingEffect
   | CanvasExtensionSelectionEffect
   | CanvasExtensionViewportEffect
 
@@ -73,6 +82,7 @@ export type CanvasExtensionCommandDescriptor<
 > = {
   id: TCommandId
   plan: CanvasExtensionPlanner<TInput, TEffect>
+  requiredCapability: string
   requiredAdapters?: readonly CanvasExtensionAdapterSlot[]
 }
 
@@ -87,6 +97,7 @@ export type CanvasExtensionToolDescriptor<
 > = {
   id: TToolId
   kind: CanvasExtensionToolKind
+  requiredCapability: string
   requiredAdapters?: readonly CanvasExtensionAdapterSlot[]
 }
 
@@ -95,6 +106,12 @@ export type CanvasExtensionRendererSlot<
 > = {
   id: TSlotId
   surface: 'item-layer' | 'overlay' | 'stage'
+}
+
+export type CanvasExtensionTextTargetSlot<
+  TSlotId extends CanvasExtensionId = CanvasExtensionId,
+> = {
+  id: TSlotId
 }
 
 export type CanvasExtensionDescriptor<
@@ -108,6 +125,7 @@ export type CanvasExtensionDescriptor<
   id: TExtensionId
   rendererSlots?: readonly CanvasExtensionRendererSlot[]
   requiredAdapters?: readonly CanvasExtensionAdapterSlot[]
+  textTargetSlots?: readonly CanvasExtensionTextTargetSlot[]
   tools?: readonly CanvasExtensionToolDescriptor[]
 }
 

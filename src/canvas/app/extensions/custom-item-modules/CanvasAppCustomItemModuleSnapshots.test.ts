@@ -5,6 +5,7 @@ import type {
   CanvasAppCustomItemModule,
   CanvasAppCustomItemModuleCreationTool,
 } from './CanvasAppCustomItemModules'
+import { createCanvasAppTestDocumentAuthority } from '../../workflow/CanvasAppDocumentAuthorityTestFixtures'
 
 describe('CanvasAppCustomItemModules snapshots', () => {
   it('snapshots defined modules against caller mutation', () => {
@@ -13,12 +14,14 @@ describe('CanvasAppCustomItemModules snapshots', () => {
     >[number] = {
       id: 'publish-risk',
       label: 'Pub',
+      requiredCapability: 'editDocument',
       title: 'Publish risk',
       run: () => undefined,
     }
     const creationTool: CanvasAppCustomItemModuleCreationTool = {
       id: 'risk',
       label: '!',
+      requiredCapability: 'editDocument',
       title: 'Risk',
       shortcut: { key: 'k', shiftKey: true },
       createItem: ({ startWorld }) => ({
@@ -34,6 +37,7 @@ describe('CanvasAppCustomItemModules snapshots', () => {
       CanvasAppCustomItemModule['inspectorPanels']
     >[number] = {
       id: 'risk-meta',
+      requiredCapability: 'view',
       render: ({ selection }) => selection.length,
     }
     const textPasteImporter: NonNullable<
@@ -105,8 +109,8 @@ describe('CanvasAppCustomItemModules snapshots', () => {
     expect(assembly.customItemValidators.risk(createRiskItem())).toBe(true)
     expect(assembly.inspectorPanels[0]?.render({
       bounds: null,
-      commitItemsChange: () => false,
       disabled: false,
+      document: createCanvasAppTestDocumentAuthority(),
       label: null,
       selectedItems: [],
       selection: ['risk-1'],
@@ -133,6 +137,7 @@ describe('CanvasAppCustomItemModules snapshots', () => {
     >[number] = {
       id: 'publish-risk',
       label: 'Pub',
+      requiredCapability: 'editDocument',
       title: 'Publish risk',
       run: () => undefined,
     }
@@ -141,6 +146,7 @@ describe('CanvasAppCustomItemModules snapshots', () => {
     >[number] = {
       id: 'risk',
       label: '!',
+      requiredCapability: 'editDocument',
       title: 'Risk',
       shortcut: { key: 'k', shiftKey: true },
       createItem: ({ startWorld }) => ({
@@ -156,6 +162,7 @@ describe('CanvasAppCustomItemModules snapshots', () => {
       CanvasAppCustomItemModule['inspectorPanels']
     >[number] = {
       id: 'risk-meta',
+      requiredCapability: 'view',
       render: ({ selection }) => selection.length,
     }
     const textPasteImporter: NonNullable<
@@ -211,8 +218,8 @@ describe('CanvasAppCustomItemModules snapshots', () => {
     })
     expect(assembly.inspectorPanels[0]?.render({
       bounds: null,
-      commitItemsChange: () => false,
       disabled: false,
+      document: createCanvasAppTestDocumentAuthority(),
       label: null,
       selectedItems: [],
       selection: ['risk-1'],

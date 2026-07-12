@@ -1,7 +1,16 @@
 import { describe, expect, it } from 'vitest'
-import type { CanvasCustomItem, TextItem } from '../../../entities'
+import type {
+  CanvasComponentItem,
+  CanvasCustomItem,
+  TextItem,
+} from '../../../entities'
+import { CANVAS_STICKY_NOTE_EXTENSION } from '../../../foundation'
 import { createCanvasDocumentController } from '../../../host'
 import { createCanvasAppTextTarget } from '../../affordances/editing/text-editor/CanvasAppTextTarget'
+import {
+  CANVAS_APP_STICKY_NOTE_CAPABILITY_ADAPTER,
+  compileCanvasAppFoundationExtensions,
+} from '../foundation-extensions'
 import { createCanvasAppCustomItemModuleAssembly } from './CanvasAppCustomItemModuleAssembly'
 import { defineCanvasAppCustomItemModule } from './CanvasAppCustomItemModules'
 import type { CanvasAppCustomItemTextTarget } from './CanvasAppCustomItemTextTargetContracts'
@@ -49,6 +58,21 @@ const textItem: TextItem = {
   y: 0,
 }
 
+const stickyItem: CanvasComponentItem = {
+  accent: '#ca8a04',
+  body: 'Decision',
+  component: 'sticky',
+  fill: '#fef3c7',
+  h: 148,
+  id: 'sticky-1',
+  stroke: '#eab308',
+  title: 'Sticky',
+  type: 'component',
+  w: 188,
+  x: 0,
+  y: 0,
+}
+
 describe('Canvas app custom item text targets', () => {
   it('assembles module text targets into the extension bundle', () => {
     const assembly = createCanvasAppCustomItemModuleAssembly([noteModule])
@@ -89,6 +113,19 @@ describe('Canvas app custom item text targets', () => {
     expect(composite.canEdit(unknownCustomItem)).toBe(false)
     expect(composite.getValue(unknownCustomItem)).toBe('')
     expect(composite.planCommitUpdates(unknownCustomItem, 'next')).toEqual([])
+  })
+
+  it('enables sticky text only through the compiled foundation adapter', () => {
+    const base = createCanvasAppTextTarget()
+    const runtime = compileCanvasAppFoundationExtensions({
+      adapters: [CANVAS_APP_STICKY_NOTE_CAPABILITY_ADAPTER],
+      extensions: [CANVAS_STICKY_NOTE_EXTENSION],
+    })
+    const composite = createCanvasAppTextTarget({}, runtime.textTargets)
+
+    expect(base.canEdit(stickyItem)).toBe(false)
+    expect(composite.canEdit(stickyItem)).toBe(true)
+    expect(composite.getValue(stickyItem)).toBe('Decision')
   })
 
   it('commits custom item text through the document set-text change', () => {

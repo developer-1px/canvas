@@ -10,6 +10,17 @@ import {
   getCanvasStickyQuickCreateControlPoints,
   quickCreateCanvasSticky,
 } from './CanvasStickyQuickCreateExecution'
+import {
+  CANVAS_APP_STICKY_NOTE_CAPABILITY_ADAPTER,
+  compileCanvasAppFoundationExtensions,
+} from '../../extensions/foundation-extensions'
+import { CANVAS_STICKY_NOTE_EXTENSION } from '../../../foundation'
+import { createCanvasDocumentController } from '../../../host'
+
+const runtime = compileCanvasAppFoundationExtensions({
+  adapters: [CANVAS_APP_STICKY_NOTE_CAPABILITY_ADAPTER],
+  extensions: [CANVAS_STICKY_NOTE_EXTENSION],
+})
 
 describe('CanvasStickyQuickCreateExecution', () => {
   it('quick-creates a blank sticky next to the selected sticky', () => {
@@ -52,6 +63,7 @@ describe('CanvasStickyQuickCreateExecution', () => {
           id: 'component-card',
         }),
       ]),
+      runtime,
       selection: ['component-source'],
       setEditing,
       setTool,
@@ -147,6 +159,7 @@ describe('CanvasStickyQuickCreateExecution', () => {
       ),
       direction,
       itemReadModel: createItemReadModel([source]),
+      runtime,
       selection: ['component-source'],
       setEditing: vi.fn(),
       setTool: vi.fn(),
@@ -217,6 +230,7 @@ describe('CanvasStickyQuickCreateExecution', () => {
           y: 24,
         }),
       ]),
+      runtime,
       selection: ['component-source'],
       setEditing: vi.fn(),
       setTool: vi.fn(),
@@ -249,6 +263,7 @@ describe('CanvasStickyQuickCreateExecution', () => {
       itemReadModel: createItemReadModel([createComponentItem({
         component: 'card',
       })]),
+      runtime,
       selection: ['component-card'],
       setEditing: vi.fn(),
       setTool: vi.fn(),
@@ -266,6 +281,7 @@ describe('CanvasStickyQuickCreateExecution', () => {
           id: 'component-card',
         }),
       ]),
+      runtime,
       selection: ['component-sticky', 'component-card'],
       setEditing: vi.fn(),
       setTool: vi.fn(),
@@ -304,6 +320,46 @@ describe('CanvasStickyQuickCreateExecution', () => {
       selection: ['component-card'],
       viewport: { scale: 2, x: 10, y: 20 },
     })).toEqual([])
+  })
+
+  it('commits the sticky and connector as one document history entry', () => {
+    const source = createComponentItem({
+      id: 'component-source',
+      x: 40,
+      y: 60,
+    })
+    const next = createComponentItem({
+      id: 'component-next',
+      x: 184,
+      y: 60,
+    })
+    const document = createCanvasDocumentController(
+      [source],
+      [source.id],
+    )
+
+    expect(quickCreateCanvasSticky({
+      commitItemsChange: (change, selection) =>
+        document.commitItemsChange(change, document.readItems(), selection),
+      componentLibrary: createComponentLibrary(next),
+      creationAdapter: createCreationAdapter(),
+      createId: (prefix) => `${prefix}-next`,
+      itemReadModel: createItemReadModel([source]),
+      runtime,
+      selection: [source.id],
+      setEditing: vi.fn(),
+      setTool: vi.fn(),
+    })).toBe(true)
+    expect(document.readHistoryAvailability()).toEqual({
+      canRedo: false,
+      canUndo: true,
+    })
+
+    const undone = document.undo(document.readItems())
+
+    expect(undone?.items).toEqual([source])
+    expect(undone?.selection).toEqual([source.id])
+    expect(document.undo(undone?.items ?? [])).toBeNull()
   })
 })
 

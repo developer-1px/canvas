@@ -3,6 +3,7 @@ import {
   assertCanvasAppOptionalDescriptorFunctionField,
 } from '../CanvasAppDescriptorContracts'
 import { assertCanvasAppExtensionEntries } from '../CanvasAppExtensionIds'
+import { assertCanvasAppRequiredCapability } from '../../CanvasAppCapabilityContracts'
 import type { CanvasAppInspectorPanel } from './CanvasAppInspectorPanels'
 
 export function assertCanvasAppInspectorPanels(
@@ -20,6 +21,10 @@ export function assertCanvasAppInspectorPanels(
       field: 'render',
       owner,
       value: panel.render,
+    })
+    assertCanvasAppRequiredCapability({
+      owner,
+      value: panel.requiredCapability,
     })
     assertCanvasAppOptionalDescriptorFunctionField({
       field: 'isVisible',

@@ -89,6 +89,9 @@ export function assertCanvasAppFoundationExtensions(
     })
     assertCanvasAppFoundationCommandDescriptors(extension.commands)
     assertCanvasAppFoundationRendererSlotDescriptors(extension.rendererSlots)
+    assertCanvasAppFoundationTextTargetSlotDescriptors(
+      extension.textTargetSlots,
+    )
     assertCanvasAppFoundationToolDescriptors(extension.tools)
   }
 
@@ -148,10 +151,37 @@ function snapshotCanvasAppFoundationExtension(
     ...(extension.requiredAdapters ? {
       requiredAdapters: snapshotCanvasAppArray(extension.requiredAdapters),
     } : {}),
+    ...(extension.textTargetSlots ? {
+      textTargetSlots: snapshotCanvasAppArray(
+        extension.textTargetSlots.map((slot) => Object.freeze({ ...slot })),
+      ),
+    } : {}),
     ...(extension.tools ? {
       tools: snapshotCanvasAppArray(
         extension.tools.map(snapshotCanvasAppFoundationToolDescriptor),
       ),
     } : {}),
   }) as CanvasAppFoundationExtension
+}
+
+function assertCanvasAppFoundationTextTargetSlotDescriptors(
+  slots: CanvasAppFoundationExtension['textTargetSlots'] | undefined,
+) {
+  if (slots === undefined) {
+    return
+  }
+
+  assertCanvasAppArray(slots, 'foundation extension text-target slots')
+
+  for (const slot of slots) {
+    assertCanvasAppDescriptorObject(
+      slot,
+      'foundation extension text-target slot',
+    )
+    assertCanvasAppDescriptorStringField({
+      field: 'id',
+      owner: 'foundation extension text-target slot',
+      value: slot.id,
+    })
+  }
 }

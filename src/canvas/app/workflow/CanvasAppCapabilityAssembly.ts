@@ -5,17 +5,15 @@ import {
 import {
   assertCanvasAppDescriptorObject,
 } from '../extensions/CanvasAppDescriptorContracts'
+import type {
+  CanvasAppCapabilityInput,
+  CanvasAppCapabilitySnapshot,
+} from '../CanvasAppCapabilityContracts'
 
-export type CanvasAppCapabilitySnapshot = {
-  comment: boolean
-  editDocument: boolean
-  export: boolean
-  follow: boolean
-  present: boolean
-  view: boolean
-}
-
-export type CanvasAppCapabilityInput = Partial<CanvasAppCapabilitySnapshot>
+export type {
+  CanvasAppCapabilityInput,
+  CanvasAppCapabilitySnapshot,
+} from '../CanvasAppCapabilityContracts'
 
 export type CanvasAppCapabilityAssemblyInput = {
   capabilities?: CanvasAppCapabilityInput

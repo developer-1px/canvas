@@ -16,6 +16,7 @@ import {
 
 export const CANVAS_LINK_PREVIEW_INSPECTOR_PANEL: CanvasAppInspectorPanel = {
   id: 'link-preview-actions',
+  requiredCapability: 'editDocument',
   isVisible: (context) => getSelectedCanvasLinkPreviewItem(context) !== null,
   render: (context) => {
     const item = getSelectedCanvasLinkPreviewItem(context)
@@ -46,13 +47,16 @@ export function changeCanvasLinkPreviewBackToText(
     context.selection,
   )
 
-  return context.commitItemsChange({
-    type: 'replace-changed',
-    items: nextItems,
-  }, {
-    before: context.selection,
-    after: context.selection,
-  })
+  return context.document.commit({
+    change: {
+      type: 'replace-changed',
+      items: nextItems,
+    },
+    selection: {
+      before: context.selection,
+      after: context.selection,
+    },
+  }).ok
 }
 
 export function changeCanvasLinkPreviewOrientation(
@@ -70,13 +74,16 @@ export function changeCanvasLinkPreviewOrientation(
     orientation,
   )
 
-  return context.commitItemsChange({
-    type: 'replace-changed',
-    items: nextItems,
-  }, {
-    before: context.selection,
-    after: context.selection,
-  })
+  return context.document.commit({
+    change: {
+      type: 'replace-changed',
+      items: nextItems,
+    },
+    selection: {
+      before: context.selection,
+      after: context.selection,
+    },
+  }).ok
 }
 
 function renderCanvasLinkPreviewInspectorPanelContent({

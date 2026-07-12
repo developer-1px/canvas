@@ -1,8 +1,6 @@
 import type {
   Bounds,
   CanvasComponentKind,
-  EditingText,
-  CanvasItem,
   Point,
 } from '../../../../entities'
 import {
@@ -20,7 +18,6 @@ import type {
   CanvasAppComponentLibrary,
   CanvasAppComponentTemplate,
 } from '../../../workflow/CanvasAppComponentAssemblyContracts'
-import { CANVAS_APP_TEXT_TARGET } from '../../editing/text-editor/CanvasAppTextTarget'
 import type { CanvasAppPointerInput } from './CanvasAppPointerInput'
 import type { Interaction } from './CanvasInteractionState'
 import {
@@ -46,12 +43,6 @@ export type CanvasPointerComponentCreationStartResult =
       gesture: CanvasPointerComponentCreationInteraction['kind']
       interaction: CanvasPointerComponentCreationInteraction
       kind: 'interaction'
-    }
-  | {
-      capturePointer: false
-      edit?: EditingText
-      item: CanvasItem
-      kind: 'created-item'
     }
 
 export type CanvasPointerComponentCreationPreviewResult =
@@ -80,7 +71,6 @@ export function isCanvasPointerComponentCreationInteraction(
 export function startCanvasPointerComponentCreation({
   componentLibrary,
   config,
-  createId,
   input,
   pointerGesture,
   startScreen,
@@ -114,55 +104,37 @@ export function startCanvasPointerComponentCreation({
     return { kind: 'none' }
   }
 
-  if (descriptor.mode === 'drag') {
-    if (pointerGesture !== 'create-section') {
-      return { kind: 'none' }
-    }
-
-    const snappedStartWorld = snapCanvasPointToGrid({
-      config,
-      point: startWorld,
-    })
-    const interaction = {
-      currentWorld: snappedStartWorld,
-      kind: pointerGesture,
-      moved: false,
-      pointerId: input.pointerId,
-      startScreen,
-      startWorld: snappedStartWorld,
-    } satisfies CanvasPointerComponentCreationInteraction
-
-    return {
-      capturePointer: true,
-      draftRect: getCanvasComponentCreationBounds({
-        currentWorld: interaction.currentWorld,
-        defaultSize: getCanvasComponentCreationDefaultSize({
-          descriptor,
-          template,
-        }),
-        moved: interaction.moved,
-        startWorld: interaction.startWorld,
-      }),
-      gesture: interaction.kind,
-      interaction,
-      kind: 'interaction',
-    }
+  if (pointerGesture !== 'create-section') {
+    return { kind: 'none' }
   }
 
-  const createdItem = componentLibrary.createItem({
-    id: createId('component'),
-    point: centerCanvasComponentTemplateAtPoint(template, startWorld),
-    templateId: descriptor.templateId,
+  const snappedStartWorld = snapCanvasPointToGrid({
+    config,
+    point: startWorld,
   })
-  const item = descriptor.applyDefaults?.(createdItem) ?? createdItem
+  const interaction = {
+    currentWorld: snappedStartWorld,
+    kind: pointerGesture,
+    moved: false,
+    pointerId: input.pointerId,
+    startScreen,
+    startWorld: snappedStartWorld,
+  } satisfies CanvasPointerComponentCreationInteraction
 
   return {
-    capturePointer: false,
-    edit: descriptor.enterTextEdit
-      ? { id: item.id, value: CANVAS_APP_TEXT_TARGET.getValue(item) }
-      : undefined,
-    item,
-    kind: 'created-item',
+    capturePointer: true,
+    draftRect: getCanvasComponentCreationBounds({
+      currentWorld: interaction.currentWorld,
+      defaultSize: getCanvasComponentCreationDefaultSize({
+        descriptor,
+        template,
+      }),
+      moved: interaction.moved,
+      startWorld: interaction.startWorld,
+    }),
+    gesture: interaction.kind,
+    interaction,
+    kind: 'interaction',
   }
 }
 
@@ -240,7 +212,7 @@ export function commitCanvasPointerComponentCreation({
   })
 
   if (!template) {
-    return
+    return false
   }
 
   const bounds = getCanvasComponentCreationBounds({
@@ -262,11 +234,16 @@ export function commitCanvasPointerComponentCreation({
     ...bounds,
   }
 
-  commitItemsChange({ type: 'add', items: [resizedItem] }, {
+  const committed = commitItemsChange({ type: 'add', items: [resizedItem] }, {
     before: selection,
     after: [resizedItem.id],
   })
-  setTool('select')
+
+  if (committed) {
+    setTool('select')
+  }
+
+  return committed
 }
 
 function getCanvasComponentCreationDefaultSize({
@@ -316,14 +293,4 @@ function getCanvasPointerComponentCreationTemplate({
   return componentLibrary.templates.find(
     (template) => template.id === templateId,
   )
-}
-
-function centerCanvasComponentTemplateAtPoint(
-  template: CanvasAppComponentTemplate,
-  point: Point,
-): Point {
-  return {
-    x: point.x - template.w / 2,
-    y: point.y - template.h / 2,
-  }
 }

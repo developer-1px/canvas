@@ -36,6 +36,12 @@ import {
 import {
   startCanvasPointerTextCreation,
 } from './CanvasPointerTextCreation'
+import {
+  startCanvasPointerFoundationExtensionCreation,
+} from './CanvasPointerFoundationExtensionCreation'
+import type {
+  CanvasAppFoundationExtensionRuntime,
+} from '../../../extensions/foundation-extensions'
 
 export type CanvasPointerCreationStartInput = {
   componentLibrary: CanvasAppComponentLibrary
@@ -44,8 +50,10 @@ export type CanvasPointerCreationStartInput = {
   createId: (prefix: string) => string
   customCreationTools: readonly CanvasAppCustomCreationTool[]
   drawingStyles: CanvasDrawingStrokeStyleSet
+  foundationExtensionRuntime: CanvasAppFoundationExtensionRuntime
   input: CanvasAppPointerInput
   pointerGesture: CanvasPointerGesture
+  selection: string[]
   startScreen: Point
   startWorld: Point
   targetItemId?: string
@@ -59,8 +67,10 @@ export function startCanvasPointerCreation({
   createId,
   customCreationTools,
   drawingStyles,
+  foundationExtensionRuntime,
   input,
   pointerGesture,
+  selection,
   startScreen,
   startWorld,
   targetItemId,
@@ -94,6 +104,22 @@ export function startCanvasPointerCreation({
 
   if (drawingStart) {
     return drawingStart
+  }
+
+  const foundationExtensionStart =
+    startCanvasPointerFoundationExtensionCreation({
+      componentLibrary,
+      config,
+      createId,
+      pointerGesture,
+      runtime: foundationExtensionRuntime,
+      selection,
+      startWorld,
+      tool,
+    })
+
+  if (foundationExtensionStart) {
+    return foundationExtensionStart
   }
 
   const commentStart = startCanvasPointerCommentCreation({

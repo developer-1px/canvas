@@ -32,6 +32,11 @@ import {
 } from './CanvasAppCollaborationAssembly'
 import type { CanvasAppAssembly } from './CanvasAppAssemblyTypes'
 import { snapshotCanvasAppAssembly } from './CanvasAppAssemblySnapshot'
+import { createCanvasAppDocumentAuthorityRead } from './CanvasAppDocumentAuthority'
+import {
+  CANVAS_APP_STICKY_NOTE_CAPABILITY_ADAPTER,
+  compileCanvasAppFoundationExtensions,
+} from '../extensions/foundation-extensions'
 
 const DEFAULT_CANVAS_APP_INITIAL_SELECTION = [
   'component-sticky',
@@ -41,6 +46,9 @@ const DEFAULT_CANVAS_APP_INITIAL_SELECTION = [
 export const DEFAULT_CANVAS_APP_BASE_EXTENSION_BUNDLE =
   createCanvasAppExtensionBundle({
     customItemRenderers: DEFAULT_CANVAS_APP_CUSTOM_ITEM_RENDERERS,
+    foundationExtensionAdapters: [
+      CANVAS_APP_STICKY_NOTE_CAPABILITY_ADAPTER,
+    ],
     foundationExtensions: [CANVAS_STICKY_NOTE_EXTENSION],
   })
 
@@ -50,6 +58,12 @@ const DEFAULT_CANVAS_APP_EXTENSION_BUNDLE = mergeCanvasAppExtensionBundle({
   owner: 'app assembly',
 })
 
+const DEFAULT_CANVAS_APP_FOUNDATION_EXTENSION_RUNTIME =
+  compileCanvasAppFoundationExtensions({
+    adapters: DEFAULT_CANVAS_APP_EXTENSION_BUNDLE.foundationExtensionAdapters,
+    extensions: DEFAULT_CANVAS_APP_EXTENSION_BUNDLE.foundationExtensions,
+  })
+
 export const DEFAULT_CANVAS_APP_ASSEMBLY: CanvasAppAssembly =
   snapshotCanvasAppAssembly({
     ...DEFAULT_CANVAS_APP_EXTENSION_BUNDLE,
@@ -57,8 +71,17 @@ export const DEFAULT_CANVAS_APP_ASSEMBLY: CanvasAppAssembly =
     capabilities: CANVAS_APP_EDITOR_CAPABILITIES,
     componentLibrary: CANVAS_COMPONENT_LIBRARY,
     componentPresentationRenderers:
-      DEFAULT_CANVAS_APP_COMPONENT_PRESENTATION_RENDERERS,
+      {
+        ...DEFAULT_CANVAS_APP_COMPONENT_PRESENTATION_RENDERERS,
+        ...DEFAULT_CANVAS_APP_FOUNDATION_EXTENSION_RUNTIME
+          .componentPresentationRenderers,
+      },
+    documentAuthority: createCanvasAppDocumentAuthorityRead(
+      CANVAS_APP_EDITOR_CAPABILITIES,
+    ),
     featurePackViewRenderers: DEFAULT_CANVAS_APP_FEATURE_PACK_VIEW_RENDERERS,
+    foundationExtensionRuntime:
+      DEFAULT_CANVAS_APP_FOUNDATION_EXTENSION_RUNTIME,
     installedFeaturePackIds: getCanvasAppInstalledFeaturePackManifestIds(
       DEFAULT_CANVAS_APP_FEATURE_PACK_MANIFESTS,
     ),

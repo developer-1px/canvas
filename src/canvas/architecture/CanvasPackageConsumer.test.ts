@@ -99,9 +99,6 @@ import {
   defineCanvasAppCustomItemModule,
   defineCanvasAppFeaturePack,
   getCanvasAppFeaturePackCatalog,
-  getCanvasAppFoundationExtensionCommands,
-  getCanvasAppFoundationExtensionRendererSlots,
-  getCanvasAppFoundationExtensionTools,
   getCanvasAppInstalledFeaturePackManifestIds,
   getCanvasAppInstalledFeaturePackManifests,
   getCanvasAppInstalledFeaturePacks,
@@ -123,9 +120,7 @@ import {
   type CanvasAppFeaturePackManifest,
   type CanvasAppFeaturePackViewRenderers,
   type CanvasAppFoundationExtension,
-  type CanvasAppFoundationExtensionCommand,
-  type CanvasAppFoundationExtensionRendererSlot,
-  type CanvasAppFoundationExtensionTool,
+  type CanvasAppFoundationExtensionCapabilityAdapter,
   type CanvasAppItemLayerAdapter,
   type CanvasAppItemsChange,
   type CanvasAppPointerInput,
@@ -227,6 +222,7 @@ describe('Canvas package consumer imports', () => {
         customCommands: [{
           id: 'smoke-note',
           label: 'Note',
+          requiredCapability: 'editDocument',
           run: () => undefined,
           shortcut: { key: 'j' },
           title: 'Smoke note',
@@ -243,6 +239,7 @@ describe('Canvas package consumer imports', () => {
           enterTextEdit: true,
           id: 'smoke-note-tool',
           label: 'N',
+          requiredCapability: 'editDocument',
           shortcut: { key: 'q' },
           title: 'Smoke note tool',
         }],
@@ -294,6 +291,7 @@ describe('Canvas package consumer imports', () => {
         commands: [{
           id: 'canvas.smoke.command',
           plan: () => [],
+          requiredCapability: 'editDocument',
           requiredAdapters: ['command'],
         }],
         id: 'canvas.smoke',
@@ -301,8 +299,19 @@ describe('Canvas package consumer imports', () => {
           id: 'canvas.smoke.renderer',
           surface: 'item-layer',
         }],
-        requiredAdapters: ['document'],
+        requiredAdapters: ['document', 'renderer'],
       })
+    const foundationExtensionAdapter:
+      CanvasAppFoundationExtensionCapabilityAdapter = {
+        extensionId: 'canvas.smoke',
+        providedAdapters: ['capability', 'command', 'document', 'renderer'],
+        rendererSlots: {
+          'canvas.smoke.renderer': {
+            presentation: 'smoke-foundation-card',
+            render: renderComponent,
+          },
+        },
+      }
     const pointerInput: CanvasAppPointerInput = {
       altKey: false,
       button: 0,
@@ -323,6 +332,7 @@ describe('Canvas package consumer imports', () => {
         customCommands: [{
           id: 'smoke-command',
           label: 'Smoke',
+          requiredCapability: 'editDocument',
           run: () => undefined,
           title: 'Smoke',
         }],
@@ -389,6 +399,7 @@ describe('Canvas package consumer imports', () => {
         customCommands: [{
           id: 'consumer-command',
           label: 'Consumer',
+          requiredCapability: 'editDocument',
           run: () => undefined,
           title: 'Consumer command',
         }],
@@ -407,6 +418,7 @@ describe('Canvas package consumer imports', () => {
       }),
       customItemModules: [module],
       disabledViewFeaturePackIds: ['toolbar'],
+      foundationExtensionAdapters: [foundationExtensionAdapter],
       foundationExtensions: [foundationExtension],
       initialItems: [rect],
       initialSelection: [rect.id],
@@ -441,35 +453,16 @@ describe('Canvas package consumer imports', () => {
     expect(assembly.initialItems).toEqual([rect])
     expect(assembly.foundationExtensions.map((extension) => extension.id))
       .toContain('canvas.smoke')
-    const foundationTools: readonly CanvasAppFoundationExtensionTool[] =
-      getCanvasAppFoundationExtensionTools(assembly.foundationExtensions)
-
-    expect(foundationTools.map((tool) => tool.extensionId)).toContain(
-      'canvas.sticky-note',
-    )
-    expect(CanvasAppAuthoring.getCanvasAppFoundationExtensionTools(
-      assembly.foundationExtensions,
-    )).toEqual(foundationTools)
-    const foundationCommands: readonly CanvasAppFoundationExtensionCommand[] =
-      getCanvasAppFoundationExtensionCommands(assembly.foundationExtensions)
-
-    expect(foundationCommands.map((command) => command.id)).toContain(
+    expect(assembly.foundationExtensionRuntime.hasTool('sticky')).toBe(true)
+    expect(assembly.foundationExtensionRuntime.planCommand(
       'canvas.smoke.command',
-    )
-    expect(CanvasAppAuthoring.getCanvasAppFoundationExtensionCommands(
-      assembly.foundationExtensions,
-    )).toEqual(foundationCommands)
-    const foundationRendererSlots =
-      getCanvasAppFoundationExtensionRendererSlots(
-        assembly.foundationExtensions,
-      ) satisfies readonly CanvasAppFoundationExtensionRendererSlot[]
-
-    expect(foundationRendererSlots.map((slot) => slot.id)).toContain(
-      'canvas.smoke.renderer',
-    )
-    expect(CanvasAppAuthoring.getCanvasAppFoundationExtensionRendererSlots(
-      assembly.foundationExtensions,
-    )).toEqual(foundationRendererSlots)
+      {},
+    )).toEqual([])
+    expect(
+      assembly.foundationExtensionRuntime.componentPresentationRenderers[
+        'smoke-foundation-card'
+      ],
+    ).toBe(renderComponent)
     expect(commitAppItemsChange(appItemsChange)).toBe(true)
     expect(assembly.initialSelection).toEqual([rect.id])
     expect(
@@ -944,12 +937,6 @@ describe('Canvas package consumer imports', () => {
       preventDefault: true,
     })
     expect(CanvasAppAuthoring.createCanvasAppAssembly).toBeTypeOf('function')
-    expect(CanvasAppAuthoring.getCanvasAppFoundationExtensionCommands)
-      .toBeTypeOf('function')
-    expect(CanvasAppAuthoring.getCanvasAppFoundationExtensionRendererSlots)
-      .toBeTypeOf('function')
-    expect(CanvasAppAuthoring.getCanvasAppFoundationExtensionTools)
-      .toBeTypeOf('function')
     expect(CanvasAppAuthoring.createCanvasAppExtensionBundle)
       .toBeTypeOf('function')
     expect(CanvasAppAuthoring.createCanvasAppFeaturePack).toBeTypeOf(

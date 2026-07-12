@@ -43,18 +43,8 @@ export type {
 } from '../extensions/CanvasAppExtensionStateContracts'
 export type {
   CanvasAppFoundationExtension,
-} from '../extensions/foundation-extensions'
-export {
-  getCanvasAppFoundationExtensionCommands,
-  type CanvasAppFoundationExtensionCommand,
-} from '../extensions/foundation-extensions'
-export {
-  getCanvasAppFoundationExtensionRendererSlots,
-  type CanvasAppFoundationExtensionRendererSlot,
-} from '../extensions/foundation-extensions'
-export {
-  getCanvasAppFoundationExtensionTools,
-  type CanvasAppFoundationExtensionTool,
+  CanvasAppFoundationExtensionCapabilityAdapter,
+  CanvasAppFoundationExtensionRuntime,
 } from '../extensions/foundation-extensions'
 export {
   createCanvasAppCustomItemModuleAssembly,

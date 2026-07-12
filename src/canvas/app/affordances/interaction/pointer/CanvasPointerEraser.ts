@@ -170,12 +170,12 @@ export function commitCanvasPointerEraserInteraction({
   selection: string[]
 }) {
   if (interaction.erasedIds.length === 0) {
-    return
+    return true
   }
 
   const erased = new Set(interaction.erasedIds)
 
-  commitItemsChange(
+  return commitItemsChange(
     {
       selection: interaction.erasedIds,
       type: 'remove-selection',

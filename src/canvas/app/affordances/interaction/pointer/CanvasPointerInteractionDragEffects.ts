@@ -77,6 +77,30 @@ export function applyCanvasPointerInteractionEndEffect({
   resetCanvasPointerInteractionDragEffect(context)
 }
 
+export function applyCanvasPointerInteractionCommitResultEffect({
+  committed,
+  context,
+  event,
+  interaction,
+}: {
+  committed: boolean
+  context: CanvasPointerInteractionDragEffectContext
+  event: CanvasAppPointerIdInput
+  interaction: Interaction
+}) {
+  if (!committed) {
+    applyCanvasPointerInteractionCancelEffect({
+      context,
+      event,
+      interaction,
+    })
+    return false
+  }
+
+  applyCanvasPointerInteractionEndEffect({ context, event })
+  return true
+}
+
 export function applyCanvasPointerInteractionCancelEffect({
   context,
   event,

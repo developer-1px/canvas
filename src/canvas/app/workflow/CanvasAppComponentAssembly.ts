@@ -9,11 +9,19 @@ export type { CanvasAppComponentAssemblyInput } from './CanvasAppAssemblyInputTy
 export function createCanvasAppComponentAssembly(
   input: CanvasAppComponentAssemblyInput,
   defaults: CanvasAppComponentAssemblyContract,
+  options: {
+    foundationRenderers?: CanvasAppComponentAssemblyContract[
+      'componentPresentationRenderers'
+    ]
+  } = {},
 ): CanvasAppComponentAssemblyContract {
   return {
     componentLibrary: input.componentLibrary ?? defaults.componentLibrary,
     componentPresentationRenderers: createCanvasAppComponentPresentationRenderers(
-      input.componentPresentationRenderers,
+      {
+        ...options.foundationRenderers,
+        ...input.componentPresentationRenderers,
+      },
     ),
   }
 }

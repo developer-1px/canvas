@@ -57,8 +57,12 @@ import {
   applyCanvasTextEditInteractionStartEffect,
 } from './CanvasPointerInteractionStartEffects'
 import { getCanvasPointerStartProjection } from './CanvasPointerStartSession'
+import type {
+  CanvasAppFoundationExtensionRuntime,
+} from '../../../extensions/foundation-extensions'
 
 type UseCanvasPointerDownHandlersArgs = {
+  canEditText: (item: CanvasItem) => boolean
   cloneItems: (ids: string[], offset: Point) => CanvasItem[]
   componentLibrary: CanvasAppComponentLibrary
   commitSelection: CommitCanvasSelection
@@ -68,6 +72,7 @@ type UseCanvasPointerDownHandlersArgs = {
   createId: (prefix: string) => string
   customCreationTools: readonly CanvasAppCustomCreationTool[]
   drawingStyles: CanvasDrawingStrokeStyleSet
+  foundationExtensionRuntime: CanvasAppFoundationExtensionRuntime
   interactionRef: MutableRefObject<Interaction>
   itemReadModel: CanvasAppItemReadModel
   items: CanvasItem[]
@@ -90,6 +95,7 @@ type UseCanvasPointerDownHandlersArgs = {
 }
 
 export function useCanvasPointerDownHandlers({
+  canEditText,
   cloneItems,
   componentLibrary,
   commitSelection,
@@ -99,6 +105,7 @@ export function useCanvasPointerDownHandlers({
   createId,
   customCreationTools,
   drawingStyles,
+  foundationExtensionRuntime,
   interactionRef,
   itemReadModel,
   items,
@@ -153,6 +160,7 @@ export function useCanvasPointerDownHandlers({
       createId,
       customCreationTools,
       drawingStyles,
+      foundationExtensionRuntime,
       input: event,
       itemReadModel,
       scene,
@@ -278,6 +286,10 @@ export function useCanvasPointerDownHandlers({
   }
 
   function handleTextDoubleClick(item: CanvasItem) {
+    if (!canEditText(item)) {
+      return
+    }
+
     const start = startCanvasTextEditInteraction({
       config,
       item,
@@ -291,7 +303,7 @@ export function useCanvasPointerDownHandlers({
   }
 
   return {
-    canEditText: (item: CanvasItem) => itemReadModel.textTarget.canEdit(item),
+    canEditText,
     handleArrowEndpointPointerDown,
     handleCanvasPointerDown,
     handleItemPointerDown,

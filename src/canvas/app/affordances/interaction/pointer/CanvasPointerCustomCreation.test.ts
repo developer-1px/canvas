@@ -265,6 +265,7 @@ function createTool(
   return {
     id: 'risk',
     label: '!',
+    requiredCapability: 'editDocument' as const,
     title: 'Risk',
     createItem: () => customItem,
     ...overrides,

@@ -276,7 +276,7 @@ export async function runCanvasAppAiLabsSummarizeSelectionCommand({
   }
 
   return commitCanvasAppAiAutomationDraft({
-    commitItemsChange: context.commitItemsChange,
+    commitItemsChange: (change) => context.document.commit({ change }).ok,
     decision: await requestReview(draft),
     draft,
   })
@@ -299,6 +299,7 @@ export function createCanvasAppAiLabsSummarizeSelectionCommand({
       }),
     ),
     label: 'Summarize',
+    requiredCapability: 'editDocument',
     run: (context) => {
       void runCanvasAppAiLabsSummarizeSelectionCommand({
         context,

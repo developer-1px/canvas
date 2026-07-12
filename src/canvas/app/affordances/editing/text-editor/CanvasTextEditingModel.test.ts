@@ -8,6 +8,7 @@ import type {
   TextItem,
 } from '../../../../entities'
 import {
+  canCanvasAppEditTextItem,
   commitCanvasTextEditing,
   getCanvasPrintableTextEditStartIntent,
   getCanvasTextEditorStyle,
@@ -16,6 +17,29 @@ import {
 } from './CanvasTextEditingModel'
 
 describe('CanvasTextEditingModel', () => {
+  it('projects document capabilities onto the selected text target', () => {
+    expect(canCanvasAppEditTextItem({
+      canComment: true,
+      canEditDocument: false,
+      item: createCommentItem(),
+    })).toBe(true)
+    expect(canCanvasAppEditTextItem({
+      canComment: true,
+      canEditDocument: false,
+      item: createTextItem(),
+    })).toBe(false)
+    expect(canCanvasAppEditTextItem({
+      canComment: false,
+      canEditDocument: true,
+      item: createTextItem(),
+    })).toBe(true)
+    expect(canCanvasAppEditTextItem({
+      canComment: false,
+      canEditDocument: false,
+      item: createCommentItem(),
+    })).toBe(false)
+  })
+
   it('commits text edits through the document change contract', () => {
     const commitItemsChange = vi.fn()
     const setEditing = vi.fn()

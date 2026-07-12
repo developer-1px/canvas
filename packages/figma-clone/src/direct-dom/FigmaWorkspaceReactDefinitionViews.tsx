@@ -1,47 +1,50 @@
 import type { CSSProperties } from 'react'
 import type {
-  ReactDesignDefinitionRenderProps,
-} from '../../../../src/canvas/react-design-renderer'
+  DesignJSONObject,
+  ReactRegisteredDesignRenderProps,
+} from '@interactive-os/canvas/react-design'
+
+type FigmaWidgetProps = {
+  readonly delta: string
+  readonly label: string
+  readonly value: string
+}
 
 export function FigmaWorkspaceStatCard({
   children,
   rootProps,
-}: ReactDesignDefinitionRenderProps) {
+}: ReactRegisteredDesignRenderProps<DesignJSONObject>) {
   return <div {...rootProps}>{children}</div>
 }
 
 export function FigmaWorkspaceDealRow({
   children,
   rootProps,
-}: ReactDesignDefinitionRenderProps) {
+}: ReactRegisteredDesignRenderProps<DesignJSONObject>) {
   return <article {...rootProps}>{children}</article>
 }
 
 export function FigmaHomeMetaCard({
   children,
   rootProps,
-}: ReactDesignDefinitionRenderProps) {
+}: ReactRegisteredDesignRenderProps<DesignJSONObject>) {
   return <article {...rootProps}>{children}</article>
 }
 
 export function FigmaReactWidget({
-  node,
+  props,
   rootProps,
-}: ReactDesignDefinitionRenderProps) {
-  const label = readWidgetText(node.props.label, 'Activation')
-  const value = readWidgetText(node.props.value, '84.2')
-  const delta = readWidgetText(node.props.delta, '+12.4%')
-
+}: ReactRegisteredDesignRenderProps<FigmaWidgetProps>) {
   return (
     <div
       {...rootProps}
       style={{ ...WIDGET_CARD_STYLE, ...rootProps.style }}
     >
       <div style={WIDGET_TOP_STYLE}>
-        <span>{label}</span>
-        <em style={WIDGET_DELTA_STYLE}>{delta}</em>
+        <span>{props.label}</span>
+        <em style={WIDGET_DELTA_STYLE}>{props.delta}</em>
       </div>
-      <strong style={WIDGET_VALUE_STYLE}>{value}</strong>
+      <strong style={WIDGET_VALUE_STYLE}>{props.value}</strong>
       <div aria-hidden="true" style={WIDGET_CHART_STYLE}>
         <i style={createWidgetBarStyle('34%')} />
         <i style={createWidgetBarStyle('56%')} />
@@ -106,8 +109,4 @@ function createWidgetBarStyle(height: string): CSSProperties {
     flex: '1 1 0',
     height,
   }
-}
-
-function readWidgetText(value: unknown, fallback: string) {
-  return typeof value === 'string' ? value : fallback
 }

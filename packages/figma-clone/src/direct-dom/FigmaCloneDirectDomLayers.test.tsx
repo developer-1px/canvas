@@ -11,8 +11,8 @@ import {
   createDesignDocument,
   type DesignDocumentSnapshot,
   type DesignNode,
-} from '../../../../src/canvas/design-document'
-import { createDomProjection } from '../../../../src/canvas/dom-projection'
+} from '@interactive-os/canvas/react-design'
+import { createDomProjection } from '@interactive-os/canvas/react-design'
 
 import { FigmaCloneDirectDomLayers } from './FigmaCloneDirectDomLayers'
 

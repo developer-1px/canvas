@@ -14,6 +14,7 @@ describe('CanvasAppCustomItemModules assembly seam', () => {
         {
           id: 'publish-risk',
           label: 'Pub',
+          requiredCapability: 'editDocument',
           title: 'Publish risk',
           run: () => undefined,
         },
@@ -22,6 +23,7 @@ describe('CanvasAppCustomItemModules assembly seam', () => {
         {
           id: 'risk',
           label: '!',
+          requiredCapability: 'editDocument',
           title: 'Risk',
           createItem: ({ startWorld }: CanvasAppCustomCreationToolContext) => ({
             title: 'Risk',
@@ -36,6 +38,7 @@ describe('CanvasAppCustomItemModules assembly seam', () => {
       inspectorPanels: [
         {
           id: 'risk-meta',
+          requiredCapability: 'view',
           render: ({ selection }) => selection.length,
         },
       ],
@@ -111,6 +114,7 @@ describe('CanvasAppCustomItemModules assembly seam', () => {
         {
           id: 'risk',
           label: '!',
+          requiredCapability: 'editDocument',
           title: 'Risk',
           createItem: () => null,
         },

@@ -37,11 +37,19 @@ export type DesignDocumentPublication = {
   readonly metadata?: JSONChangeMetadata
 }
 
+export type PreparedDesignDocumentPublication = {
+  readonly operations: ReadonlyArray<JSONPatchOperation>
+  synchronize(): void
+}
+
 export type DesignDocumentPublicationCoordinator = {
   readonly port: DesignDocumentPatchPort
   isPublishing(): boolean
   ownsPublication(): DesignDocumentPublicationOwnership
-  publish<T>(publication: () => T): T
+  publish<T>(
+    publication: () => T,
+    prepared?: PreparedDesignDocumentPublication,
+  ): T
 }
 
 const coordinators = new WeakMap<
@@ -66,6 +74,8 @@ export function createDesignDocumentPublicationCoordinator({
   synchronize: () => void
 }): DesignDocumentPublicationCoordinator {
   let activeSequence: number | null = null
+  let activePreparedPublication: PreparedDesignDocumentPublication | null = null
+  let ownedPreparedOperations: ReadonlyArray<JSONPatchOperation> | null = null
   let nextSequence = 0
   let pendingPublications: DesignDocumentPublication[] = []
   let projectionSnapshot: DesignDocumentSnapshot | null = null
@@ -73,7 +83,10 @@ export function createDesignDocumentPublicationCoordinator({
   const subscriptions = new Set<PublicationSubscription>()
 
   store.subscribe((operations, metadata) => {
-    const publication = ownPublication(operations, metadata)
+    const publication = ownedPreparedOperations === null
+      ? ownPublication(operations, metadata)
+      : ownPreparedPublication(ownedPreparedOperations, metadata)
+    ownedPreparedOperations = null
 
     if (activeSequence !== null) {
       pendingPublications.push(publication)
@@ -106,7 +119,10 @@ export function createDesignDocumentPublicationCoordinator({
     return projection
   }
 
-  function publish<T>(publication: () => T): T {
+  function publish<T>(
+    publication: () => T,
+    prepared?: PreparedDesignDocumentPublication,
+  ): T {
     if (activeSequence !== null) {
       throw new Error('DesignDocument publications cannot be nested')
     }
@@ -118,6 +134,8 @@ export function createDesignDocumentPublicationCoordinator({
 
     nextSequence = sequence
     activeSequence = sequence
+    activePreparedPublication = prepared ?? null
+    ownedPreparedOperations = prepared?.operations ?? null
     pendingPublications = []
 
     try {
@@ -129,7 +147,11 @@ export function createDesignDocumentPublicationCoordinator({
       try {
         if (observed.length > 0) {
           const recipients = [...subscriptions]
-          synchronize()
+          if (activePreparedPublication === null) {
+            synchronize()
+          } else {
+            activePreparedPublication.synchronize()
+          }
           notifyPublicationListeners(
             subscriptions,
             recipients,
@@ -138,6 +160,8 @@ export function createDesignDocumentPublicationCoordinator({
         }
       } finally {
         activeSequence = null
+        activePreparedPublication = null
+        ownedPreparedOperations = null
         pendingPublications = []
       }
     }
@@ -251,6 +275,20 @@ function ownPublication(
     ? { operations: ownedOperations }
     : {
         operations: ownedOperations,
+        metadata: deepFreeze(contentMetadata),
+      }
+}
+
+function ownPreparedPublication(
+  operations: ReadonlyArray<JSONPatchOperation>,
+  metadata: JSONChangeMetadata | undefined,
+): DesignDocumentPublication {
+  const contentMetadata = compactPublishedMetadata(metadata)
+
+  return contentMetadata === undefined
+    ? { operations }
+    : {
+        operations,
         metadata: deepFreeze(contentMetadata),
       }
 }

@@ -50,6 +50,10 @@ function isCanvasAppCustomCommandDisabled(
   command: CanvasAppCustomCommand,
   context: CanvasAppCustomCommandContext,
 ) {
+  if (!context.document.can(command.requiredCapability)) {
+    return true
+  }
+
   if (!command.isEnabled) {
     return false
   }

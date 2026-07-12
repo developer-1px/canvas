@@ -37,7 +37,7 @@ import {
 } from './CanvasPointerInteractionLifecycle'
 import {
   applyCanvasPointerInteractionCancelEffect,
-  applyCanvasPointerInteractionEndEffect,
+  applyCanvasPointerInteractionCommitResultEffect,
   applyCanvasPointerInteractionPreviewEffect,
 } from './CanvasPointerInteractionDragEffects'
 import { previewCanvasPointerInteraction } from './CanvasPointerInteractionPreview'
@@ -164,7 +164,7 @@ export function useCanvasPointerDragHandlers({
     }
 
     event.preventDefault()
-    commitCanvasPointerInteraction({
+    const committed = commitCanvasPointerInteraction({
       componentLibrary,
       commitItemsChange,
       commitSelection,
@@ -180,9 +180,11 @@ export function useCanvasPointerDragHandlers({
       textTarget: itemReadModel.textTarget,
     })
 
-    applyCanvasPointerInteractionEndEffect({
+    applyCanvasPointerInteractionCommitResultEffect({
+      committed,
       context: dragEffectContext,
       event,
+      interaction: drag.interaction,
     })
   }
 

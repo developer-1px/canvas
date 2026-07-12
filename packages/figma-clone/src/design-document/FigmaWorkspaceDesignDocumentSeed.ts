@@ -5,7 +5,7 @@ import {
   type DesignJSONObject,
   type DesignNode,
   type DesignNodeComponentBinding,
-} from '../../../../src/canvas/design-document'
+} from '@interactive-os/canvas/react-design'
 import {
   FIGMA_WORKSPACE_COMPONENT_METADATA,
   type FigmaWorkspaceDesignNodeId,

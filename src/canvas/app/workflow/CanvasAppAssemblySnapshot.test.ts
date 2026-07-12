@@ -2,6 +2,7 @@ import { CANVAS_APP_TEXT_TARGET } from '../affordances/editing/text-editor/Canva
 import { describe, expect, it } from 'vitest'
 import { defineCanvasExtension } from '../../foundation'
 import { createCanvasComponentLibrary } from '../../host'
+import { createCanvasAppTestDocumentAuthority } from './CanvasAppDocumentAuthorityTestFixtures'
 import {
   DEFAULT_CANVAS_APP_ASSEMBLY,
   createCanvasAppAssembly,
@@ -14,6 +15,7 @@ import type {
   CanvasAppComponentRendererStrategy,
   CanvasAppCustomItemModuleCreationTool,
   CanvasAppFoundationExtension,
+  CanvasAppFoundationExtensionCapabilityAdapter,
   CanvasAppInspectorPanel,
   CanvasAppItemLayerAdapter,
   CanvasAppPresenceProvider,
@@ -55,11 +57,13 @@ describe('CanvasAppAssembly snapshots', () => {
     const customCommand = {
       id: 'publish',
       label: 'Pub',
+      requiredCapability: 'editDocument' as const,
       title: 'Publish risk',
       run: customCommandRun,
     }
     const customInspectorPanel: CanvasAppInspectorPanel = {
       id: 'risk-meta',
+      requiredCapability: 'view',
       render: ({ selection }) => selection.length,
     }
     const textPasteImporter: CanvasTextPasteImporter = {
@@ -81,9 +85,29 @@ describe('CanvasAppAssembly snapshots', () => {
       tools: [{
         id: 'canvas.risk.tool',
         kind: 'creation',
+        requiredCapability: 'editDocument',
         requiredAdapters: ['creation'],
       }],
     })
+    const foundationExtensionAdapter:
+      CanvasAppFoundationExtensionCapabilityAdapter = {
+        extensionId: foundationExtension.id,
+        providedAdapters: [
+          'capability',
+          'creation',
+          'document',
+          'renderer',
+        ],
+        rendererSlots: {
+          'canvas.risk.renderer': {
+            presentation: 'foundation-risk-card',
+            render: renderRisk,
+          },
+        },
+        toolPlanners: {
+          'canvas.risk.tool': () => [],
+        },
+      }
     const presenceProvider: CanvasAppPresenceProvider = () => [{
       color: '#2563eb',
       id: 'remote-mia',
@@ -131,6 +155,7 @@ describe('CanvasAppAssembly snapshots', () => {
     const moduleCreationTool: CanvasAppCustomItemModuleCreationTool = {
       id: 'risk',
       label: '!',
+      requiredCapability: 'editDocument',
       title: 'Risk',
       shortcut: { key: 'k', shiftKey: true },
       createItem: ({ startWorld }) => ({
@@ -157,6 +182,7 @@ describe('CanvasAppAssembly snapshots', () => {
       componentPresentationRenderers,
       customCommands: [customCommand],
       featurePackViewRenderers,
+      foundationExtensionAdapters: [foundationExtensionAdapter],
       foundationExtensions: [foundationExtension],
       customItemModules: [riskModule],
       initialItems,
@@ -237,8 +263,8 @@ describe('CanvasAppAssembly snapshots', () => {
       panel.id === 'risk-meta'
     )?.render({
       bounds: null,
-      commitItemsChange: () => false,
       disabled: false,
+      document: createCanvasAppTestDocumentAuthority(),
       label: null,
       selectedItems: [],
       selection: ['risk-1'],

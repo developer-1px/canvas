@@ -97,6 +97,11 @@ describe('CanvasAppAssembly seams', () => {
       present: false,
       view: true,
     })
+    expect(assembly.documentAuthority.capabilities).toBe(
+      assembly.capabilities,
+    )
+    expect(assembly.documentAuthority.can('editDocument')).toBe(false)
+    expect(assembly.documentAuthority.can('view')).toBe(true)
     expect(assembly.affordanceConfig.commands.copy).toBe(false)
     expect(assembly.affordanceConfig.commands.delete).toBe(false)
     expect(assembly.affordanceConfig.gestures.createComment).toBe(false)
@@ -151,6 +156,7 @@ describe('CanvasAppAssembly seams', () => {
         {
           id: 'publish',
           label: 'Pub',
+          requiredCapability: 'editDocument',
           title: 'Publish selection',
           run: () => undefined,
         },
@@ -159,6 +165,7 @@ describe('CanvasAppAssembly seams', () => {
         {
           id: 'risk',
           label: '!',
+          requiredCapability: 'editDocument',
           title: 'Risk',
           createItem: ({ startWorld }) => ({
             title: 'Risk',
@@ -173,6 +180,7 @@ describe('CanvasAppAssembly seams', () => {
       inspectorPanels: [
         {
           id: 'risk-meta',
+          requiredCapability: 'editDocument',
           render: ({ selection }) => selection.length,
         },
       ],
@@ -345,6 +353,7 @@ describe('CanvasAppAssembly seams', () => {
               customCommands: [{
                 id: 'status-pack-command',
                 label: 'Status pack',
+                requiredCapability: 'view',
                 run: () => undefined,
                 title: 'Status pack',
               }],
@@ -499,6 +508,7 @@ describe('CanvasAppAssembly seams', () => {
         {
           id: 'risk',
           label: '!',
+          requiredCapability: 'editDocument',
           title: 'Risk',
           createItem: () => null,
         },

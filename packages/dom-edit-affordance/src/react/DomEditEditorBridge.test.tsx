@@ -7,9 +7,9 @@ import { afterEach, describe, expect, it } from 'vitest'
 import { createEditorEngine } from '@interactive-os/canvas/editor'
 import {
   createDesignDocument,
+  createDomProjection,
   type DesignDocumentSnapshot,
-} from '../../../../src/canvas/design-document'
-import { createDomProjection } from '../../../../src/canvas/dom-projection'
+} from '@interactive-os/canvas/react-design'
 import {
   DomEditEditorInspector,
   DomEditEditorOverlay,

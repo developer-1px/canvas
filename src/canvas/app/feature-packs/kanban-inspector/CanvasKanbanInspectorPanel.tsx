@@ -16,6 +16,7 @@ import type {
 
 export const CANVAS_KANBAN_INSPECTOR_PANEL: CanvasAppInspectorPanel = {
   id: 'kanban-actions',
+  requiredCapability: 'editDocument',
   isVisible: (context) => getSelectedCanvasKanbanItem(context) !== null,
   render: (context) => {
     const item = getSelectedCanvasKanbanItem(context)
@@ -202,13 +203,16 @@ function commitCanvasKanbanItems(
   context: CanvasAppInspectorPanelContext,
   items: CanvasItem[],
 ) {
-  return context.commitItemsChange({
-    type: 'replace-changed',
-    items,
-  }, {
-    before: context.selection,
-    after: context.selection,
-  })
+  return context.document.commit({
+    change: {
+      type: 'replace-changed',
+      items,
+    },
+    selection: {
+      before: context.selection,
+      after: context.selection,
+    },
+  }).ok
 }
 
 function handleCanvasKanbanCardTextKeyDown(

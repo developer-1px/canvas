@@ -3,11 +3,25 @@ import type { CanvasComponentItem } from '../../../entities'
 import type { CanvasAppStageElement } from '../../rendering/stage/CanvasAppStageElement'
 import type { CanvasAppComponentLibrary } from '../../workflow/CanvasAppComponentAssemblyContracts'
 import { insertCanvasComponent } from './CanvasComponentInsertionExecution'
+import { CANVAS_STICKY_NOTE_EXTENSION } from '../../../foundation'
+import {
+  CANVAS_APP_STICKY_NOTE_CAPABILITY_ADAPTER,
+  compileCanvasAppFoundationExtensions,
+} from '../../extensions/foundation-extensions'
+
+const runtime = compileCanvasAppFoundationExtensions({
+  adapters: [CANVAS_APP_STICKY_NOTE_CAPABILITY_ADAPTER],
+  extensions: [CANVAS_STICKY_NOTE_EXTENSION],
+})
+const emptyRuntime = compileCanvasAppFoundationExtensions({
+  adapters: [],
+  extensions: [],
+})
 
 describe('CanvasComponentInsertionExecution', () => {
   it('creates the component at the stage viewport center and selects it', () => {
     const componentLibrary = createComponentLibrary()
-    const commitItemsChange = vi.fn()
+    const commitItemsChange = vi.fn(() => true)
     const setEditing = vi.fn()
     const setTool = vi.fn()
 
@@ -16,6 +30,7 @@ describe('CanvasComponentInsertionExecution', () => {
       component: 'sticky',
       componentLibrary,
       createId: vi.fn(() => 'component-1'),
+      runtime,
       selection: ['previous'],
       setEditing,
       setTool,
@@ -29,10 +44,13 @@ describe('CanvasComponentInsertionExecution', () => {
       templateId: 'sticky',
     })
     expect(commitItemsChange).toHaveBeenCalledWith(
-      { type: 'add', items: [createComponentItem()] },
+      { type: 'add', items: [expect.objectContaining(createComponentItem())] },
       { before: ['previous'], after: ['component-1'] },
     )
-    expect(setEditing).toHaveBeenCalledWith(null)
+    expect(setEditing).toHaveBeenCalledWith({
+      id: 'component-1',
+      value: '',
+    })
     expect(setTool).toHaveBeenCalledWith('select')
   })
 
@@ -44,6 +62,7 @@ describe('CanvasComponentInsertionExecution', () => {
       component: 'card',
       componentLibrary,
       createId: vi.fn(() => 'component-1'),
+      runtime: emptyRuntime,
       selection: [],
       setEditing: vi.fn(),
       setTool: vi.fn(),
@@ -56,6 +75,31 @@ describe('CanvasComponentInsertionExecution', () => {
       point: { x: 120, y: 120 },
       templateId: 'card',
     })
+  })
+
+  it('does not fall back when the compiled runtime owns a component tool', () => {
+    const componentLibrary = createComponentLibrary()
+    const commitItemsChange = vi.fn(() => true)
+    const unavailableRuntime = {
+      ...emptyRuntime,
+      hasTool: () => true,
+      planTool: () => null,
+    }
+
+    expect(insertCanvasComponent({
+      commitItemsChange,
+      component: 'sticky',
+      componentLibrary,
+      createId: vi.fn(() => 'component-1'),
+      runtime: unavailableRuntime,
+      selection: [],
+      setEditing: vi.fn(),
+      setTool: vi.fn(),
+      stageElement: createStageElement({ x: 40, y: 50 }),
+      viewport: { scale: 1, x: 0, y: 0 },
+    })).toBe(false)
+    expect(componentLibrary.createItem).not.toHaveBeenCalled()
+    expect(commitItemsChange).not.toHaveBeenCalled()
   })
 
 })

@@ -11,10 +11,246 @@ import {
 } from '../dom-projection'
 import {
   createEditorEngine,
+  defineRegisteredDesignDefinition,
   type EditorEngineCommand,
 } from './index'
 
 describe('EditorEngine', () => {
+  it('rejects invalid registered props across create, edit, and raw apply before history', () => {
+    const card = defineRegisteredDesignDefinition({
+      id: 'test.card',
+      kind: 'widget',
+      props: {
+        defaults: { tone: 'info' as const },
+        safeParse: (value) => (
+          typeof value === 'object' &&
+          value !== null &&
+          'tone' in value &&
+          (value.tone === 'info' || value.tone === 'warning')
+            ? { ok: true as const, value: { tone: value.tone } }
+            : { ok: false as const, reason: 'invalid card tone' }
+        ),
+      },
+      create: ({ nodeId }) => ({
+        ...createNode(nodeId),
+        definition: { id: 'test.card', kind: 'widget' },
+        props: { tone: 'info' },
+      }),
+      capabilities: {
+        textEdit: false,
+        transform: { move: true, resize: true },
+      },
+    })
+    const registeredNode = {
+      ...createNode('card'),
+      definition: { id: 'test.card', kind: 'widget' as const },
+      props: { tone: 'info' },
+    }
+    const document = createDesignDocument({
+      schemaVersion: 1,
+      roots: [registeredNode.id],
+      nodes: [registeredNode],
+    })
+    const projection = createDomProjection({
+      getStageElement: () => null,
+      getViewport: () => ({ scale: 1, x: 0, y: 0 }),
+    })
+    const engine = createEditorEngine({
+      definitionResolver: {
+        resolveRegistered: (reference) =>
+          reference.kind === card.kind && reference.id === card.id ? card : null,
+      },
+      document,
+      projection,
+    })
+    const before = document.snapshot
+    const invalidNode = {
+      ...registeredNode,
+      id: 'invalid-card',
+      props: { tone: 'danger' },
+    }
+
+    for (const command of [
+      {
+        type: 'node.create' as const,
+        index: 1,
+        label: 'Create invalid card',
+        node: invalidNode,
+        parentId: null,
+      },
+      {
+        type: 'node.edit' as const,
+        edits: [{ field: 'tone', target: 'props' as const, value: 'danger' }],
+        label: 'Edit invalid card',
+        nodeId: registeredNode.id,
+      },
+      {
+        type: 'document.apply' as const,
+        changes: [{
+          type: 'update' as const,
+          nodeId: registeredNode.id,
+          values: { props: { tone: 'danger' } },
+        }],
+        label: 'Apply invalid card props',
+      },
+    ] satisfies readonly EditorEngineCommand[]) {
+      expect(engine.commands.can(command)).toBe(false)
+      expect(engine.commands.execute(command)).toMatchObject({
+        code: 'invalid-command',
+        ok: false,
+        reason: expect.stringContaining('invalid card tone'),
+      })
+      expect(document.snapshot).toBe(before)
+      expect(document.historyStatus()).toEqual({
+        canRedo: false,
+        canUndo: false,
+      })
+    }
+
+    engine.dispose()
+    projection.dispose()
+  })
+
+  it('enforces registered text and transform capabilities at every Engine mutation boundary', () => {
+    const labelDefinition = defineRegisteredDesignDefinition({
+      id: 'test.locked-label',
+      kind: 'component',
+      props: {
+        defaults: {},
+        safeParse: (value) =>
+          value && typeof value === 'object' && !Array.isArray(value)
+            ? { ok: true as const, value: {} }
+            : { ok: false as const, reason: 'props must be an object' },
+      },
+      create: ({ nodeId, x, y }) => ({
+        ...createNode(nodeId),
+        definition: { id: 'test.locked-label', kind: 'component' },
+        text: 'Single line',
+        frame: {
+          x,
+          y,
+          width: 120,
+          height: 40,
+          rotation: 0,
+          widthMode: 'fixed' as const,
+          heightMode: 'fixed' as const,
+          overflow: 'visible' as const,
+        },
+      }),
+      capabilities: {
+        textEdit: { source: 'node-text', multiline: false },
+        transform: { move: false, resize: false },
+      },
+    })
+    const node = labelDefinition.create({ nodeId: 'label', x: 0, y: 0 })
+    const document = createDesignDocument({
+      schemaVersion: 1,
+      roots: [node.id],
+      nodes: [node],
+    })
+    const projection = createDomProjection({
+      getStageElement: () => null,
+      getViewport: () => ({ scale: 1, x: 0, y: 0 }),
+    })
+    const engine = createEditorEngine({
+      definitionResolver: {
+        resolveRegistered: (reference) =>
+          reference.kind === labelDefinition.kind &&
+          reference.id === labelDefinition.id
+            ? labelDefinition
+            : null,
+      },
+      document,
+      projection,
+    })
+    const before = document.snapshot
+    const commands = [
+      {
+        type: 'node.edit' as const,
+        edits: [{ field: 'x' as const, target: 'layout' as const, value: 20 }],
+        label: 'Move locked label',
+        nodeId: node.id,
+      },
+      {
+        type: 'document.apply' as const,
+        changes: [{
+          type: 'move' as const,
+          index: 0,
+          nodeId: node.id,
+          parentId: null,
+        }],
+        label: 'Raw hierarchy move locked label',
+      },
+      {
+        type: 'document.apply' as const,
+        changes: [{
+          type: 'update' as const,
+          nodeId: node.id,
+          values: {
+            definition: { id: 'div', kind: 'intrinsic' as const },
+            frame: { ...node.frame!, x: 40 },
+          },
+        }],
+        label: 'Swap definition while moving locked label',
+      },
+      {
+        type: 'document.apply' as const,
+        changes: [
+          {
+            type: 'update' as const,
+            nodeId: node.id,
+            values: {
+              definition: { id: 'div', kind: 'intrinsic' as const },
+            },
+          },
+          {
+            type: 'update' as const,
+            nodeId: node.id,
+            values: { frame: { ...node.frame!, x: 40 } },
+          },
+        ],
+        label: 'Split definition swap and move locked label',
+      },
+      {
+        type: 'frame.edit' as const,
+        label: 'Resize locked label',
+        nodeId: node.id,
+        values: { width: 240 },
+      },
+      {
+        type: 'document.apply' as const,
+        changes: [{
+          type: 'update' as const,
+          nodeId: node.id,
+          values: { frame: { ...node.frame!, width: 240 } },
+        }],
+        label: 'Raw resize locked label',
+      },
+      {
+        type: 'node.edit' as const,
+        edits: [{ target: 'text' as const, value: 'First\nSecond' }],
+        label: 'Add multiline label',
+        nodeId: node.id,
+      },
+    ] satisfies readonly EditorEngineCommand[]
+
+    for (const command of commands) {
+      expect(engine.commands.can(command)).toBe(false)
+      expect(engine.commands.execute(command)).toMatchObject({
+        code: 'invalid-command',
+        ok: false,
+      })
+      expect(document.snapshot).toBe(before)
+      expect(document.historyStatus()).toEqual({
+        canRedo: false,
+        canUndo: false,
+      })
+    }
+
+    engine.dispose()
+    projection.dispose()
+  })
+
   it('creates one node without changing selection and restores it through history', () => {
     const document = createDesignDocument(createEditorSnapshot())
     const projection = createDomProjection({

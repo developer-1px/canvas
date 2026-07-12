@@ -110,6 +110,7 @@ function createCommand(id: string) {
   return {
     id,
     label: id,
+    requiredCapability: 'editDocument' as const,
     run: () => undefined,
     title: id,
   }

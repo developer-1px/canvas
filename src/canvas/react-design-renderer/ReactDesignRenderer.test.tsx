@@ -2,15 +2,21 @@
 
 import { renderToStaticMarkup } from 'react-dom/server'
 import { createRoot } from 'react-dom/client'
-import { act } from 'react'
+import { act, type ReactNode } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 
 import {
   createDesignDocument,
+  type DesignJSONObject,
   type DesignDocumentSnapshot,
 } from '../design-document'
 import { createDomProjection } from '../dom-projection'
-import { createReactDesignDefinitionRegistry } from './ReactDesignDefinitionRegistry'
+import { defineRegisteredDesignDefinition } from '../editor-engine'
+import {
+  createReactDesignDefinitionRegistry,
+  defineReactDesignDefinition,
+  type ReactDesignDefinitionRenderProps,
+} from './ReactDesignDefinitionRegistry'
 import { ReactDesignRenderer } from './ReactDesignRenderer'
 
 ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean })
@@ -50,10 +56,9 @@ describe('ReactDesignRenderer', () => {
     })
     const registry = createReactDesignDefinitionRegistry({
       intrinsics: ['h1'],
-      definitions: [{
-        id: 'sales-card',
-        kind: 'component',
-        render: ({ children, read, rootProps }) => (
+      definitions: [createRegisteredDefinition(
+        'sales-card',
+        ({ children, read, rootProps }) => (
           <article
             {...rootProps}
             data-component="sales-card"
@@ -62,7 +67,7 @@ describe('ReactDesignRenderer', () => {
             {children}
           </article>
         ),
-      }],
+      )],
     })
     const markup = renderToStaticMarkup(
       <ReactDesignRenderer
@@ -165,13 +170,12 @@ describe('ReactDesignRenderer', () => {
         read={document.read}
         registry={createReactDesignDefinitionRegistry({
           intrinsics: ['h1'],
-          definitions: [{
-            id: 'broken-card',
-            kind: 'component',
-            render: () => {
+          definitions: [createRegisteredDefinition(
+            'broken-card',
+            () => {
               throw new Error('broken renderer')
             },
-          }],
+          )],
         })}
       />,
     ))
@@ -204,25 +208,23 @@ describe('ReactDesignRenderer', () => {
     const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {})
     const brokenRegistry = createReactDesignDefinitionRegistry({
       intrinsics: ['h1'],
-      definitions: [{
-        id: 'sales-card',
-        kind: 'component',
-        render: () => {
+      definitions: [createRegisteredDefinition(
+        'sales-card',
+        () => {
           throw new Error('broken renderer')
         },
-      }],
+      )],
     })
     const healthyRegistry = createReactDesignDefinitionRegistry({
       intrinsics: ['h1'],
-      definitions: [{
-        id: 'sales-card',
-        kind: 'component',
-        render: ({ children, rootProps }) => (
+      definitions: [createRegisteredDefinition(
+        'sales-card',
+        ({ children, rootProps }) => (
           <article {...rootProps} data-component="recovered-card">
             {children}
           </article>
         ),
-      }],
+      )],
     })
 
     await act(async () => root.render(
@@ -254,6 +256,47 @@ describe('ReactDesignRenderer', () => {
     container.remove()
   })
 })
+
+function createRegisteredDefinition(
+  id: string,
+  renderer: (props: ReactDesignDefinitionRenderProps) => ReactNode,
+) {
+  return defineReactDesignDefinition({
+    definition: defineRegisteredDesignDefinition({
+      id,
+      kind: 'component',
+      props: {
+        defaults: {},
+        safeParse: (value) => (
+          typeof value === 'object' && value !== null && !Array.isArray(value)
+            ? {
+                ok: true as const,
+                value: value as DesignJSONObject,
+              }
+            : { ok: false as const, reason: 'invalid component props' }
+        ),
+      },
+      create: ({ nodeId }) => ({
+        id: nodeId,
+        label: id,
+        definition: { id, kind: 'component' },
+        children: [],
+        props: {},
+        text: null,
+        layout: {},
+        style: {},
+        frame: null,
+        component: null,
+      }),
+      capabilities: {
+        textEdit: false,
+        transform: { move: true, resize: true },
+      },
+    }),
+    renderer,
+    fallback: () => null,
+  })
+}
 
 function createProjection() {
   return createDomProjection({

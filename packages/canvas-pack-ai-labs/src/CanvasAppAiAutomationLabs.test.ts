@@ -4,9 +4,11 @@ import type {
   Viewport,
 } from '@interactive-os/canvas'
 import type {
+  CanvasAppCommitItemsChange,
   CanvasAppCustomCommandContext,
   CanvasAppItemsChange,
 } from '@interactive-os/canvas/app/authoring'
+import { CANVAS_APP_EDITOR_CAPABILITIES } from '@interactive-os/canvas/app/authoring'
 import {
   CANVAS_APP_AI_AUTOMATION_LABS_DATA_POLICY,
   CANVAS_APP_AI_LABS_SUMMARIZE_SELECTION_COMMAND_ID,
@@ -196,12 +198,23 @@ describe('CanvasAppAiAutomationLabs', () => {
 })
 
 function createCustomCommandContext(
-  overrides: Partial<CanvasAppCustomCommandContext> = {},
+  {
+    commitItemsChange = () => true,
+    ...overrides
+  }: Partial<CanvasAppCustomCommandContext> & {
+    commitItemsChange?: CanvasAppCommitItemsChange
+  } = {},
 ): CanvasAppCustomCommandContext {
   return {
-    commitItemsChange: () => true,
     commitSelection: () => true,
     createId: (prefix) => `${prefix}-1`,
+    document: {
+      can: (capability) => CANVAS_APP_EDITOR_CAPABILITIES[capability],
+      capabilities: CANVAS_APP_EDITOR_CAPABILITIES,
+      commit: ({ change, selection }) => commitItemsChange(change, selection)
+        ? { ok: true }
+        : { code: 'mutation-rejected', ok: false },
+    },
     items: [],
     selection: [],
     setEditing: () => undefined,
