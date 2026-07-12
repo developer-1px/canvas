@@ -82,6 +82,7 @@
 - Canvas App Renderer Registries: App-named component/custom item renderer registry 생성, 검증, default를 소유하고 Whiteboard SVG registry 구현명을 외부 authoring seam 뒤에 숨기는 Module.
 - Canvas App Stage Adapter: App Shell이 concrete Renderer Stage를 직접 import하지 않고 stage ReactNode를 받도록 만드는 Adapter. Interface는 Canvas App Rendering Contracts가 소유하고 default SVG 구현은 별도 파일에 둔다.
 - Canvas App Stage Element: stage DOM element의 bounds, pointer capture, wheel listener를 한 Module에 숨기는 App-owned element Adapter.
+- Canvas Browser Interaction Runtime: Legacy Canvas App과 canonical React Design editor가 공유하는 browser-only 입력 경계. non-passive wheel, browser page zoom/overscroll 차단, Safari gesture scale, multi-pointer pinch, 명시적 native wheel passthrough 문법만 소유하고 Core/Foundation/Engine의 viewport·gesture 계산을 대체하지 않는다.
 - Canvas App Stage Element Model: App Model이 Stage Element Adapter 생성 세부를 직접 알지 않도록 숨기는 workflow Module.
 - Canvas App Stage Element Consumer Model: Stage Element Adapter를 command, component, pointer, viewport, stage render consumer별 context로 변환하는 workflow Module.
 - Canvas App Consumer Contracts: command, component, control, extension, inspector, interaction, keyboard, pointer, stage, stage element, text, viewport 같은 workflow runtime fan-out의 입력, command/extension/pointer/text/viewport runtime callback, consumer별 출력 Interface를 한곳에 모아 구현 mapping과 분리하고, 외부 등록 descriptor와 내부 runtime state의 노출 범위를 고정하는 App-owned type 계약.
@@ -443,6 +444,7 @@
 - App Model은 wheel viewport listener, fit/reset/zoom control hook 조립, keyboard/control fan-out 세부를 직접 알지 않고 Canvas App Viewport Model에서 consumer별 viewport context를 받는다. Viewport model input과 viewport runtime/control context shape는 Canvas App Consumer Contracts가, viewport listener/control runtime 생성은 Canvas App Viewport Model이, consumer별 viewport fan-out은 Canvas App Viewport Consumer Model이 소유한다.
 - Viewport control hook은 callback memoization만 맡고, fit target defaulting, missing bounds/rect no-op, reset, stage-center zoom 실행 규칙은 Canvas Viewport Control Execution이 소유한다.
 - Wheel viewport hook은 listener binding과 cleanup만 맡고, wheel event-to-engine adaptation, preventDefault timing, stage-local point projection, null-result viewport fallback은 Canvas Wheel Viewport Execution이 소유한다.
+- Fullscreen canvas shell은 `data-canvas-native-gesture-boundary`에서 browser page zoom, Safari gesture, multi-touch pinch, overscroll을 소유한다. Stage 안에서 native scroll이 필요한 editor/control은 `data-canvas-wheel-passthrough="true"`를 명시하고, 일반 wheel/pinch는 Canvas viewport pan/zoom으로 변환한다.
 - App Model은 draft, marquee, snap guide, temporary pan raw setter routing을 직접 알지 않고 Canvas Interaction Model의 consumer별 interaction context를 전달한다.
 - Canvas Interaction Model은 state storage와 overlay creation을 맡고, consumer별 interaction fan-out과 temporary pan active mode precedence는 Canvas Interaction Consumer Model이 소유한다.
 - App Shell은 workspace 저장, document history, read model 생성 방식을 직접 알지 않는다.

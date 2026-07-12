@@ -62,6 +62,7 @@ export function CanvasTextEditor({
     <textarea
       ref={editorRef as RefObject<HTMLTextAreaElement | null>}
       className="text-editor"
+      data-canvas-wheel-passthrough="true"
       value={editing.value}
       style={style}
       spellCheck={false}

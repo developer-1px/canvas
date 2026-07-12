@@ -3,6 +3,8 @@
   width: 100vw;
   height: 100svh;
   overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: manipulation;
   color: var(--canvas-ink);
   background: var(--canvas-paper);
   font-family: var(--demo-font);
@@ -28,6 +30,7 @@
   background: transparent;
   touch-action: none;
   user-select: none;
+  -webkit-touch-callout: none;
 }
 
 .engine-demo-workspace .canvas-hit {

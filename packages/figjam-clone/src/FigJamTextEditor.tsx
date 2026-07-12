@@ -183,6 +183,7 @@ export function FigJamTextEditor({
       ref={inputRef}
       aria-label={edit.label}
       className="figjam-react-text-editor"
+      data-canvas-wheel-passthrough="true"
       data-dom-edit-editor-control
       data-figjam-text-editor={edit.nodeId}
       spellCheck={false}

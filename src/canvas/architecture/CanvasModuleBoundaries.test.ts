@@ -47,6 +47,24 @@ describe('Canvas module layer boundaries', () => {
     expect(violations).toEqual([])
   })
 
+  it('keeps headless canvas layers independent from browser runtime input', () => {
+    const headlessPrefixes = [
+      'src/canvas/core/',
+      'src/canvas/engine/',
+      'src/canvas/foundation/',
+    ]
+    const violations = sourceFiles
+      .filter((file) => headlessPrefixes.some((prefix) =>
+        file.path.startsWith(prefix),
+      ))
+      .flatMap(getImportReferences)
+      .filter((reference) =>
+        reference.target.startsWith('src/canvas/browser-runtime'),
+      )
+
+    expect(violations).toEqual([])
+  })
+
 
   it('keeps host access behind the host public facade outside the host layer', () => {
     const violations = getImportsFromOutside('src/canvas/host/')

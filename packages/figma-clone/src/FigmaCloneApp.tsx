@@ -11,8 +11,8 @@ import {
   useEffect,
   useRef,
   useState,
+  type MouseEvent as ReactMouseEvent,
   type PointerEvent as ReactPointerEvent,
-  type WheelEvent as ReactWheelEvent,
 } from 'react'
 import type { EditorEngine } from '@interactive-os/canvas/editor'
 import {
@@ -217,6 +217,12 @@ export function FigmaCloneApp() {
     }
   }, [])
 
+  const handleStageContextMenu = (event: ReactMouseEvent<HTMLElement>) => {
+    if (!isFigmaEditorControl(event.target)) {
+      event.preventDefault()
+    }
+  }
+
   const handlePointerDown = (event: ReactPointerEvent<HTMLElement>) => {
     const explicitlyPans = event.button === 1 ||
       (event.button === 0 && temporaryPan)
@@ -263,24 +269,12 @@ export function FigmaCloneApp() {
       event.currentTarget.releasePointerCapture(event.pointerId)
     }
   }
-  const handleWheel = (event: ReactWheelEvent<HTMLElement>) => {
-    event.preventDefault()
-
-    if (!event.ctrlKey && !event.metaKey) {
-      viewportRuntime.panBy({ x: -event.deltaX, y: -event.deltaY })
-      return
-    }
-
-    viewportRuntime.zoomAtClientPoint(
-      { x: event.clientX, y: event.clientY },
-      Math.exp(-event.deltaY * 0.002),
-    )
-  }
   const canvasPanActive = temporaryPan || panning
 
   return (
     <main
       className="figma-clone figma-direct-dom"
+      data-canvas-native-gesture-boundary
       data-affordance-mode={affordanceState.mode}
       data-document-node-count={document.snapshot.nodes.length}
       data-dom-projection-count={registeredNodeCount}
@@ -369,11 +363,11 @@ export function FigmaCloneApp() {
           data-mode={canvasPanActive ? 'pan' : 'select'}
           data-panning={panning ? 'true' : 'false'}
           tabIndex={-1}
+          onContextMenu={handleStageContextMenu}
           onPointerCancel={finishPointerPan}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={finishPointerPan}
-          onWheel={handleWheel}
         >
           <div
             className="figma-direct-dom__world"

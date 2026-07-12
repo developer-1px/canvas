@@ -13,6 +13,20 @@ import {
   type Point,
   type Viewport,
 } from '../core'
+import {
+  createCanvasAffordanceConfig,
+  getCanvasWheelViewport,
+} from '../engine'
+import {
+  bindCanvasNativeGestureBoundary,
+  CANVAS_NATIVE_GESTURE_BOUNDARY_SELECTOR,
+  getCanvasNativeKeyboardZoomIntent,
+  isCanvasNativeWheelPassthroughTarget,
+} from '../browser-runtime/CanvasNativeGestureBoundary'
+import {
+  bindCanvasPointerPinchGesture,
+  type CanvasPointerPinchChange,
+} from '../browser-runtime/CanvasPointerPinchGesture'
 import type {
   DesignDocument,
   DesignNodeId,
@@ -30,6 +44,8 @@ import type { ReactDesignDefinitionRegistry } from '../react-design-renderer'
 import {
   disposeReactDesignEditorExternalChangeHost,
 } from './ReactDesignEditorExternalChanges'
+
+const REACT_DESIGN_VIEWPORT_GESTURE_CONFIG = createCanvasAffordanceConfig()
 
 export type ReactDesignEditorViewportOptions = {
   readonly fitPadding?: number
@@ -96,6 +112,8 @@ export function useReactDesignEditorRuntime(
     runtime.editor.snapshot,
   )
   const lifetimeRef = useRef({ generation: 0, runtime })
+  const stageInputCleanupRef = useRef<() => boolean>(() => false)
+  const gestureScaleRef = useRef(1)
 
   const setViewport = useCallback((viewport: Viewport) => {
     const nextViewport = normalizeViewport(viewport, runtime.viewport)
@@ -155,6 +173,105 @@ export function useReactDesignEditorRuntime(
       y: stageRect.top + stageRect.height / 2,
     }, factor)
   }, [runtime, zoomAtClientPoint])
+  const handleStageWheel = useCallback((event: WheelEvent) => {
+    if (isCanvasNativeWheelPassthroughTarget(event.target)) {
+      return
+    }
+
+    event.preventDefault()
+
+    const stage = runtime.stage.read()
+
+    if (!stage) {
+      return
+    }
+
+    const rect = stage.getBoundingClientRect()
+    const nextViewport = getCanvasWheelViewport({
+      config: REACT_DESIGN_VIEWPORT_GESTURE_CONFIG,
+      input: {
+        ctrlKey: event.ctrlKey,
+        deltaMode: event.deltaMode,
+        deltaX: event.deltaX,
+        deltaY: event.deltaY,
+        metaKey: event.metaKey,
+        shiftKey: event.shiftKey,
+      },
+      point: {
+        x: event.clientX - rect.left,
+        y: event.clientY - rect.top,
+      },
+      viewport: runtime.viewport.read(),
+    })
+
+    if (nextViewport) {
+      setViewport(nextViewport)
+    }
+  }, [runtime, setViewport])
+  const handleViewportZoomShortcut = useCallback((event: KeyboardEvent) => {
+    const intent = getCanvasNativeKeyboardZoomIntent(event)
+
+    if (!intent) {
+      return
+    }
+
+    event.preventDefault()
+
+    if (intent === 'reset') {
+      resetViewport()
+      return
+    }
+
+    zoomAtStageCenter(intent === 'in' ? 1.2 : 1 / 1.2)
+  }, [resetViewport, zoomAtStageCenter])
+  const handleGestureStart = useCallback((event: Event) => {
+    gestureScaleRef.current = getReactDesignGestureScale(event) ?? 1
+  }, [])
+  const handleGestureChange = useCallback((event: Event) => {
+    const scale = getReactDesignGestureScale(event)
+
+    if (scale === null) {
+      return
+    }
+
+    const factor = scale / gestureScaleRef.current
+
+    gestureScaleRef.current = scale
+
+    if (!Number.isFinite(factor) || factor <= 0 || factor === 1) {
+      return
+    }
+
+    const stage = runtime.stage.read()
+
+    if (!stage) {
+      return
+    }
+
+    const rect = stage.getBoundingClientRect()
+    const gestureEvent = event as ReactDesignGestureEvent
+
+    event.preventDefault()
+    zoomAtClientPoint({
+      x: gestureEvent.clientX ?? rect.left + rect.width / 2,
+      y: gestureEvent.clientY ?? rect.top + rect.height / 2,
+    }, factor)
+  }, [runtime, zoomAtClientPoint])
+  const handleGestureEnd = useCallback(() => {
+    gestureScaleRef.current = 1
+  }, [])
+  const handlePointerPinch = useCallback((change: CanvasPointerPinchChange) => {
+    if (change.deltaX !== 0 || change.deltaY !== 0) {
+      panBy({ x: change.deltaX, y: change.deltaY })
+    }
+
+    if (change.scale !== 1) {
+      zoomAtClientPoint({
+        x: change.clientX,
+        y: change.clientY,
+      }, change.scale)
+    }
+  }, [panBy, zoomAtClientPoint])
   const fitNodeIds = useCallback((nodeIds: readonly DesignNodeId[]) => {
     const stage = runtime.stage.read()
     const bounds = getMeasuredBounds(runtime.projection, nodeIds)
@@ -189,8 +306,64 @@ export function useReactDesignEditorRuntime(
     return true
   }, [runtime, setViewport])
   const attachStage = useCallback((element: HTMLElement | null) => {
+    const currentElement = runtime.stage.read()
+
+    if (currentElement === element) {
+      return
+    }
+
+    stageInputCleanupRef.current()
     runtime.stage.write(element)
-  }, [runtime])
+
+    if (!element) {
+      stageInputCleanupRef.current = () => false
+      return
+    }
+
+    const nativeGestureBoundary = element.closest(
+      CANVAS_NATIVE_GESTURE_BOUNDARY_SELECTOR,
+    ) ?? element.parentElement ?? element
+    const cleanupNativeGestureBoundary = bindCanvasNativeGestureBoundary(
+      nativeGestureBoundary,
+    )
+    const cleanupPointerPinch = bindCanvasPointerPinchGesture(
+      element,
+      handlePointerPinch,
+    )
+
+    element.addEventListener('wheel', handleStageWheel, { passive: false })
+    element.addEventListener('gesturestart', handleGestureStart)
+    element.addEventListener('gesturechange', handleGestureChange)
+    element.addEventListener('gestureend', handleGestureEnd)
+    nativeGestureBoundary.addEventListener(
+      'keydown',
+      handleViewportZoomShortcut as EventListener,
+      { capture: true },
+    )
+    stageInputCleanupRef.current = () => {
+      element.removeEventListener('wheel', handleStageWheel)
+      element.removeEventListener('gesturestart', handleGestureStart)
+      element.removeEventListener('gesturechange', handleGestureChange)
+      element.removeEventListener('gestureend', handleGestureEnd)
+      nativeGestureBoundary.removeEventListener(
+        'keydown',
+        handleViewportZoomShortcut as EventListener,
+        { capture: true },
+      )
+      const didCleanupPointerPinch = cleanupPointerPinch()
+      const didCleanupNativeGestureBoundary = cleanupNativeGestureBoundary()
+
+      return didCleanupPointerPinch || didCleanupNativeGestureBoundary
+    }
+  }, [
+    handleGestureChange,
+    handleGestureEnd,
+    handleGestureStart,
+    handlePointerPinch,
+    handleStageWheel,
+    handleViewportZoomShortcut,
+    runtime,
+  ])
 
   useEffect(() => {
     runtime.projection.refresh()
@@ -238,6 +411,20 @@ export function useReactDesignEditorRuntime(
       zoomAtStageCenter,
     },
   }
+}
+
+type ReactDesignGestureEvent = Event & {
+  readonly clientX?: number
+  readonly clientY?: number
+  readonly scale?: number
+}
+
+function getReactDesignGestureScale(event: Event) {
+  const scale = (event as ReactDesignGestureEvent).scale
+
+  return typeof scale === 'number' && Number.isFinite(scale) && scale > 0
+    ? scale
+    : null
 }
 
 function createRuntimeState({

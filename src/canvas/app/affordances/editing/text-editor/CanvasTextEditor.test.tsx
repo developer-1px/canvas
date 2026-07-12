@@ -7,6 +7,12 @@ import { describe, expect, it, vi } from 'vitest'
 import { CanvasTextEditor } from './CanvasTextEditor'
 
 describe('CanvasTextEditor', () => {
+  it('preserves native textarea wheel scrolling while editing', () => {
+    const editor = renderTextEditor({ onCommit: vi.fn() })
+
+    expect(editor.props['data-canvas-wheel-passthrough']).toBe('true')
+  })
+
   it('lets modified Enter bubble to global quick-create shortcuts', () => {
     const onCommit = vi.fn()
     const preventDefault = vi.fn()
@@ -120,6 +126,7 @@ function renderTextEditor({
   }
 
   return rendered as ReactElement<{
+    'data-canvas-wheel-passthrough': string
     onBlur: () => void
     onKeyDown: (event: {
       ctrlKey: boolean

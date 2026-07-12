@@ -209,7 +209,11 @@ export function CanvasAppView({
   const hasBottomRightZone = surfaces['canvas-status']
 
   return (
-    <main className="canvas-app" onContextMenuCapture={openContextMenu}>
+    <main
+      className="canvas-app"
+      data-canvas-native-gesture-boundary
+      onContextMenuCapture={openContextMenu}
+    >
       {stage}
 
       {hasTopLeftZone ? (

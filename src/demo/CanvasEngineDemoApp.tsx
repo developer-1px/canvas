@@ -203,7 +203,11 @@ function CanvasEngineDemoSurface({
   }
 
   return (
-    <main className="engine-demo-app" data-theme={theme}>
+    <main
+      className="engine-demo-app"
+      data-canvas-native-gesture-boundary
+      data-theme={theme}
+    >
       <section
         className="engine-demo-workspace"
         aria-label="Canvas"

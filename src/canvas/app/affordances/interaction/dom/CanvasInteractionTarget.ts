@@ -1,3 +1,8 @@
+import {
+  CANVAS_WHEEL_PASSTHROUGH_SELECTOR,
+  isCanvasNativeWheelPassthroughTarget,
+} from '../../../../browser-runtime/CanvasNativeGestureBoundary'
+
 export const CANVAS_CONTROL_TARGET_SELECTOR = [
   'a',
   'button',
@@ -11,8 +16,7 @@ export const CANVAS_CONTROL_TARGET_SELECTOR = [
   '[role="tab"]',
 ].join(',')
 
-export const CANVAS_WHEEL_PASSTHROUGH_SELECTOR =
-  '[data-canvas-wheel-passthrough="true"]'
+export { CANVAS_WHEEL_PASSTHROUGH_SELECTOR }
 
 export type CanvasInteractionTargetSelectorInput = {
   selectors: readonly string[] | string
@@ -56,10 +60,7 @@ export function isCanvasControlTarget({
 }
 
 export function isCanvasWheelPassthroughTarget(target: EventTarget | null) {
-  return isCanvasTargetWithinSelector({
-    selectors: CANVAS_WHEEL_PASSTHROUGH_SELECTOR,
-    target,
-  })
+  return isCanvasNativeWheelPassthroughTarget(target)
 }
 
 function getCanvasInteractionTargetElement(target: EventTarget | null) {

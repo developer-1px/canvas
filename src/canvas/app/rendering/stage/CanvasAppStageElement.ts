@@ -10,6 +10,16 @@ import type {
   Viewport,
 } from '../../../entities'
 import {
+  bindCanvasNativeGestureBoundary,
+  CANVAS_NATIVE_GESTURE_BOUNDARY_SELECTOR,
+  type CanvasNativeGestureTarget,
+} from '../../../browser-runtime/CanvasNativeGestureBoundary'
+import {
+  bindCanvasPointerPinchGesture,
+  type CanvasPointerPinchChange,
+  type CanvasPointerPinchTarget,
+} from '../../../browser-runtime/CanvasPointerPinchGesture'
+import {
   isCanvasWheelPassthroughTarget,
 } from '../../affordances/interaction/dom/CanvasInteractionTarget'
 
@@ -41,36 +51,14 @@ export type CanvasAppStageWheelHandler = (
   rect: CanvasAppStageRect,
 ) => void
 
-type CanvasAppStageDomElement = {
-  addEventListener: (
-    type: 'wheel',
-    listener: (event: globalThis.WheelEvent) => void,
-    options?: AddEventListenerOptions,
-  ) => void
+type CanvasAppStageDomElement = CanvasPointerPinchTarget & {
+  closest?: (selector: string) => CanvasNativeGestureTarget | null
   contains: (target: Node | null) => boolean
   getBoundingClientRect: () => CanvasAppStageRect
   hasPointerCapture: (pointerId: number) => boolean
-  parentElement: CanvasAppStageWheelRoot | null
+  parentElement: CanvasNativeGestureTarget | null
   releasePointerCapture: (pointerId: number) => void
-  removeEventListener: (
-    type: 'wheel',
-    listener: (event: globalThis.WheelEvent) => void,
-    options?: EventListenerOptions,
-  ) => void
   setPointerCapture: (pointerId: number) => void
-}
-
-type CanvasAppStageWheelRoot = {
-  addEventListener: (
-    type: 'wheel',
-    listener: (event: globalThis.WheelEvent) => void,
-    options?: AddEventListenerOptions,
-  ) => void
-  removeEventListener: (
-    type: 'wheel',
-    listener: (event: globalThis.WheelEvent) => void,
-    options?: EventListenerOptions,
-  ) => void
 }
 
 export type CanvasAppStageElement = {
@@ -128,23 +116,137 @@ export function createCanvasAppStageElement({
       }
 
       const activeElement = element
-      const wheelRoot = activeElement.parentElement ?? activeElement
+      const wheelRoot = activeElement.closest?.(
+        CANVAS_NATIVE_GESTURE_BOUNDARY_SELECTOR,
+      ) ?? activeElement.parentElement ?? activeElement
+      const cleanupNativeGestureBoundary =
+        bindCanvasNativeGestureBoundary(wheelRoot)
+      let gestureScale = 1
 
-      function handleWheel(event: globalThis.WheelEvent) {
-        if (!isCanvasStageWheelEvent(event, activeElement)) {
+      const runPinchWheel = (
+        change: CanvasPointerPinchChange,
+        zoom: boolean,
+      ) => {
+        const rect = getStageElementRect(activeElement)
+
+        handler({
+          clientX: change.clientX,
+          clientY: change.clientY,
+          ctrlKey: zoom,
+          deltaMode: 0,
+          deltaX: zoom ? 0 : -change.deltaX,
+          deltaY: zoom ? -Math.log(change.scale) / 0.01 : -change.deltaY,
+          metaKey: false,
+          preventDefault: () => undefined,
+          shiftKey: false,
+        } as globalThis.WheelEvent, rect)
+      }
+      const cleanupPointerPinch = bindCanvasPointerPinchGesture(
+        activeElement,
+        (change) => {
+          if (change.deltaX !== 0 || change.deltaY !== 0) {
+            runPinchWheel(change, false)
+          }
+
+          if (change.scale !== 1) {
+            runPinchWheel(change, true)
+          }
+        },
+      )
+
+      function handleWheel(event: Event) {
+        const wheelEvent = event as globalThis.WheelEvent
+
+        if (!isCanvasStageWheelEvent(wheelEvent, activeElement)) {
           return
         }
 
-        handler(event, getStageElementRect(activeElement))
+        handler(wheelEvent, getStageElementRect(activeElement))
+      }
+
+      function handleGestureStart(event: Event) {
+        if (!isCanvasStageWheelEvent(
+          event as globalThis.WheelEvent,
+          activeElement,
+        )) {
+          return
+        }
+
+        gestureScale = getCanvasGestureScale(event) ?? 1
+      }
+
+      function handleGestureChange(event: Event) {
+        if (!isCanvasStageWheelEvent(
+          event as globalThis.WheelEvent,
+          activeElement,
+        )) {
+          return
+        }
+
+        const nextScale = getCanvasGestureScale(event)
+
+        if (nextScale === null) {
+          return
+        }
+
+        const factor = nextScale / gestureScale
+
+        gestureScale = nextScale
+
+        if (!Number.isFinite(factor) || factor <= 0 || factor === 1) {
+          return
+        }
+
+        const rect = getStageElementRect(activeElement)
+        const gestureEvent = event as CanvasAppGestureEvent
+
+        handler({
+          clientX: gestureEvent.clientX ?? rect.left + rect.width / 2,
+          clientY: gestureEvent.clientY ?? rect.top + rect.height / 2,
+          ctrlKey: true,
+          deltaMode: 0,
+          deltaX: 0,
+          deltaY: -Math.log(factor) / 0.01,
+          metaKey: false,
+          preventDefault: () => event.preventDefault(),
+          shiftKey: false,
+        } as globalThis.WheelEvent, rect)
+      }
+
+      function handleGestureEnd() {
+        gestureScale = 1
       }
 
       wheelRoot.addEventListener('wheel', handleWheel, {
         capture: true,
         passive: false,
       })
+      wheelRoot.addEventListener('gesturestart', handleGestureStart, {
+        capture: true,
+        passive: false,
+      })
+      wheelRoot.addEventListener('gesturechange', handleGestureChange, {
+        capture: true,
+        passive: false,
+      })
+      wheelRoot.addEventListener('gestureend', handleGestureEnd, {
+        capture: true,
+        passive: false,
+      })
 
       return () => {
         wheelRoot.removeEventListener('wheel', handleWheel, { capture: true })
+        wheelRoot.removeEventListener('gesturestart', handleGestureStart, {
+          capture: true,
+        })
+        wheelRoot.removeEventListener('gesturechange', handleGestureChange, {
+          capture: true,
+        })
+        wheelRoot.removeEventListener('gestureend', handleGestureEnd, {
+          capture: true,
+        })
+        cleanupPointerPinch()
+        cleanupNativeGestureBoundary()
       }
     },
     capturePointer: (pointerId) => {
@@ -228,6 +330,20 @@ function isCanvasStageWheelEvent(
 
   return target instanceof Element &&
     Boolean(target.closest('.canvas-viewport-overlay-layer'))
+}
+
+type CanvasAppGestureEvent = Event & {
+  readonly clientX?: number
+  readonly clientY?: number
+  readonly scale?: number
+}
+
+function getCanvasGestureScale(event: Event) {
+  const scale = (event as CanvasAppGestureEvent).scale
+
+  return typeof scale === 'number' && Number.isFinite(scale) && scale > 0
+    ? scale
+    : null
 }
 
 const CANVAS_STAGE_SNAPSHOT_PADDING = 24

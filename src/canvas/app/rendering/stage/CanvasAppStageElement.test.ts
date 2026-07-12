@@ -112,7 +112,7 @@ describe('CanvasAppStageElement', () => {
 
     const cleanup = stageElement.addWheelListener(handler)
 
-    expect(parentWheelListeners.size).toBe(1)
+    expect(parentWheelListeners.size).toBe(2)
 
     for (const listener of parentWheelListeners) {
       listener(wheelEvent)
@@ -128,6 +128,39 @@ describe('CanvasAppStageElement', () => {
     cleanup()
 
     expect(parentWheelListeners.size).toBe(0)
+  })
+
+  it('routes Safari gesture scale changes through canvas zoom input', () => {
+    const { dispatchParent, element } = createStageElementFake()
+    const stageElement = createCanvasAppStageElement({
+      getElement: () => element,
+      setElement: () => undefined,
+    })
+    const handler = vi.fn()
+    const cleanup = stageElement.addWheelListener(handler)
+    const gestureStart = createGestureEvent('gesturestart', 1)
+    const gestureChange = createGestureEvent('gesturechange', 1.2)
+
+    dispatchParent('gesturestart', gestureStart)
+    dispatchParent('gesturechange', gestureChange)
+
+    expect(gestureStart.defaultPrevented).toBe(true)
+    expect(gestureChange.defaultPrevented).toBe(true)
+    expect(handler).toHaveBeenCalledTimes(1)
+    expect(handler).toHaveBeenCalledWith(
+      expect.objectContaining({
+        ctrlKey: true,
+        deltaY: expect.any(Number),
+      }),
+      {
+        height: 100,
+        left: 8,
+        top: 12,
+        width: 160,
+      },
+    )
+
+    cleanup()
   })
 
   it('lets wheel passthrough targets keep native scroll', () => {
@@ -194,7 +227,7 @@ describe('CanvasAppStageElement', () => {
 
     currentElement = second.element
 
-    expect(first.parentWheelListeners.size).toBe(1)
+    expect(first.parentWheelListeners.size).toBe(2)
     expect(second.parentWheelListeners.size).toBe(0)
 
     cleanup()
@@ -213,35 +246,52 @@ function createStageElementFake(
   },
 ) {
   const capturedPointers = new Set<number>()
-  const wheelListeners = new Set<(event: globalThis.WheelEvent) => void>()
-  const parentWheelListeners = new Set<(event: globalThis.WheelEvent) => void>()
+  const wheelListeners = new Set<EventListener>()
+  const parentWheelListeners = new Set<EventListener>()
+  const parentListeners = new Map<string, Set<EventListener>>()
   const parentElement = {
     addEventListener: (
-      _type: 'wheel',
-      listener: (event: globalThis.WheelEvent) => void,
+      type: string,
+      listener: EventListener,
     ) => {
-      parentWheelListeners.add(listener)
+      const listeners = parentListeners.get(type) ?? new Set<EventListener>()
+
+      listeners.add(listener)
+      parentListeners.set(type, listeners)
+
+      if (type === 'wheel') {
+        parentWheelListeners.add(listener)
+      }
     },
     removeEventListener: (
-      _type: 'wheel',
-      listener: (event: globalThis.WheelEvent) => void,
+      type: string,
+      listener: EventListener,
     ) => {
-      parentWheelListeners.delete(listener)
+      parentListeners.get(type)?.delete(listener)
+
+      if (type === 'wheel') {
+        parentWheelListeners.delete(listener)
+      }
     },
   }
   const element: CanvasAppStageDomElement = {
-    addEventListener: (_type, listener) => {
-      wheelListeners.add(listener)
+    addEventListener: (type, listener) => {
+      if (type === 'wheel') {
+        wheelListeners.add(listener)
+      }
     },
     contains: () => true,
+    dispatchEvent: () => true,
     getBoundingClientRect: () => rect,
     hasPointerCapture: (pointerId) => capturedPointers.has(pointerId),
     parentElement,
     releasePointerCapture: (pointerId) => {
       capturedPointers.delete(pointerId)
     },
-    removeEventListener: (_type, listener) => {
-      wheelListeners.delete(listener)
+    removeEventListener: (type, listener) => {
+      if (type === 'wheel') {
+        wheelListeners.delete(listener)
+      }
     },
     setPointerCapture: (pointerId) => {
       capturedPointers.add(pointerId)
@@ -250,8 +300,25 @@ function createStageElementFake(
 
   return {
     capturedPointers,
+    dispatchParent(type: string, event: Event) {
+      for (const listener of parentListeners.get(type) ?? []) {
+        listener(event)
+      }
+    },
     element,
     parentWheelListeners,
     wheelListeners,
   }
+}
+
+function createGestureEvent(type: string, scale: number) {
+  const event = new Event(type, { bubbles: true, cancelable: true })
+
+  Object.defineProperties(event, {
+    clientX: { value: 88 },
+    clientY: { value: 62 },
+    scale: { value: scale },
+  })
+
+  return event
 }

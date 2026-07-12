@@ -201,6 +201,168 @@ describe('ReactDesignEditorRuntime', () => {
     await act(async () => root.unmount())
   })
 
+  it('owns non-passive stage wheel pan and zoom for native canvas input', async () => {
+    stubResizeObserver()
+    const container = document.createElement('div')
+    document.body.append(container)
+    const root = createRoot(container)
+    let runtime: ReactDesignEditorRuntime | null = null
+
+    function RuntimeHarness() {
+      const current = useReactDesignEditorRuntime({
+        createDocument: createRuntimeDocument,
+        createRegistry: createRuntimeRegistry,
+        viewport: {
+          initial: { scale: 1, x: 20, y: 30 },
+        },
+      })
+
+      runtime = current
+
+      return <div ref={current.stage.attach} data-runtime-stage />
+    }
+
+    await act(async () => root.render(<RuntimeHarness />))
+
+    const stage = container.querySelector<HTMLElement>('[data-runtime-stage]')
+
+    expect(stage).not.toBeNull()
+    stage!.getBoundingClientRect = () => createDomRect({
+      height: 400,
+      left: 0,
+      top: 0,
+      width: 600,
+    })
+    const passthrough = document.createElement('textarea')
+
+    passthrough.dataset.canvasWheelPassthrough = 'true'
+    stage!.append(passthrough)
+
+    const viewportBeforePassthrough = runtime!.viewport.read()
+
+    expect(passthrough.dispatchEvent(new WheelEvent('wheel', {
+      bubbles: true,
+      cancelable: true,
+      deltaY: 12,
+    }))).toBe(true)
+    expect(runtime!.viewport.read()).toBe(viewportBeforePassthrough)
+
+    let didCancelPan = false
+
+    await act(async () => {
+      didCancelPan = !stage!.dispatchEvent(new WheelEvent('wheel', {
+        bubbles: true,
+        cancelable: true,
+        deltaX: 8,
+        deltaY: 12,
+      }))
+    })
+
+    expect(didCancelPan).toBe(true)
+    expect(runtime!.viewport.value).toEqual({ scale: 1, x: 12, y: 18 })
+
+    let didCancelZoom = false
+
+    await act(async () => {
+      didCancelZoom = !stage!.dispatchEvent(new WheelEvent('wheel', {
+        bubbles: true,
+        cancelable: true,
+        clientX: 300,
+        clientY: 200,
+        ctrlKey: true,
+        deltaY: -80,
+      }))
+    })
+
+    expect(didCancelZoom).toBe(true)
+    expect(runtime!.viewport.value.scale).toBeGreaterThan(1)
+
+    const scaleBeforeKeyboardZoom = runtime!.viewport.value.scale
+    let didCancelKeyboardZoom = false
+
+    await act(async () => {
+      didCancelKeyboardZoom = !stage!.dispatchEvent(new KeyboardEvent(
+        'keydown',
+        {
+          bubbles: true,
+          cancelable: true,
+          ctrlKey: true,
+          key: '=',
+        },
+      ))
+    })
+
+    expect(didCancelKeyboardZoom).toBe(true)
+    expect(runtime!.viewport.value.scale).toBeGreaterThan(
+      scaleBeforeKeyboardZoom,
+    )
+
+    const scaleBeforeGestureZoom = runtime!.viewport.value.scale
+
+    await act(async () => {
+      stage!.dispatchEvent(createGestureEvent('gesturestart', 1))
+      stage!.dispatchEvent(createGestureEvent('gesturechange', 1.15))
+      stage!.dispatchEvent(createGestureEvent('gestureend', 1.15))
+    })
+
+    expect(runtime!.viewport.value.scale).toBeGreaterThan(
+      scaleBeforeGestureZoom,
+    )
+
+    const scaleBeforePointerPinch = runtime!.viewport.value.scale
+
+    await act(async () => {
+      stage!.dispatchEvent(createTouchPointerEvent(
+        'pointerdown',
+        1,
+        220,
+        200,
+      ))
+      stage!.dispatchEvent(createTouchPointerEvent(
+        'pointerdown',
+        2,
+        380,
+        200,
+      ))
+      stage!.dispatchEvent(createTouchPointerEvent(
+        'pointermove',
+        1,
+        180,
+        200,
+      ))
+      stage!.dispatchEvent(createTouchPointerEvent(
+        'pointermove',
+        2,
+        420,
+        200,
+      ))
+      stage!.dispatchEvent(createTouchPointerEvent(
+        'pointerup',
+        1,
+        180,
+        200,
+      ))
+      stage!.dispatchEvent(createTouchPointerEvent(
+        'pointerup',
+        2,
+        420,
+        200,
+      ))
+    })
+
+    expect(runtime!.viewport.value.scale).toBeGreaterThan(
+      scaleBeforePointerPinch,
+    )
+
+    await act(async () => root.unmount())
+
+    expect(stage!.dispatchEvent(new WheelEvent('wheel', {
+      bubbles: true,
+      cancelable: true,
+      deltaY: 12,
+    }))).toBe(true)
+  })
+
   it('survives the StrictMode effect replay and disposes after the real unmount', async () => {
     stubResizeObserver()
     const container = document.createElement('div')
@@ -720,6 +882,36 @@ function createRuntimeRegistry() {
   return createReactDesignDefinitionRegistry({
     intrinsics: ['section'],
   })
+}
+
+function createGestureEvent(type: string, scale: number) {
+  const event = new Event(type, { bubbles: true, cancelable: true })
+
+  Object.defineProperties(event, {
+    clientX: { value: 300 },
+    clientY: { value: 200 },
+    scale: { value: scale },
+  })
+
+  return event
+}
+
+function createTouchPointerEvent(
+  type: string,
+  pointerId: number,
+  clientX: number,
+  clientY: number,
+) {
+  const event = new Event(type, { bubbles: true, cancelable: true })
+
+  Object.defineProperties(event, {
+    clientX: { value: clientX },
+    clientY: { value: clientY },
+    pointerId: { value: pointerId },
+    pointerType: { value: 'touch' },
+  })
+
+  return event
 }
 
 function stubResizeObserver() {

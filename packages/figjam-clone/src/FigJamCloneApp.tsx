@@ -29,7 +29,6 @@ import {
   type KeyboardEvent as ReactKeyboardEvent,
   type MouseEvent as ReactMouseEvent,
   type PointerEvent as ReactPointerEvent,
-  type WheelEvent as ReactWheelEvent,
 } from 'react'
 import {
   ReactDesignEditorRenderer,
@@ -1052,18 +1051,10 @@ export function FigJamCloneApp() {
     }
   }
 
-  const handleWheel = (event: ReactWheelEvent<HTMLElement>) => {
-    event.preventDefault()
-
-    if (!event.ctrlKey && !event.metaKey) {
-      viewportRuntime.panBy({ x: -event.deltaX, y: -event.deltaY })
-      return
+  const handleStageContextMenu = (event: ReactMouseEvent<HTMLElement>) => {
+    if (!isFigJamControlTarget(event.target)) {
+      event.preventDefault()
     }
-
-    viewportRuntime.zoomAtClientPoint(
-      { x: event.clientX, y: event.clientY },
-      Math.exp(-event.deltaY * 0.002),
-    )
   }
 
   const handleDragOver = (event: ReactDragEvent<HTMLElement>) => {
@@ -1333,6 +1324,7 @@ export function FigJamCloneApp() {
   return (
     <main
       className="engine-demo-app figjam-react-app"
+      data-canvas-native-gesture-boundary
       data-document-node-count={designDocument.snapshot.nodes.length}
       data-editor-revision={snapshot.revision}
       data-history-can-redo={snapshot.history.canRedo}
@@ -1355,6 +1347,7 @@ export function FigJamCloneApp() {
           data-mode={canvasPanActive ? 'pan' : tool}
           tabIndex={0}
           onClickCapture={handleStageClickCapture}
+          onContextMenu={handleStageContextMenu}
           onDoubleClick={handleDoubleClick}
           onDragOver={handleDragOver}
           onDrop={handleDrop}
@@ -1362,7 +1355,6 @@ export function FigJamCloneApp() {
           onPointerDown={handleStagePointerDown}
           onPointerMove={handleStagePointerMove}
           onPointerUp={finishStagePointer}
-          onWheel={handleWheel}
         >
           <div
             className="figjam-react-world"

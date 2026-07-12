@@ -247,6 +247,7 @@ export function CanvasContentEditableText({
         ? `${className} canvas-content-editable-text-active`
         : className}
       contentEditable={active ? 'plaintext-only' : undefined}
+      data-canvas-wheel-passthrough={active ? 'true' : undefined}
       data-editing={active ? 'true' : undefined}
       data-text-item-id={id}
       role={active ? 'textbox' : undefined}
