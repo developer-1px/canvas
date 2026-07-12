@@ -2,10 +2,6 @@ packages:
   - .
   - packages/*
   - ../apg-patterns/packages/interaction
-  - ../json-document/packages/json-document
-  - ../json-document/packages/patch-preview
-  - ../json-document/packages/search-replace
-  - ../json-document/packages/grouping
   - ../object-surface/packages/object-surface
   - ../preview-surface/packages/preview-surface
 
