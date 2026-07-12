@@ -27,6 +27,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
 
+      - name: Verify json-document registry contract
+        run: >-
+          pnpm exec vitest run src/canvas/host/document
+          src/canvas/architecture/CanvasPackageManifest.test.ts
+
       - name: Install Playwright
         run: pnpm exec playwright install --with-deps chromium
 
