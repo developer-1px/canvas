@@ -1,5 +1,6 @@
 export {
   createDesignDocument,
+  getDesignDocumentPatchPort,
   restoreDesignDocument,
 } from '../design-document'
 export type {
@@ -8,6 +9,9 @@ export type {
   DesignDocumentCommand,
   DesignDocumentCommandResult,
   DesignDocumentHistoryStatus,
+  DesignDocumentPatchPort,
+  DesignDocumentPublication,
+  DesignDocumentPublicationOwnership,
   DesignDocumentRead,
   DesignDocumentSnapshot,
   DesignJSONValue,

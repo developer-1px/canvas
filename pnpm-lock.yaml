@@ -4,6 +4,10 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+overrides:
+  '@interactive-os/json-document-patch-rebase': file:vendor/json-document-218aa475/interactive-os-json-document-patch-rebase-0.1.0.tgz
+  '@interactive-os/json-document-stable-id-rebase': file:vendor/json-document-218aa475/interactive-os-json-document-stable-id-rebase-0.1.0.tgz
+
 importers:
 
   .:
@@ -63,6 +67,12 @@ importers:
       '@interactive-os/figjam-pack':
         specifier: workspace:*
         version: link:packages/figjam-pack
+      '@interactive-os/json-document-causal-patch-inbox':
+        specifier: file:vendor/json-document-218aa475/interactive-os-json-document-causal-patch-inbox-0.1.0.tgz
+        version: file:vendor/json-document-218aa475/interactive-os-json-document-causal-patch-inbox-0.1.0.tgz(@interactive-os/json-document-id-resolver@file:vendor/json-document-218aa475/interactive-os-json-document-id-resolver-0.1.0.tgz(@interactive-os/json-document@1.1.0-rc.0(react@19.2.6)(zod@4.4.3)))(@interactive-os/json-document@1.1.0-rc.0(react@19.2.6)(zod@4.4.3))
+      '@interactive-os/json-document-id-resolver':
+        specifier: file:vendor/json-document-218aa475/interactive-os-json-document-id-resolver-0.1.0.tgz
+        version: file:vendor/json-document-218aa475/interactive-os-json-document-id-resolver-0.1.0.tgz(@interactive-os/json-document@1.1.0-rc.0(react@19.2.6)(zod@4.4.3))
       '@playwright/test':
         specifier: ^1.60.0
         version: 1.60.0
@@ -624,20 +634,45 @@ packages:
     resolution: {integrity: sha512-bV0Tgo9K4hfPCek+aMAn81RppFKv2ySDQeMoSZuvTASywNTnVJCArCZE2FWqpvIatKu7VMRLWlR1EazvVhDyhQ==}
     engines: {node: '>=18.18'}
 
+  '@interactive-os/json-document-causal-patch-inbox@file:vendor/json-document-218aa475/interactive-os-json-document-causal-patch-inbox-0.1.0.tgz':
+    resolution: {integrity: sha512-wCJ9KyWQGOobmU8Ox75UyuJCOZAMU1PBSt0fe4BlcJetCNadICf39ZRAXJzmiOov9cjxY4m4mul4qo1r1gAJqw==, tarball: file:vendor/json-document-218aa475/interactive-os-json-document-causal-patch-inbox-0.1.0.tgz}
+    version: 0.1.0
+    peerDependencies:
+      '@interactive-os/json-document': ^1.0.0
+
   '@interactive-os/json-document-grouping@0.1.1-rc.1':
     resolution: {integrity: sha512-QBgSmuKAbeOD3b0TgWvtNYkFXblnpCaDcLJHICHbJfZYYPM5d4nxpr5mb6YcG38ZGR4TFlZFKqyCa684wXXHwg==}
     peerDependencies:
       '@interactive-os/json-document': ^1.0.1 || ^1.1.0-rc.0
+
+  '@interactive-os/json-document-id-resolver@file:vendor/json-document-218aa475/interactive-os-json-document-id-resolver-0.1.0.tgz':
+    resolution: {integrity: sha512-dKQ9kj2hj0SyyxN1aV5bThqfopNX9YGBMVkjPh42GlnJgGI0tj1qetlgjj6cGHSAWw8RwR5mtBOBVTAfMYQhQA==, tarball: file:vendor/json-document-218aa475/interactive-os-json-document-id-resolver-0.1.0.tgz}
+    version: 0.1.0
+    peerDependencies:
+      '@interactive-os/json-document': ^1.0.0
 
   '@interactive-os/json-document-patch-preview@0.1.1-rc.1':
     resolution: {integrity: sha512-c1rbUf4mLXRzIhE4trJNOcUOzMlZK4UorDqz5FDeSPfcDxqEQiWXKg/NxqNVcJLycb5cRKVl1cdeAyyJhGyFzA==}
     peerDependencies:
       '@interactive-os/json-document': ^1.0.1 || ^1.1.0-rc.0
 
+  '@interactive-os/json-document-patch-rebase@file:vendor/json-document-218aa475/interactive-os-json-document-patch-rebase-0.1.0.tgz':
+    resolution: {integrity: sha512-6ZZXG/6tB4DZns11lEo5yIkMVnS4m/+SVcb9tHBKCNWbTHP9zX8x9ahlrSL6kzfoEbcFXNzJPj73+tqzPZbY2Q==, tarball: file:vendor/json-document-218aa475/interactive-os-json-document-patch-rebase-0.1.0.tgz}
+    version: 0.1.0
+    peerDependencies:
+      '@interactive-os/json-document': ^1.0.0
+
   '@interactive-os/json-document-search-replace@0.1.1-rc.1':
     resolution: {integrity: sha512-tdq7zNLr0WyZGKedUO+eqJNJXSAIcCsDbnjs6ITzIanDq3IY+iOoRFq0yggIctdC/C7y941r69STjinoTHkDag==}
     peerDependencies:
       '@interactive-os/json-document': ^1.0.1 || ^1.1.0-rc.0
+
+  '@interactive-os/json-document-stable-id-rebase@file:vendor/json-document-218aa475/interactive-os-json-document-stable-id-rebase-0.1.0.tgz':
+    resolution: {integrity: sha512-ChCf+Mf/wzC5NHV3uk1RwNgGa/YbLlyD2S/mOfjyyGRw5vLRvV3jCA1qutO8jVlU6bKpKXsv/+3ei2ZZLTzQAQ==, tarball: file:vendor/json-document-218aa475/interactive-os-json-document-stable-id-rebase-0.1.0.tgz}
+    version: 0.1.0
+    peerDependencies:
+      '@interactive-os/json-document': ^1.0.0
+      '@interactive-os/json-document-id-resolver': ^0.1.0
 
   '@interactive-os/json-document@1.1.0-rc.0':
     resolution: {integrity: sha512-gC88ujdx95iCQWQBzkcNHRL76pGmNbjgVX5tSyawok+HKYfIp8b2pIQWEJNKm1kERARwX2CQLDo+fg6MgFVPFg==}
@@ -2484,7 +2519,19 @@ snapshots:
 
   '@humanwhocodes/retry@0.4.3': {}
 
+  '@interactive-os/json-document-causal-patch-inbox@file:vendor/json-document-218aa475/interactive-os-json-document-causal-patch-inbox-0.1.0.tgz(@interactive-os/json-document-id-resolver@file:vendor/json-document-218aa475/interactive-os-json-document-id-resolver-0.1.0.tgz(@interactive-os/json-document@1.1.0-rc.0(react@19.2.6)(zod@4.4.3)))(@interactive-os/json-document@1.1.0-rc.0(react@19.2.6)(zod@4.4.3))':
+    dependencies:
+      '@interactive-os/json-document': 1.1.0-rc.0(react@19.2.6)(zod@4.4.3)
+      '@interactive-os/json-document-patch-rebase': file:vendor/json-document-218aa475/interactive-os-json-document-patch-rebase-0.1.0.tgz(@interactive-os/json-document@1.1.0-rc.0(react@19.2.6)(zod@4.4.3))
+      '@interactive-os/json-document-stable-id-rebase': file:vendor/json-document-218aa475/interactive-os-json-document-stable-id-rebase-0.1.0.tgz(@interactive-os/json-document-id-resolver@file:vendor/json-document-218aa475/interactive-os-json-document-id-resolver-0.1.0.tgz(@interactive-os/json-document@1.1.0-rc.0(react@19.2.6)(zod@4.4.3)))(@interactive-os/json-document@1.1.0-rc.0(react@19.2.6)(zod@4.4.3))
+    transitivePeerDependencies:
+      - '@interactive-os/json-document-id-resolver'
+
   '@interactive-os/json-document-grouping@0.1.1-rc.1(@interactive-os/json-document@1.1.0-rc.0(react@19.2.6)(zod@4.4.3))':
+    dependencies:
+      '@interactive-os/json-document': 1.1.0-rc.0(react@19.2.6)(zod@4.4.3)
+
+  '@interactive-os/json-document-id-resolver@file:vendor/json-document-218aa475/interactive-os-json-document-id-resolver-0.1.0.tgz(@interactive-os/json-document@1.1.0-rc.0(react@19.2.6)(zod@4.4.3))':
     dependencies:
       '@interactive-os/json-document': 1.1.0-rc.0(react@19.2.6)(zod@4.4.3)
 
@@ -2492,9 +2539,18 @@ snapshots:
     dependencies:
       '@interactive-os/json-document': 1.1.0-rc.0(react@19.2.6)(zod@4.4.3)
 
+  '@interactive-os/json-document-patch-rebase@file:vendor/json-document-218aa475/interactive-os-json-document-patch-rebase-0.1.0.tgz(@interactive-os/json-document@1.1.0-rc.0(react@19.2.6)(zod@4.4.3))':
+    dependencies:
+      '@interactive-os/json-document': 1.1.0-rc.0(react@19.2.6)(zod@4.4.3)
+
   '@interactive-os/json-document-search-replace@0.1.1-rc.1(@interactive-os/json-document@1.1.0-rc.0(react@19.2.6)(zod@4.4.3))':
     dependencies:
       '@interactive-os/json-document': 1.1.0-rc.0(react@19.2.6)(zod@4.4.3)
+
+  '@interactive-os/json-document-stable-id-rebase@file:vendor/json-document-218aa475/interactive-os-json-document-stable-id-rebase-0.1.0.tgz(@interactive-os/json-document-id-resolver@file:vendor/json-document-218aa475/interactive-os-json-document-id-resolver-0.1.0.tgz(@interactive-os/json-document@1.1.0-rc.0(react@19.2.6)(zod@4.4.3)))(@interactive-os/json-document@1.1.0-rc.0(react@19.2.6)(zod@4.4.3))':
+    dependencies:
+      '@interactive-os/json-document': 1.1.0-rc.0(react@19.2.6)(zod@4.4.3)
+      '@interactive-os/json-document-id-resolver': file:vendor/json-document-218aa475/interactive-os-json-document-id-resolver-0.1.0.tgz(@interactive-os/json-document@1.1.0-rc.0(react@19.2.6)(zod@4.4.3))
 
   '@interactive-os/json-document@1.1.0-rc.0(react@19.2.6)(zod@4.4.3)':
     dependencies:

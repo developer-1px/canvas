@@ -2,6 +2,12 @@ export {
   createDesignDocument,
   restoreDesignDocument,
 } from './DesignDocument'
+export {
+  getDesignDocumentPatchPort,
+  type DesignDocumentPatchPort,
+  type DesignDocumentPublication,
+  type DesignDocumentPublicationOwnership,
+} from './DesignDocumentPatchPort'
 export type {
   DesignDocument,
   DesignDocumentChange,

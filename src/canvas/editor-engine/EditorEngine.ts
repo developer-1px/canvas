@@ -10,7 +10,14 @@ import type {
   DesignNodeId,
   DesignNodeUpdateValues,
 } from '../design-document'
+import {
+  tryGetDesignDocumentPublicationCoordinator,
+} from '../design-document/DesignDocumentPatchPort'
 import type { DomProjection } from '../dom-projection'
+import {
+  registerEditorEngineDocumentHost,
+  type EditorEngineDocumentHost,
+} from './EditorEngineDocumentHost'
 
 type EditorEngineNumericLayoutField =
   | 'gap'
@@ -173,6 +180,8 @@ export function createEditorEngine({
   let observedDocumentSnapshot = document.snapshot
   let mutatingDocument = false
   let documentChangedDuringMutation = false
+  let runningReadyDocumentChange = false
+  const documentPublications = tryGetDesignDocumentPublicationCoordinator(document)
 
   const read: DesignDocumentRead = {
     ancestry: (nodeId) => readSynchronized(() =>
@@ -610,8 +619,12 @@ export function createEditorEngine({
     activePreview = null
     mutatingDocument = true
     documentChangedDuringMutation = false
-    const restored = direction === 'undo' ? document.undo() : document.redo()
-    mutatingDocument = false
+    let restored: boolean
+    try {
+      restored = direction === 'undo' ? document.undo() : document.redo()
+    } finally {
+      mutatingDocument = false
+    }
 
     if (!restored) {
       documentChangedDuringMutation = false
@@ -751,8 +764,12 @@ export function createEditorEngine({
   ): EditorEngineCommandResult {
     mutatingDocument = true
     documentChangedDuringMutation = false
-    const result = document.execute(command)
-    mutatingDocument = false
+    let result: ReturnType<DesignDocument['execute']>
+    try {
+      result = document.execute(command)
+    } finally {
+      mutatingDocument = false
+    }
 
     if (!result.ok) {
       documentChangedDuringMutation = false
@@ -767,7 +784,67 @@ export function createEditorEngine({
     return result
   }
 
-  return {
+  const documentHost: EditorEngineDocumentHost | null = documentPublications
+    ? {
+        ownsPublication: () => documentPublications.ownsPublication(),
+        runReady(request) {
+          if (disposed) {
+            throw new Error('EditorEngine is disposed')
+          }
+
+          if (runningReadyDocumentChange) {
+            return {
+              code: 'host_not_ready',
+              ok: false,
+              reason: 'The editor is already publishing a document change',
+            }
+          }
+
+          runningReadyDocumentChange = true
+          const previewOwnedOnEntry = activePreview !== null
+          try {
+            synchronizeUnobservedDocument()
+
+            if (disposed) {
+              throw new Error('EditorEngine is disposed')
+            }
+
+            if (
+              previewOwnedOnEntry ||
+              activePreview !== null ||
+              mutatingDocument ||
+              documentPublications.isPublishing()
+            ) {
+              return {
+                code: 'host_not_ready',
+                ok: false,
+                reason: previewOwnedOnEntry || activePreview !== null
+                  ? 'The editor preview must commit or cancel before applying a document change'
+                  : 'The editor is already publishing a document change',
+              }
+            }
+
+            request.apply()
+
+            if (disposed) {
+              throw new Error('EditorEngine is disposed')
+            }
+
+            synchronizeUnobservedDocument()
+
+            if (disposed) {
+              throw new Error('EditorEngine is disposed')
+            }
+
+            return { ok: true }
+          } finally {
+            runningReadyDocumentChange = false
+          }
+        },
+      }
+    : null
+
+  const engine: EditorEngine = {
     commands: {
       beginPreview,
       can: canExecute,
@@ -808,6 +885,11 @@ export function createEditorEngine({
       }
     },
   }
+
+  if (documentHost) {
+    registerEditorEngineDocumentHost(engine, documentHost)
+  }
+  return engine
 }
 
 function normalizeFrameEditValues(
