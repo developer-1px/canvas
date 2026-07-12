@@ -39,6 +39,12 @@ const sourceModules = import.meta.glob('../**/index.ts', {
   query: '?raw',
 }) as Record<string, string>
 
+const canvasModules = import.meta.glob('../**/*.{ts,tsx}', {
+  eager: true,
+  import: 'default',
+  query: '?raw',
+}) as Record<string, string>
+
 const packageJson = JSON.parse(
   packageModules['../../../package.json'],
 ) as CanvasPackageJson
@@ -49,6 +55,12 @@ const jsonDocumentReleaseDependencies = {
   '@interactive-os/json-document-patch-preview': '0.1.1-rc.1',
   '@interactive-os/json-document-search-replace': '0.1.1-rc.1',
 }
+const unreleasedJsonDocumentPackages = [
+  '@interactive-os/json-document-causal-patch-inbox',
+  '@interactive-os/json-document-id-resolver',
+  '@interactive-os/json-document-patch-rebase',
+  '@interactive-os/json-document-stable-id-rebase',
+]
 const publishedRuntimeDependencies = [
   '@interactive-os/interaction',
   '@interactive-os/json-document',
@@ -155,6 +167,24 @@ describe('Canvas package manifest', () => {
     expect(packageJson.dependencies).toEqual(
       expect.objectContaining(jsonDocumentReleaseDependencies),
     )
+  })
+
+  it('keeps unreleased JSON document tracers out of production package code', () => {
+    for (const packageName of unreleasedJsonDocumentPackages) {
+      expect(packageJson.dependencies).not.toHaveProperty(packageName)
+    }
+
+    const productionSources = Object.entries(canvasModules)
+      .filter(([path]) => !path.includes('.test.'))
+
+    for (const [path, source] of productionSources) {
+      for (const packageName of unreleasedJsonDocumentPackages) {
+        expect(source, `${path} imports ${packageName}`)
+          .not.toContain(`from '${packageName}'`)
+        expect(source, `${path} imports ${packageName}`)
+          .not.toContain(`from "${packageName}"`)
+      }
+    }
   })
 })
 

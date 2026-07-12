@@ -112,6 +112,8 @@
     "@interactive-os/dom-edit-affordance": "workspace:*",
     "@interactive-os/figjam-clone": "workspace:*",
     "@interactive-os/figjam-pack": "workspace:*",
+    "@interactive-os/json-document-causal-patch-inbox": "file:vendor/json-document-218aa475/interactive-os-json-document-causal-patch-inbox-0.1.0.tgz",
+    "@interactive-os/json-document-id-resolver": "file:vendor/json-document-218aa475/interactive-os-json-document-id-resolver-0.1.0.tgz",
     "@playwright/test": "^1.60.0",
     "@types/node": "^24.12.3",
     "@types/react": "^19.2.14",
@@ -125,5 +127,11 @@
     "typescript-eslint": "^8.59.2",
     "vite": "^8.0.12",
     "vitest": "^3.2.4"
+  },
+  "pnpm": {
+    "overrides": {
+      "@interactive-os/json-document-patch-rebase": "file:vendor/json-document-218aa475/interactive-os-json-document-patch-rebase-0.1.0.tgz",
+      "@interactive-os/json-document-stable-id-rebase": "file:vendor/json-document-218aa475/interactive-os-json-document-stable-id-rebase-0.1.0.tgz"
+    }
   }
 }

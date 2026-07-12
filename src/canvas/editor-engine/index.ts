@@ -1,4 +1,5 @@
 export { createEditorEngine } from './EditorEngine'
+export { getEditorEngineDocumentHost } from './EditorEngineDocumentHost'
 export type {
   EditorEngine,
   EditorEngineCommand,
@@ -8,3 +9,4 @@ export type {
   EditorEnginePreviewSession,
   EditorEngineSnapshot,
 } from './EditorEngine'
+export type { EditorEngineDocumentHost } from './EditorEngineDocumentHost'

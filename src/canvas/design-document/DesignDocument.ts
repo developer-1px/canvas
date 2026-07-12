@@ -8,6 +8,10 @@ import {
   parseDesignDocumentSnapshot,
 } from './DesignDocumentSchema'
 import { validateAndIndexDesignDocument } from './DesignDocumentValidation'
+import {
+  createDesignDocumentPublicationCoordinator,
+  registerDesignDocumentPublicationCoordinator,
+} from './DesignDocumentPatchPort'
 import type {
   DesignDocument,
   DesignDocumentCommand,
@@ -36,6 +40,15 @@ export function createDesignDocument(
     },
   ) as JSONDocument<DesignDocumentSnapshot>
 
+  const publications = createDesignDocumentPublicationCoordinator({
+    onExternalPublication: () => {
+      previousHistoryGroup = null
+    },
+    readSnapshot: () => snapshot,
+    store,
+    synchronize: synchronizeSnapshot,
+  })
+
   function synchronizeSnapshot() {
     const nextSnapshot = freezeSnapshot(
       parseDesignDocumentSnapshot(store.value),
@@ -50,6 +63,14 @@ export function createDesignDocument(
   function execute(
     command: DesignDocumentCommand,
   ): DesignDocumentCommandResult {
+    if (publications.isPublishing()) {
+      return {
+        ok: false,
+        code: 'invalid-command',
+        reason: 'DesignDocument publications cannot be nested',
+      }
+    }
+
     let nextSnapshot: DesignDocumentSnapshot
 
     try {
@@ -69,10 +90,25 @@ export function createDesignDocument(
       return { ok: true, changed: false }
     }
 
-    const result = store.commit(
-      [{ op: 'replace', path: '', value: nextSnapshot }],
-      { label: command.label, origin: 'design-document' },
-    )
+    const result = publications.publish(() => {
+      const committed = store.commit(
+        [{ op: 'replace', path: '', value: nextSnapshot }],
+        { label: command.label, origin: 'design-document' },
+      )
+
+      if (!committed.ok) {
+        return committed
+      }
+
+      const historyGroup = normalizeHistoryGroup(command.historyGroup)
+
+      if (historyGroup && historyGroup === previousHistoryGroup) {
+        store.history.mergeLast({ mergeKey: historyGroup })
+      }
+
+      previousHistoryGroup = historyGroup
+      return committed
+    })
 
     if (!result.ok) {
       return {
@@ -82,28 +118,22 @@ export function createDesignDocument(
       }
     }
 
-    const historyGroup = normalizeHistoryGroup(command.historyGroup)
-
-    if (historyGroup && historyGroup === previousHistoryGroup) {
-      store.history.mergeLast({ mergeKey: historyGroup })
-    }
-
-    previousHistoryGroup = historyGroup
-
-    synchronizeSnapshot()
-
     return { ok: true, changed: true }
   }
 
   function restoreHistory(direction: 'redo' | 'undo') {
+    if (publications.isPublishing()) {
+      return false
+    }
+
     previousHistoryGroup = null
-    const result = direction === 'undo' ? store.undo() : store.redo()
+    const result = publications.publish(() =>
+      direction === 'undo' ? store.undo() : store.redo()
+    )
 
     if (!result.ok) {
       return false
     }
-
-    synchronizeSnapshot()
 
     return true
   }
@@ -146,7 +176,7 @@ export function createDesignDocument(
     },
   }
 
-  return {
+  const document: DesignDocument = {
     get snapshot() {
       return snapshot
     },
@@ -169,6 +199,9 @@ export function createDesignDocument(
       return JSON.stringify(snapshot)
     },
   }
+
+  registerDesignDocumentPublicationCoordinator(document, publications)
+  return document
 }
 
 export function restoreDesignDocument(serialized: string): DesignDocument {
