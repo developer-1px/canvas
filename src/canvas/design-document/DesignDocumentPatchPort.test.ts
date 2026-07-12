@@ -8,10 +8,10 @@ import {
 } from './index'
 
 describe('DesignDocumentPatchPort', () => {
-  it('publishes a validated external patch through current document history', () => {
+  it('publishes a validated external patch outside local document history', () => {
     const document = createDesignDocument(createSnapshot())
     const port = getDesignDocumentPatchPort(document)
-    const listener = vi.fn()
+    const listener = vi.fn(() => document.historyStatus())
 
     document.subscribe(listener)
 
@@ -28,17 +28,29 @@ describe('DesignDocumentPatchPort', () => {
     expect(document.read.node('leaf')?.text).toBe('Reviewed')
     expect(document.historyStatus()).toEqual({
       canRedo: false,
-      canUndo: true,
+      canUndo: false,
     })
     expect(listener).toHaveBeenCalledTimes(1)
+    expect(listener.mock.results[0]?.value).toEqual({
+      canRedo: false,
+      canUndo: false,
+    })
   })
 
   it('rejects graph-invalid patches before publication', () => {
     const document = createDesignDocument(createSnapshot())
     const port = getDesignDocumentPatchPort(document)
     const publication = vi.fn()
-    const snapshot = document.snapshot
 
+    expect(document.execute({
+      changes: [{
+        nodeId: 'leaf',
+        type: 'update',
+        values: { text: 'Local' },
+      }],
+      label: 'Local text',
+    })).toEqual({ changed: true, ok: true })
+    const snapshot = document.snapshot
     port.subscribe(publication)
 
     const invalidPatch = [
@@ -63,7 +75,10 @@ describe('DesignDocumentPatchPort', () => {
       reason: 'DesignDocument authored content does not own text selection',
     })
     expect(document.snapshot).toBe(snapshot)
+    expect(document.historyStatus().canUndo).toBe(true)
     expect(publication).not.toHaveBeenCalled()
+    expect(document.undo()).toBe(true)
+    expect(document.read.node('leaf')?.text).toBe('Draft')
   })
 
   it('rejects patches that would normalize differently in canonical state', () => {
@@ -91,23 +106,33 @@ describe('DesignDocumentPatchPort', () => {
     expect(publication).not.toHaveBeenCalled()
   })
 
-  it('does not create history or a publication for a successful no-op patch', () => {
+  it('preserves local history and emits no publication for a successful no-op patch', () => {
     const document = createDesignDocument(createSnapshot())
     const port = getDesignDocumentPatchPort(document)
     const publication = vi.fn()
 
+    expect(document.execute({
+      changes: [{
+        nodeId: 'leaf',
+        type: 'update',
+        values: { text: 'Local' },
+      }],
+      label: 'Local text',
+    })).toEqual({ changed: true, ok: true })
     port.subscribe(publication)
 
     expect(port.commit([
-      { op: 'test', path: '/nodes/1/text', value: 'Draft' },
-      { op: 'replace', path: '/nodes/1/text', value: 'Draft' },
+      { op: 'test', path: '/nodes/1/text', value: 'Local' },
+      { op: 'replace', path: '/nodes/1/text', value: 'Local' },
     ])).toEqual({ ok: true })
     expect(document.historyStatus()).toEqual({
       canRedo: false,
-      canUndo: false,
+      canUndo: true,
     })
-    expect(document.read.node('leaf')?.text).toBe('Draft')
+    expect(document.read.node('leaf')?.text).toBe('Local')
     expect(publication).not.toHaveBeenCalled()
+    expect(document.undo()).toBe(true)
+    expect(document.read.node('leaf')?.text).toBe('Draft')
   })
 
   it('keeps ordinary document commands atomic and undoable', () => {
@@ -196,9 +221,19 @@ describe('DesignDocumentPatchPort', () => {
     const port = getDesignDocumentPatchPort(document)
     const observed: unknown[] = []
 
+    expect(document.execute({
+      changes: [{
+        nodeId: 'leaf',
+        type: 'update',
+        values: { text: 'Local' },
+      }],
+      label: 'Local text',
+    })).toEqual({ changed: true, ok: true })
+
     port.subscribe(() => {
       observed.push({
         document: document.snapshot.nodes[1]?.text,
+        history: document.historyStatus(),
         pointer: port.at('/nodes/1/text'),
         query: port.query('$.nodes[?@.id == "leaf"].text'),
         value: port.value.nodes[1]?.text,
@@ -210,6 +245,10 @@ describe('DesignDocumentPatchPort', () => {
     ])).toEqual({ ok: true })
     expect(observed).toEqual([{
       document: 'Remote',
+      history: {
+        canRedo: false,
+        canUndo: false,
+      },
       pointer: {
         ok: true,
         path: '/nodes/1/text',
@@ -273,7 +312,7 @@ describe('DesignDocumentPatchPort', () => {
     expect(document.read.node('leaf')?.text).toBe('Remote')
   })
 
-  it('owns immutable patch inputs and observer payloads across undo and redo', () => {
+  it('owns immutable patch data across later local undo and redo', () => {
     const document = createDesignDocument(createSnapshot())
     const port = getDesignDocumentPatchPort(document)
     const operations = [
@@ -301,14 +340,22 @@ describe('DesignDocumentPatchPort', () => {
     ])
     expect(healthy.mock.calls[0]?.[1]).toBeUndefined()
     expect(Object.isFrozen(healthy.mock.calls[0]?.[0])).toBe(true)
+    expect(document.execute({
+      changes: [{
+        nodeId: 'leaf',
+        type: 'update',
+        values: { text: 'Local' },
+      }],
+      label: 'Local text',
+    })).toEqual({ changed: true, ok: true })
     expect(document.undo()).toBe(true)
-    expect(document.read.node('leaf')?.text).toBe('Draft')
-    expect(document.redo()).toBe(true)
-    expect(document.snapshot.roots).toEqual(['root'])
     expect(document.read.node('leaf')?.text).toBe('Remote')
+    expect(document.redo()).toBe(true)
+    expect(document.read.node('leaf')?.text).toBe('Local')
+    expect(document.snapshot.roots).toEqual(['root'])
   })
 
-  it('uses an external publication as a local history-group boundary', () => {
+  it('uses an external publication as a local history barrier', () => {
     const document = createDesignDocument(createSnapshot())
     const port = getDesignDocumentPatchPort(document)
 
@@ -324,6 +371,10 @@ describe('DesignDocumentPatchPort', () => {
     expect(port.commit([
       { op: 'replace', path: '/nodes/1/text', value: 'Remote' },
     ])).toEqual({ ok: true })
+    expect(document.historyStatus()).toEqual({
+      canRedo: false,
+      canUndo: false,
+    })
     expect(document.execute({
       changes: [{
         nodeId: 'leaf',
@@ -336,8 +387,43 @@ describe('DesignDocumentPatchPort', () => {
 
     expect(document.undo()).toBe(true)
     expect(document.read.node('leaf')?.text).toBe('Remote')
+    expect(document.historyStatus()).toEqual({
+      canRedo: true,
+      canUndo: false,
+    })
+    expect(document.undo()).toBe(false)
+    expect(document.read.node('leaf')?.text).toBe('Remote')
+    expect(document.redo()).toBe(true)
+    expect(document.read.node('leaf')?.text).toBe('Local B')
+  })
+
+  it('discards stale local redo when an external publication advances the barrier', () => {
+    const document = createDesignDocument(createSnapshot())
+    const port = getDesignDocumentPatchPort(document)
+
+    expect(document.execute({
+      changes: [{
+        nodeId: 'leaf',
+        type: 'update',
+        values: { text: 'Local' },
+      }],
+      label: 'Local text',
+    })).toEqual({ changed: true, ok: true })
     expect(document.undo()).toBe(true)
-    expect(document.read.node('leaf')?.text).toBe('Local A')
+    expect(document.historyStatus()).toEqual({
+      canRedo: true,
+      canUndo: false,
+    })
+
+    expect(port.commit([
+      { op: 'replace', path: '/nodes/1/text', value: 'Remote' },
+    ])).toEqual({ ok: true })
+    expect(document.historyStatus()).toEqual({
+      canRedo: false,
+      canUndo: false,
+    })
+    expect(document.redo()).toBe(false)
+    expect(document.read.node('leaf')?.text).toBe('Remote')
   })
 
   it('rejects non-string metadata before mutating the internal store', () => {
@@ -359,8 +445,18 @@ describe('DesignDocumentPatchPort', () => {
     expect(port.commit([
       { op: 'replace', path: '/nodes/1/text', value: 'Next' },
     ])).toEqual({ ok: true })
+    expect(document.undo()).toBe(false)
+    expect(document.read.node('leaf')?.text).toBe('Next')
+    expect(document.execute({
+      changes: [{
+        nodeId: 'leaf',
+        type: 'update',
+        values: { text: 'Local' },
+      }],
+      label: 'Local text',
+    })).toEqual({ changed: true, ok: true })
     expect(document.undo()).toBe(true)
-    expect(document.read.node('leaf')?.text).toBe('Draft')
+    expect(document.read.node('leaf')?.text).toBe('Next')
   })
 
   it('never lets runtime-invalid command metadata split canonical state', () => {
