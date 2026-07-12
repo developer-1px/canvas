@@ -43,6 +43,12 @@ const packageJson = JSON.parse(
   packageModules['../../../package.json'],
 ) as CanvasPackageJson
 const hostDocumentDependencyName = '@interactive-os/json-document'
+const jsonDocumentReleaseDependencies = {
+  '@interactive-os/json-document': '1.1.0-rc.0',
+  '@interactive-os/json-document-grouping': '0.1.1-rc.1',
+  '@interactive-os/json-document-patch-preview': '0.1.1-rc.1',
+  '@interactive-os/json-document-search-replace': '0.1.1-rc.1',
+}
 const publishedRuntimeDependencies = [
   '@interactive-os/interaction',
   '@interactive-os/json-document',
@@ -143,6 +149,12 @@ describe('Canvas package manifest', () => {
     for (const dependency of publishedRuntimeDependencies) {
       expect(packageJson.dependencies?.[dependency]).toMatch(/^\^?\d+\.\d+\.\d+/)
     }
+  })
+
+  it('pins the JSON document RC graph exactly', () => {
+    expect(packageJson.dependencies).toEqual(
+      expect.objectContaining(jsonDocumentReleaseDependencies),
+    )
   })
 })
 

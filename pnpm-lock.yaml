@@ -12,17 +12,17 @@ importers:
         specifier: ^0.1.0
         version: link:../apg-patterns/packages/interaction
       '@interactive-os/json-document':
-        specifier: ^1.0.0
-        version: link:../json-document/packages/json-document
+        specifier: 1.1.0-rc.0
+        version: 1.1.0-rc.0(react@19.2.6)(zod@4.4.3)
       '@interactive-os/json-document-grouping':
-        specifier: ^0.1.0
-        version: link:../json-document/packages/grouping
+        specifier: 0.1.1-rc.1
+        version: 0.1.1-rc.1(@interactive-os/json-document@1.1.0-rc.0(react@19.2.6)(zod@4.4.3))
       '@interactive-os/json-document-patch-preview':
-        specifier: ^0.1.0
-        version: link:../json-document/packages/patch-preview
+        specifier: 0.1.1-rc.1
+        version: 0.1.1-rc.1(@interactive-os/json-document@1.1.0-rc.0(react@19.2.6)(zod@4.4.3))
       '@interactive-os/json-document-search-replace':
-        specifier: ^0.1.0
-        version: link:../json-document/packages/search-replace
+        specifier: 0.1.1-rc.1
+        version: 0.1.1-rc.1(@interactive-os/json-document@1.1.0-rc.0(react@19.2.6)(zod@4.4.3))
       '@interactive-os/object-surface':
         specifier: ^0.1.0
         version: link:../object-surface/packages/object-surface
@@ -136,78 +136,6 @@ importers:
       vitest:
         specifier: ^4.1.5
         version: 4.1.8(@types/node@25.9.3)(jsdom@29.1.1)(vite@8.0.14(@types/node@25.9.3)(esbuild@0.27.7))
-
-  ../json-document/packages/grouping:
-    devDependencies:
-      '@interactive-os/json-document':
-        specifier: '*'
-        version: link:../json-document
-      typescript:
-        specifier: ^5.0.0
-        version: 5.9.3
-      vitest:
-        specifier: ^4.1.7
-        version: 4.1.8(@types/node@25.9.3)(jsdom@29.1.1)(vite@8.0.14(@types/node@25.9.3)(esbuild@0.27.7))
-      zod:
-        specifier: ^4.0.0
-        version: 4.4.3
-
-  ../json-document/packages/json-document:
-    devDependencies:
-      '@types/node':
-        specifier: ^25.9.0
-        version: 25.9.3
-      '@types/react':
-        specifier: ^19.0.0
-        version: 19.2.15
-      '@types/react-dom':
-        specifier: ^19.0.0
-        version: 19.2.3(@types/react@19.2.15)
-      react:
-        specifier: ^19.0.0
-        version: 19.2.6
-      react-dom:
-        specifier: ^19.0.0
-        version: 19.2.6(react@19.2.6)
-      typescript:
-        specifier: ^5.0.0
-        version: 5.9.3
-      vitest:
-        specifier: ^4.1.7
-        version: 4.1.8(@types/node@25.9.3)(jsdom@29.1.1)(vite@8.0.14(@types/node@25.9.3)(esbuild@0.27.7))
-      zod:
-        specifier: ^4.0.0
-        version: 4.4.3
-
-  ../json-document/packages/patch-preview:
-    devDependencies:
-      '@interactive-os/json-document':
-        specifier: '*'
-        version: link:../json-document
-      typescript:
-        specifier: ^5.0.0
-        version: 5.9.3
-      vitest:
-        specifier: ^4.1.7
-        version: 4.1.8(@types/node@25.9.3)(jsdom@29.1.1)(vite@8.0.14(@types/node@25.9.3)(esbuild@0.27.7))
-      zod:
-        specifier: ^4.0.0
-        version: 4.4.3
-
-  ../json-document/packages/search-replace:
-    devDependencies:
-      '@interactive-os/json-document':
-        specifier: '*'
-        version: link:../json-document
-      typescript:
-        specifier: ^5.0.0
-        version: 5.9.3
-      vitest:
-        specifier: ^4.1.7
-        version: 4.1.8(@types/node@25.9.3)(jsdom@29.1.1)(vite@8.0.14(@types/node@25.9.3)(esbuild@0.27.7))
-      zod:
-        specifier: ^4.0.0
-        version: 4.4.3
 
   ../object-surface/packages/object-surface:
     devDependencies:
@@ -695,6 +623,30 @@ packages:
   '@humanwhocodes/retry@0.4.3':
     resolution: {integrity: sha512-bV0Tgo9K4hfPCek+aMAn81RppFKv2ySDQeMoSZuvTASywNTnVJCArCZE2FWqpvIatKu7VMRLWlR1EazvVhDyhQ==}
     engines: {node: '>=18.18'}
+
+  '@interactive-os/json-document-grouping@0.1.1-rc.1':
+    resolution: {integrity: sha512-QBgSmuKAbeOD3b0TgWvtNYkFXblnpCaDcLJHICHbJfZYYPM5d4nxpr5mb6YcG38ZGR4TFlZFKqyCa684wXXHwg==}
+    peerDependencies:
+      '@interactive-os/json-document': ^1.0.1 || ^1.1.0-rc.0
+
+  '@interactive-os/json-document-patch-preview@0.1.1-rc.1':
+    resolution: {integrity: sha512-c1rbUf4mLXRzIhE4trJNOcUOzMlZK4UorDqz5FDeSPfcDxqEQiWXKg/NxqNVcJLycb5cRKVl1cdeAyyJhGyFzA==}
+    peerDependencies:
+      '@interactive-os/json-document': ^1.0.1 || ^1.1.0-rc.0
+
+  '@interactive-os/json-document-search-replace@0.1.1-rc.1':
+    resolution: {integrity: sha512-tdq7zNLr0WyZGKedUO+eqJNJXSAIcCsDbnjs6ITzIanDq3IY+iOoRFq0yggIctdC/C7y941r69STjinoTHkDag==}
+    peerDependencies:
+      '@interactive-os/json-document': ^1.0.1 || ^1.1.0-rc.0
+
+  '@interactive-os/json-document@1.1.0-rc.0':
+    resolution: {integrity: sha512-gC88ujdx95iCQWQBzkcNHRL76pGmNbjgVX5tSyawok+HKYfIp8b2pIQWEJNKm1kERARwX2CQLDo+fg6MgFVPFg==}
+    peerDependencies:
+      react: '>=18'
+      zod: ^4.0.0
+    peerDependenciesMeta:
+      react:
+        optional: true
 
   '@jridgewell/gen-mapping@0.3.13':
     resolution: {integrity: sha512-2kkt/7niJ6MgEPxF0bYdQ6etZaA+fQvDcLKckhy1yIQOzaoKjBBjSj63/aLVjYE3qhRt5dvM+uUyfCg6UKCBbA==}
@@ -1981,11 +1933,6 @@ packages:
       eslint: ^8.57.0 || ^9.0.0 || ^10.0.0
       typescript: '>=4.8.4 <6.1.0'
 
-  typescript@5.9.3:
-    resolution: {integrity: sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==}
-    engines: {node: '>=14.17'}
-    hasBin: true
-
   typescript@6.0.3:
     resolution: {integrity: sha512-y2TvuxSZPDyQakkFRPZHKFm+KKVqIisdg9/CZwm9ftvKXLP8NRWj38/ODjNbr43SsoXqNuAisEf1GdCxqWcdBw==}
     engines: {node: '>=14.17'}
@@ -2537,6 +2484,24 @@ snapshots:
 
   '@humanwhocodes/retry@0.4.3': {}
 
+  '@interactive-os/json-document-grouping@0.1.1-rc.1(@interactive-os/json-document@1.1.0-rc.0(react@19.2.6)(zod@4.4.3))':
+    dependencies:
+      '@interactive-os/json-document': 1.1.0-rc.0(react@19.2.6)(zod@4.4.3)
+
+  '@interactive-os/json-document-patch-preview@0.1.1-rc.1(@interactive-os/json-document@1.1.0-rc.0(react@19.2.6)(zod@4.4.3))':
+    dependencies:
+      '@interactive-os/json-document': 1.1.0-rc.0(react@19.2.6)(zod@4.4.3)
+
+  '@interactive-os/json-document-search-replace@0.1.1-rc.1(@interactive-os/json-document@1.1.0-rc.0(react@19.2.6)(zod@4.4.3))':
+    dependencies:
+      '@interactive-os/json-document': 1.1.0-rc.0(react@19.2.6)(zod@4.4.3)
+
+  '@interactive-os/json-document@1.1.0-rc.0(react@19.2.6)(zod@4.4.3)':
+    dependencies:
+      zod: 4.4.3
+    optionalDependencies:
+      react: 19.2.6
+
   '@jridgewell/gen-mapping@0.3.13':
     dependencies:
       '@jridgewell/sourcemap-codec': 1.5.5
@@ -2760,6 +2725,7 @@ snapshots:
   '@types/node@25.9.3':
     dependencies:
       undici-types: 7.24.6
+    optional: true
 
   '@types/react-dom@19.2.3(@types/react@19.2.15)':
     dependencies:
@@ -3765,15 +3731,14 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  typescript@5.9.3: {}
-
   typescript@6.0.3: {}
 
   ufo@1.6.4: {}
 
   undici-types@7.16.0: {}
 
-  undici-types@7.24.6: {}
+  undici-types@7.24.6:
+    optional: true
 
   undici@7.27.2: {}
 
