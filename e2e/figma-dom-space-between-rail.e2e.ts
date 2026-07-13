@@ -15,7 +15,7 @@ const BETWEEN_SAMPLES = [
   },
 ] as const
 
-test('shows read-only rails for space-between lanes', async ({ page }) => {
+test('reveals one read-only space-between rail only on intent', async ({ page }) => {
   await page.goto('/?demo=figma')
   await page.getByRole('button', { name: 'Select layer Workspace page' })
     .click()
@@ -27,13 +27,21 @@ test('shows read-only rails for space-between lanes', async ({ page }) => {
     const laneCount = await lanes.count()
 
     expect(laneCount).toBeGreaterThan(0)
-    await expect(betweenMarks(page)).toHaveCount(laneCount)
-    await expect(betweenRails(page)).toHaveCount(laneCount)
-    await expect(betweenTicks(page)).toHaveCount(laneCount * 2)
-    await expect(betweenLabels(page)).toHaveCount(laneCount)
-    await expect(betweenLabels(page).first())
-      .toContainText(/Between \d+px actual/)
+    await expect(betweenMarks(page)).toHaveCount(0)
+    await expect(betweenRails(page)).toHaveCount(0)
+    await expect(betweenTicks(page)).toHaveCount(0)
+    await expect(betweenLabels(page)).toHaveCount(0)
+
   }
+
+  await selectLayer(page, 'Select layer Deal row 1', 'workspaceDealOne')
+  await betweenLanes(page).first().hover()
+  await expect(betweenMarks(page)).toHaveCount(1)
+  await expect(betweenRails(page)).toHaveCount(1)
+  await expect(betweenTicks(page)).toHaveCount(2)
+  await expect(betweenLabels(page)).toHaveCount(1)
+  await expect(betweenLabels(page).first())
+    .toContainText(/Between \d+px actual/)
 
   await selectLayer(page, 'Select layer Hero actions', 'workspaceHeroActions')
   await expect(betweenLanes(page)).toHaveCount(0)
@@ -46,12 +54,13 @@ test('keeps space-between lanes read-only on pointer drag', async ({ page }) => 
     .click()
   await selectLayer(page, 'Select layer Deal row 1', 'workspaceDealOne')
 
-  const lane = visibleBetweenLanes(page).first()
+  const lane = betweenLanes(page).first()
   await expect(lane).not.toHaveCount(0)
   const initialBackground = await readBackgroundColor(lane)
   const initialGap = await readFlexGap(page, 'workspaceDealOne')
 
   await lane.hover()
+  await expect(visibleBetweenLanes(page)).toHaveCount(1)
   await expect.poll(() => readCursor(lane)).toBe('default')
   await expect.poll(() => readBackgroundColor(lane))
     .not.toBe(initialBackground)

@@ -27,6 +27,100 @@ test('shows flex container controls only for flex containers', async ({
   await expect(verticalDirection(page)).toHaveCount(0)
 })
 
+test('shows compact spacing cues without filling idle gap and padding surfaces', async ({
+  page,
+}) => {
+  await page.goto('/?demo=figma')
+  await selectLayer(page, 'Select layer Workspace page', 'workspacePage')
+  await selectLayer(page, 'Select layer Pipeline list', 'workspacePipelineList')
+
+  const gapCue = await readSurfaceCue(
+    page.locator('.figma-autolayout-gap--column').first(),
+  )
+  const paddingCue = await readSurfaceCue(sideHandle(page, 'top'))
+
+  expect(gapCue.surface).toBe('rgba(0, 0, 0, 0)')
+  expect(gapCue.cue.color).not.toBe('rgba(0, 0, 0, 0)')
+  expect(gapCue.cue.width).toBeLessThanOrEqual(20)
+  expect(gapCue.cue.height).toBeLessThanOrEqual(3)
+
+  expect(paddingCue.surface).toBe('rgba(0, 0, 0, 0)')
+  expect(paddingCue.cue.color).not.toBe('rgba(0, 0, 0, 0)')
+  expect(paddingCue.cue.width).toBeLessThanOrEqual(20)
+  expect(paddingCue.cue.height).toBeLessThanOrEqual(3)
+})
+
+test('expands only the hovered flex gap and anchors its value to that gap', async ({
+  page,
+}) => {
+  await page.goto('/?demo=figma')
+  await selectLayer(page, 'Select layer Workspace page', 'workspacePage')
+  await selectLayer(page, 'Select layer Pipeline list', 'workspacePipelineList')
+
+  const gaps = page.locator('.figma-autolayout-gap--column')
+  const hoveredGap = gaps.first()
+  const idleGap = gaps.nth(1)
+
+  await hoveredGap.hover()
+
+  const hoveredStyle = await readSurfaceCue(hoveredGap)
+  const idleStyle = await readSurfaceCue(idleGap)
+
+  expect(hoveredStyle.image).not.toBe('none')
+  expect(idleStyle.image).toBe('none')
+  expect(idleStyle.surface).toBe('rgba(0, 0, 0, 0)')
+  expect(idleStyle.cue.color).not.toBe('rgba(0, 0, 0, 0)')
+
+  const value = page.locator('.figma-autolayout-value--gap')
+  await expect(value).toHaveText(/Gap \d+/)
+  expect(await distanceBetweenCenters(hoveredGap, value)).toBeLessThan(4)
+})
+
+test('expands only the hovered padding side with its directional value', async ({
+  page,
+}) => {
+  await page.goto('/?demo=figma')
+  await selectLayer(page, 'Select layer Workspace page', 'workspacePage')
+  await selectLayer(page, 'Select layer Main area', 'workspaceMain')
+
+  const right = sideHandle(page, 'right')
+  const left = sideHandle(page, 'left')
+
+  await right.hover()
+
+  await expect(right).toHaveClass(/figma-autolayout-padding--active/)
+  await expect(left).not.toHaveClass(/figma-autolayout-padding--active/)
+  await expect(left).toHaveClass(/figma-autolayout-padding--muted/)
+  await expect(page.locator('.figma-autolayout-value--padding'))
+    .toHaveText(/Right \d+/)
+})
+
+test('keeps only controls relevant to the active spacing affordance', async ({
+  page,
+}) => {
+  await page.goto('/?demo=figma')
+  await selectLayer(page, 'Select layer Workspace page', 'workspacePage')
+  await selectLayer(page, 'Select layer Pipeline list', 'workspacePipelineList')
+
+  await expect(page.getByRole('button', { name: 'Alignment editor' }))
+    .toHaveCount(1)
+  await page.locator('.figma-autolayout-gap').first().hover()
+  await expect(page.getByRole('button', { name: 'Alignment editor' }))
+    .toHaveCount(0)
+  await expect(page.locator('.figma-size-mode-capsule')).toHaveCount(0)
+  await expect(page.locator('.figma-autolayout-toolbar'))
+    .toHaveCount(1)
+
+  await page.mouse.move(0, 0)
+  await expect(sideHandle(page, 'right')).toHaveCount(1)
+  await sideHandle(page, 'right').hover()
+  await expect(page.getByRole('button', { name: 'Alignment editor' }))
+    .toHaveCount(0)
+  await expect(page.locator('.figma-size-mode-capsule')).toHaveCount(0)
+  await expect(page.locator('.figma-autolayout-toolbar'))
+    .toHaveCount(0)
+})
+
 test('edits flex direction and shared gap from canvas controls', async ({
   page,
 }) => {
@@ -133,6 +227,36 @@ async function readFlexDirection(page: Page, nodeId: string) {
 async function readFlexGap(page: Page, nodeId: string) {
   return page.locator(`[data-design-node-id="${nodeId}"]`).evaluate((element) =>
     Number.parseFloat(getComputedStyle(element).rowGap))
+}
+
+async function readSurfaceCue(locator: Locator) {
+  return locator.evaluate((element) => {
+    const surface = getComputedStyle(element)
+    const cue = getComputedStyle(element, '::after')
+
+    return {
+      cue: {
+        color: cue.backgroundColor,
+        height: Number.parseFloat(cue.height),
+        width: Number.parseFloat(cue.width),
+      },
+      image: surface.backgroundImage,
+      surface: surface.backgroundColor,
+    }
+  })
+}
+
+async function distanceBetweenCenters(first: Locator, second: Locator) {
+  const firstBox = await first.boundingBox()
+  const secondBox = await second.boundingBox()
+
+  expect(firstBox).not.toBeNull()
+  expect(secondBox).not.toBeNull()
+
+  return Math.hypot(
+    firstBox!.x + firstBox!.width / 2 - (secondBox!.x + secondBox!.width / 2),
+    firstBox!.y + firstBox!.height / 2 - (secondBox!.y + secondBox!.height / 2),
+  )
 }
 
 function horizontalDirection(page: Page) {

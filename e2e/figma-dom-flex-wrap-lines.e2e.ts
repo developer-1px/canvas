@@ -1,11 +1,16 @@
 import { expect, test, type Locator, type Page } from '@playwright/test'
 
-test('shows flex-wrap line guides and line gap values', async ({ page }) => {
+test('reveals flex-wrap line guides only while inspecting gap', async ({ page }) => {
   await page.goto('/?demo=figma')
   await page.getByRole('button', { name: 'Select layer Workspace page' })
     .click()
 
   await selectLayer(page, 'Select layer Audience tags', 'workspaceAudienceTags')
+  await expect(flexWrapLine(page)).toHaveCount(0)
+  await expect(flexWrapLineLabel(page)).toHaveCount(0)
+  await expect(flexWrapLineGap(page)).toHaveCount(0)
+
+  await page.locator('.figma-autolayout-gap').first().hover()
   await expect(flexWrapLine(page)).toHaveCount(2)
   await expect(flexWrapLineLabel(page)).toHaveText(['line 1', 'line 2'])
   await expect(flexWrapLineGap(page)).toHaveCount(1)
@@ -25,6 +30,8 @@ test('shows flex-wrap line guides and line gap values', async ({ page }) => {
 
   await selectLayer(page, 'Select layer Audience tags', 'workspaceAudienceTags')
   await page.getByRole('button', { name: 'Zoom in' }).click()
+  await expect(flexWrapLine(page)).toHaveCount(0)
+  await page.locator('.figma-autolayout-gap').first().hover()
   await expectLineContainsNode(
     flexWrapLine(page).nth(0),
     page.locator('[data-design-node-id="workspaceAudienceTagRenewal"]'),

@@ -1869,9 +1869,35 @@
 .figma-autolayout-padding--empty::after {
   content: '';
   position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: rgba(245, 158, 11, 0.12);
+  border-radius: 999px;
+  background: rgba(180, 83, 9, 0.72);
+  pointer-events: none;
+}
+
+.figma-autolayout-padding--empty.figma-autolayout-padding--top::after,
+.figma-autolayout-padding--empty.figma-autolayout-padding--bottom::after {
+  left: 50%;
+  top: 50%;
+  width: min(20px, calc(100% - 4px));
+  height: 2px;
+  transform: translate(-50%, -50%);
+}
+
+.figma-autolayout-padding--empty.figma-autolayout-padding--left::after,
+.figma-autolayout-padding--empty.figma-autolayout-padding--right::after {
+  left: 50%;
+  top: 50%;
+  width: 2px;
+  height: min(20px, calc(100% - 4px));
+  transform: translate(-50%, -50%);
+}
+
+.figma-autolayout-padding-corner.figma-autolayout-padding--empty::after {
+  left: 50%;
+  top: 50%;
+  width: 4px;
+  height: 4px;
+  transform: translate(-50%, -50%);
 }
 
 .figma-autolayout-padding:hover {
@@ -1995,9 +2021,25 @@
 .figma-autolayout-gap--empty::after {
   content: '';
   position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: transparent;
+  border-radius: 999px;
+  background: rgba(37, 99, 235, 0.72);
+  pointer-events: none;
+}
+
+.figma-autolayout-gap--empty.figma-autolayout-gap--row::after {
+  left: 50%;
+  top: 50%;
+  width: 2px;
+  height: min(20px, calc(100% - 4px));
+  transform: translate(-50%, -50%);
+}
+
+.figma-autolayout-gap--empty.figma-autolayout-gap--column::after {
+  left: 50%;
+  top: 50%;
+  width: min(20px, calc(100% - 4px));
+  height: 2px;
+  transform: translate(-50%, -50%);
 }
 
 .figma-autolayout-gap:hover {
@@ -2038,6 +2080,10 @@
 
 .figma-autolayout-gap--between.figma-autolayout-gap--empty,
 .figma-autolayout-gap--between.figma-autolayout-gap--empty:hover {
+  background: transparent;
+}
+
+.figma-autolayout-gap--between.figma-autolayout-gap--empty::after {
   background: transparent;
 }
 
@@ -2176,7 +2222,6 @@
 
 .figma-autolayout-value--padding {
   background: #b45309;
-  transform: none;
 }
 
 .figma-alignment-editor-trigger {
@@ -2466,9 +2511,25 @@
 .figma-grid-gap--empty::after {
   content: '';
   position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: transparent;
+  border-radius: 999px;
+  background: rgba(37, 99, 235, 0.72);
+  pointer-events: none;
+}
+
+.figma-grid-gap--empty.figma-grid-gap--column::after {
+  left: 50%;
+  top: 50%;
+  width: 2px;
+  height: min(20px, calc(100% - 4px));
+  transform: translate(-50%, -50%);
+}
+
+.figma-grid-gap--empty.figma-grid-gap--row::after {
+  left: 50%;
+  top: 50%;
+  width: min(20px, calc(100% - 4px));
+  height: 2px;
+  transform: translate(-50%, -50%);
 }
 
 .figma-grid-gap--empty,

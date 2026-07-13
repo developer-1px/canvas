@@ -712,6 +712,7 @@ export function DomEditSelectionOverlay<
         ) : null}
         {layerVisibility.grid ? (
           <DomEditGridOverlay
+            key={selectedNodeId}
             adapter={adapter}
             affordanceState={affordanceState}
             directManipulation={directManipulation}

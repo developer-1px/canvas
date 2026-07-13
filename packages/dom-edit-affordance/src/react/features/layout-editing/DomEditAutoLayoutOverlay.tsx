@@ -57,6 +57,7 @@ import {
   type DomEditAutoLayoutDragKind,
   type DomEditAutoLayoutPaddingCornerDragKind,
   type DomEditAutoLayoutPaddingDragKind,
+  type DomEditAutoLayoutPaddingSideDragKind,
   type DomEditAutoLayoutRect,
 } from './DomEditAutoLayoutGeometry'
 import {
@@ -95,6 +96,7 @@ type DomEditAutoLayoutOverlayTransientState<
 > = {
   alignmentPreview: DomEditAlignmentPreview | null
   hoveredAffordance: AutoLayoutAffordanceMode | null
+  hoveredGapIndex: number | null
   hoveredPaddingKind: DomEditAutoLayoutPaddingDragKind | null
   isAlignmentEditorOpen: boolean
   pinnedPaddingSide: DomEditPaddingSide | null
@@ -187,6 +189,7 @@ export function DomEditAutoLayoutOverlay<
   const {
     alignmentPreview,
     hoveredAffordance,
+    hoveredGapIndex,
     hoveredPaddingKind,
     isAlignmentEditorOpen,
     pinnedPaddingSide,
@@ -244,6 +247,17 @@ export function DomEditAutoLayoutOverlay<
       return next === current.hoveredPaddingKind
         ? current
         : { ...current, hoveredPaddingKind: next }
+    })
+  }, [updateTransientState])
+  const setHoveredGapIndex = useCallback((
+    action: SetStateAction<number | null>,
+  ) => {
+    updateTransientState((current) => {
+      const next = resolveDomEditStateAction(current.hoveredGapIndex, action)
+
+      return next === current.hoveredGapIndex
+        ? current
+        : { ...current, hoveredGapIndex: next }
     })
   }, [updateTransientState])
   const setPinnedPaddingSide = useCallback((
@@ -350,12 +364,18 @@ export function DomEditAutoLayoutOverlay<
 
       const hoveredTarget = document.elementFromPoint(event.clientX, event.clientY)
       const paddingKind = readDomEditPaddingDragKind(hoveredTarget)
-      const nextAffordance = hoveredTarget?.closest('.figma-autolayout-gap')
+      const gapTarget = hoveredTarget?.closest<HTMLElement>(
+        '[data-dom-edit-gap-index]',
+      )
+      const nextGapIndex = readDomEditGapIndex(gapTarget)
+      const nextAffordance = gapTarget
         ? 'gap'
         : paddingKind
           ? 'padding'
           : null
 
+      setHoveredGapIndex((current) =>
+        current === nextGapIndex ? current : nextGapIndex)
       setHoveredPaddingKind((current) =>
         current === paddingKind ? current : paddingKind)
       setHoveredAffordance((current) =>
@@ -372,6 +392,7 @@ export function DomEditAutoLayoutOverlay<
     context.showGridLayout,
     context.showSelfLayout,
     setHoveredAffordance,
+    setHoveredGapIndex,
     setHoveredPaddingKind,
   ])
 
@@ -390,21 +411,44 @@ export function DomEditAutoLayoutOverlay<
     rect,
   })
   const paddingCornerRects = getDomEditPaddingCornerRects({ rect })
-  const paddingLabelPosition = getDomEditPaddingLabelPosition({
-    padding,
-    rect,
-  })
-  const activeGapRect = gapRects[Math.max(0, Math.floor(gapRects.length / 2))]
+  const fallbackGapRect = gapRects[Math.max(0, Math.floor(gapRects.length / 2))]
+  const hoveredGapRect = hoveredGapIndex === null
+    ? null
+    : gapRects[hoveredGapIndex] ?? null
+  const activeGapRect = activeDragKind === 'gap'
+    ? fallbackGapRect
+    : hoveredGapRect ?? fallbackGapRect
   const activePaddingKind = activeDragKind && activeDragKind !== 'gap'
     ? activeDragKind
     : hoveredPaddingKind
   const activePaddingSides = activePaddingKind
-    ? getDomEditPaddingDragActiveSides(activePaddingKind, {
-      pinnedSide: pinnedPaddingSide,
-    })
+    ? activeDragKind
+      ? getDomEditPaddingDragActiveSides(activePaddingKind, {
+        pinnedSide: pinnedPaddingSide,
+      })
+      : getDomEditPaddingHoverActiveSides(activePaddingKind)
     : pinnedPaddingSide
       ? [pinnedPaddingSide]
       : []
+  const paddingLabelKind = activePaddingKind ?? (pinnedPaddingSide
+    ? `padding-${pinnedPaddingSide}` as DomEditAutoLayoutPaddingDragKind
+    : null)
+  const paddingLabelPosition = paddingLabelKind
+    ? getDomEditActivePaddingLabelPosition({
+      kind: paddingLabelKind,
+      paddingCornerRects,
+      paddingRects,
+      rect,
+    })
+    : getDomEditPaddingLabelPosition({ padding, rect })
+  const paddingLabel = paddingLabelKind
+    ? getDomEditActivePaddingLabel({
+      activeSides: activePaddingSides,
+      isDragging: Boolean(activeDragKind),
+      kind: paddingLabelKind,
+      padding,
+    })
+    : `Pad ${getDomEditPaddingSummary(padding)}`
   const activeAffordance = activeDragKind === 'gap'
     ? 'gap'
     : activeDragKind
@@ -422,15 +466,17 @@ export function DomEditAutoLayoutOverlay<
     context,
   })
   const activeFlexWrapLayout = context.showSelfLayout &&
-    visibility.gapHitTargets
+    visibility.gapVisuals
     ? flexWrapLayout
     : null
   const shouldRenderPadding = visibility.paddingHitTargets
   const shouldRenderGap = visibility.gapHitTargets
-  const showGapVisuals = visibility.gapVisuals || isBetweenDistribution
+  const showGapVisuals = visibility.gapVisuals
   const visibleGapLabelRects = showGapVisuals
     ? isBetweenDistribution
-      ? gapRects
+      ? hoveredGapRect
+        ? [hoveredGapRect]
+        : []
       : activeGapRect
         ? [activeGapRect]
         : []
@@ -438,7 +484,11 @@ export function DomEditAutoLayoutOverlay<
   const alignGuideValue = alignmentPreview?.align ??
     (style.align === 'auto' ? null : style.align)
   const shouldRenderAlignmentEditor =
-    context.showSelfLayout || context.showGridLayout
+    (context.showSelfLayout || context.showGridLayout) &&
+    (
+      affordanceState.mode === 'idle' ||
+      isAlignmentEditorOpen
+    )
   const shouldRenderAlignGuide = visibility.alignGuides &&
     Boolean(alignGuideValue)
   const directionControlOffset = visibility.sizeModes ? 30 : 12
@@ -569,6 +619,7 @@ export function DomEditAutoLayoutOverlay<
       }
       setActiveDragKind(null)
       setHoveredAffordance(null)
+      setHoveredGapIndex(null)
       setHoveredPaddingKind(null)
       onAffordanceStateChange({ mode: 'idle' })
       window.removeEventListener('pointermove', handleMove)
@@ -790,7 +841,7 @@ export function DomEditAutoLayoutOverlay<
                     top: paddingLabelPosition.y,
                   }}
                 >
-                  Pad {getDomEditPaddingSummary(padding)}
+                  {paddingLabel}
                 </span>
               ) : null}
             </>
@@ -800,8 +851,12 @@ export function DomEditAutoLayoutOverlay<
               {activeFlexWrapLayout ? (
                 <DomEditFlexWrapGuides layout={activeFlexWrapLayout} />
               ) : null}
-              {gapRects.map((gapRect, index) => (
-                <button
+              {gapRects.map((gapRect, index) => {
+                const isGapLaneVisible = activeDragKind === 'gap' ||
+                  hoveredGapIndex === index
+
+                return (
+                  <button
                   key={`${index}:${gapRect.x}:${gapRect.y}`}
                   aria-label={
                     isBetweenDistribution
@@ -814,11 +869,12 @@ export function DomEditAutoLayoutOverlay<
                   className={getDomEditGapClassName({
                     direction: style.direction,
                     isBetween: isBetweenDistribution,
-                    isVisible: showGapVisuals,
+                    isVisible: isGapLaneVisible,
                   })}
                   data-dom-edit-between-lane={
                     isBetweenDistribution ? `${index + 1}` : undefined
                   }
+                  data-dom-edit-gap-index={index}
                   style={{
                     height: gapRect.h,
                     left: gapRect.x,
@@ -827,8 +883,14 @@ export function DomEditAutoLayoutOverlay<
                   }}
                   title={isBetweenDistribution ? 'Between auto spacing' : 'Gap'}
                   type="button"
-                  onPointerEnter={() => setHoveredAffordance('gap')}
-                  onPointerLeave={() => setHoveredAffordance(null)}
+                  onPointerEnter={() => {
+                    setHoveredAffordance('gap')
+                    setHoveredGapIndex(index)
+                  }}
+                  onPointerLeave={() => {
+                    setHoveredAffordance(null)
+                    setHoveredGapIndex(null)
+                  }}
                   onPointerDown={(event) => {
                     if (isBetweenDistribution) {
                       event.preventDefault()
@@ -839,7 +901,7 @@ export function DomEditAutoLayoutOverlay<
                     startDrag(event, 'gap')
                   }}
                 >
-                  {isBetweenDistribution && showGapVisuals ? (
+                  {isBetweenDistribution && isGapLaneVisible ? (
                     <span
                       aria-hidden="true"
                       className="figma-autolayout-between-mark"
@@ -850,8 +912,9 @@ export function DomEditAutoLayoutOverlay<
                       <span className="figma-autolayout-between-tick figma-autolayout-between-tick--end" />
                     </span>
                   ) : null}
-                </button>
-              ))}
+                  </button>
+                )
+              })}
               {visibleGapLabelRects.map((gapRect, index) => (
                 <span
                   key={`gap-label:${index}:${gapRect.x}:${gapRect.y}`}
@@ -863,8 +926,8 @@ export function DomEditAutoLayoutOverlay<
                       : '',
                   ].filter(Boolean).join(' ')}
                   style={{
-                    left: activeGapRect.x + activeGapRect.w / 2,
-                    top: activeGapRect.y + activeGapRect.h / 2,
+                    left: gapRect.x + gapRect.w / 2,
+                    top: gapRect.y + gapRect.h / 2,
                   }}
                 >
                   {isBetweenDistribution
@@ -1230,6 +1293,7 @@ function createDomEditAutoLayoutOverlayTransientState<
   return {
     alignmentPreview: null,
     hoveredAffordance: null,
+    hoveredGapIndex: null,
     hoveredPaddingKind: null,
     isAlignmentEditorOpen: false,
     pinnedPaddingSide: null,
@@ -1524,6 +1588,71 @@ function getDomEditPaddingClassName({
   ].filter(Boolean).join(' ')
 }
 
+function getDomEditPaddingHoverActiveSides(
+  kind: DomEditAutoLayoutPaddingDragKind,
+): DomEditPaddingSide[] {
+  const side = getDomEditPaddingDragSide(kind)
+
+  return side
+    ? [side]
+    : ['top', 'right', 'bottom', 'left']
+}
+
+function getDomEditActivePaddingLabel({
+  activeSides,
+  isDragging,
+  kind,
+  padding,
+}: {
+  activeSides: readonly DomEditPaddingSide[]
+  isDragging: boolean
+  kind: DomEditAutoLayoutPaddingDragKind
+  padding: DomEditPaddingSides
+}) {
+  const side = getDomEditPaddingDragSide(kind)
+
+  if (!side) {
+    return `Pad ${getDomEditPaddingSummary(padding)}`
+  }
+
+  const sides = isDragging && activeSides.length > 1
+    ? activeSides
+    : [side]
+
+  return sides.map((activeSide) =>
+    `${capitalizeDomEditPaddingSide(activeSide)} ${padding[activeSide]}`)
+    .join(' · ')
+}
+
+function getDomEditActivePaddingLabelPosition({
+  kind,
+  paddingCornerRects,
+  paddingRects,
+  rect,
+}: {
+  kind: DomEditAutoLayoutPaddingDragKind
+  paddingCornerRects: Record<DomEditAutoLayoutPaddingCornerDragKind, CSSProperties>
+  paddingRects: Record<DomEditAutoLayoutPaddingSideDragKind, CSSProperties>
+  rect: DomEditAutoLayoutRect
+}) {
+  const localRect = kind.startsWith('padding-corner-')
+    ? paddingCornerRects[kind as DomEditAutoLayoutPaddingCornerDragKind]
+    : paddingRects[kind as DomEditAutoLayoutPaddingSideDragKind]
+  const left = Number(localRect.left ?? 0)
+  const top = Number(localRect.top ?? 0)
+  const width = Number(localRect.width ?? 0)
+  const height = Number(localRect.height ?? 0)
+
+  return {
+    x: rect.x + left + width / 2,
+    y: rect.y + top + height / 2,
+  }
+}
+
+function capitalizeDomEditPaddingSide(side: DomEditPaddingSide) {
+  return `${side.slice(0, 1).toUpperCase()}${side.slice(1)}`
+}
+
 function getDomEditPaddingCornerClassName({
   activeSides,
   corner,
@@ -1565,6 +1694,12 @@ function readDomEditPaddingDragKind(
   return kind && DOM_EDIT_PADDING_DRAG_KINDS.has(kind)
     ? kind as DomEditAutoLayoutPaddingDragKind
     : null
+}
+
+function readDomEditGapIndex(target: HTMLElement | null | undefined) {
+  const index = Number.parseInt(target?.dataset.domEditGapIndex ?? '', 10)
+
+  return Number.isInteger(index) && index >= 0 ? index : null
 }
 
 function getDomEditGapClassName({

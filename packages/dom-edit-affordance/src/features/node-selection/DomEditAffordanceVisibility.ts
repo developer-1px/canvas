@@ -54,6 +54,8 @@ export function getDomEditOverlayVisibility({
   const alignSelfActive = isDomEditPropertyActive(affordanceState, 'alignSelf')
   const marginActive = isDomEditPropertyActive(affordanceState, 'margin')
   const spacingActive = gapActive || paddingActive
+  const canShowGapTargets = affordanceState.mode === 'idle' || gapActive
+  const canShowPaddingTargets = affordanceState.mode === 'idle' || paddingActive
   const canShowGeometry = context.showGeometry && context.position !== 'static'
   const canShowSizeModes =
     context.showSelfLayout ||
@@ -108,7 +110,7 @@ export function getDomEditOverlayVisibility({
     flexChildControls: canShowFlexChildControls,
     flexChildMargin: canShowFlexChildControls && !alignSelfActive,
     gapHitTargets: context.showSelfLayout &&
-      affordanceState.mode !== 'xray' &&
+      canShowGapTargets &&
       !paddingActive,
     gapVisuals: context.showSelfLayout && gapActive,
     geometry: canShowGeometry &&
@@ -117,17 +119,17 @@ export function getDomEditOverlayVisibility({
       affordanceState.mode !== 'xray' &&
       !spacingActive,
     gridGapHitTargets: context.showGridLayout &&
-      affordanceState.mode !== 'xray' &&
+      canShowGapTargets &&
       !paddingActive,
     gridGapVisuals: context.showGridLayout && gapActive,
     measurements: affordanceState.mode === 'measure',
     paddingHitTargets: (context.showSelfLayout || context.showGridLayout) &&
-      affordanceState.mode !== 'xray' &&
+      canShowPaddingTargets &&
       !gapActive,
     paddingVisuals: (context.showSelfLayout || context.showGridLayout) &&
       paddingActive,
     parentReference: Boolean(context.parentId) &&
-      affordanceState.mode === 'idle',
+      affordanceState.mode === 'measure',
     selection: true,
     sizeModes: canShowSizeModes && sizeModesActive,
     xray: affordanceState.mode === 'xray',

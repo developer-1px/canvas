@@ -1,6 +1,6 @@
 import { expect, test, type Locator, type Page } from '@playwright/test'
 
-test('shows grid track lines, line numbers, and hovered track sizes', async ({
+test('reveals only hovered grid tracks and their boundary lines', async ({
   page,
 }) => {
   await page.goto('/?demo=figma')
@@ -8,12 +8,11 @@ test('shows grid track lines, line numbers, and hovered track sizes', async ({
     .click()
 
   await selectLayer(page, 'Select layer Content grid', 'workspaceContent')
-  await expect(gridLine(page, 'column')).toHaveCount(3)
-  await expect(gridLine(page, 'row')).toHaveCount(2)
-  await expect(gridLineLabel(page, 'column')).toHaveText(['1', '2', '3'])
-  await expect(gridLineLabel(page, 'row')).toHaveText(['1', '2'])
+  await expect(gridLine(page, 'column')).toHaveCount(0)
+  await expect(gridLine(page, 'row')).toHaveCount(0)
+  await expect(gridLineLabel(page, 'column')).toHaveCount(0)
+  await expect(gridLineLabel(page, 'row')).toHaveCount(0)
   await expect(page.locator('.figma-grid-track-size')).toHaveCount(0)
-  await expectGridLinesMatchSelected(page)
 
   const gridBox = await getRequiredBox(
     page.locator('[data-design-node-id="workspaceContent"]'),
@@ -23,6 +22,15 @@ test('shows grid track lines, line numbers, and hovered track sizes', async ({
   await expect(gridTrackSize(page, 'column')).toContainText(/c1 .*px/)
   await expect(gridTrackSize(page, 'row')).toHaveCount(1)
   await expect(gridTrackSize(page, 'row')).toContainText(/r1 .*px/)
+  await expect(gridLine(page, 'column')).toHaveCount(2)
+  await expect(gridLineLabel(page, 'column')).toHaveText(['1', '2'])
+  await expect(gridLine(page, 'row')).toHaveCount(2)
+  await expect(gridLineLabel(page, 'row')).toHaveText(['1', '2'])
+  await expect(page.getByRole('button', { name: 'Alignment editor' }))
+    .toHaveCount(0)
+  await expect(page.locator('.figma-size-mode-capsule')).toHaveCount(0)
+  await expect(page.locator('.figma-autolayout-padding')).toHaveCount(0)
+  await expectGridLinesMatchHoveredTracks(page)
 
   await selectLayer(page, 'Select layer Stats row', 'workspaceStats')
   await expect(page.locator('.figma-grid-line')).toHaveCount(0)
@@ -30,7 +38,8 @@ test('shows grid track lines, line numbers, and hovered track sizes', async ({
 
   await selectLayer(page, 'Select layer Content grid', 'workspaceContent')
   await page.getByRole('button', { name: 'Zoom in' }).click()
-  await expectGridLinesMatchSelected(page)
+  await expect(gridLine(page, 'column')).toHaveCount(0)
+  await expect(gridLine(page, 'row')).toHaveCount(0)
 })
 
 async function selectLayer(
@@ -43,22 +52,19 @@ async function selectLayer(
     .toHaveAttribute('data-selected', 'true')
 }
 
-async function expectGridLinesMatchSelected(page: Page) {
+async function expectGridLinesMatchHoveredTracks(page: Page) {
   const gridBox = await getRequiredBox(
     page.locator('[data-design-node-id="workspaceContent"]'),
   )
   const firstColumnLine = await getRequiredBox(
     gridLine(page, 'column').nth(0),
   )
-  const lastColumnLine = await getRequiredBox(
-    gridLine(page, 'column').nth(2),
-  )
+  const lastColumnLine = await getRequiredBox(gridLine(page, 'column').nth(1))
   const firstRowLine = await getRequiredBox(gridLine(page, 'row').nth(0))
   const lastRowLine = await getRequiredBox(gridLine(page, 'row').nth(1))
 
   expect(Math.abs(centerX(firstColumnLine) - gridBox.x)).toBeLessThanOrEqual(1)
-  expect(Math.abs(centerX(lastColumnLine) - right(gridBox)))
-    .toBeLessThanOrEqual(1)
+  expect(centerX(lastColumnLine)).toBeGreaterThan(centerX(firstColumnLine))
   expect(Math.abs(centerY(firstRowLine) - gridBox.y)).toBeLessThanOrEqual(1)
   expect(Math.abs(centerY(lastRowLine) - bottom(gridBox))).toBeLessThanOrEqual(1)
 }
@@ -93,8 +99,4 @@ function centerX(box: { width: number; x: number }) {
 
 function centerY(box: { height: number; y: number }) {
   return box.y + box.height / 2
-}
-
-function right(box: { width: number; x: number }) {
-  return box.x + box.width
 }

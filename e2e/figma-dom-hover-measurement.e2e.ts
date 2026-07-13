@@ -30,7 +30,7 @@ test('shows selected-to-hover DOM measurement redlines', async ({ page }) => {
   await expect(page.locator('.figma-guide-distance')).toHaveCount(0)
 })
 
-test('hides DOM measurement redlines while spacing affordances drag', async ({
+test('keeps DOM measurement redlines and spacing affordances exclusive', async ({
   page,
 }) => {
   await page.goto('/?demo=figma')
@@ -41,6 +41,11 @@ test('hides DOM measurement redlines while spacing affordances drag', async ({
   await page.getByRole('button', { name: 'Measure tool' }).click()
   await expect.poll(() => page.locator('.figma-guide-distance').count())
     .toBeGreaterThan(0)
+  await expect(page.locator('.figma-autolayout-gap')).toHaveCount(0)
+
+  await page.getByRole('button', { name: 'Measure tool' }).click()
+  await expect(page.locator('.figma-guide-distance')).toHaveCount(0)
+  await expect(page.locator('.figma-autolayout-gap')).toHaveCount(1)
 
   await startDrag(page, page.locator('.figma-autolayout-gap').first(), {
     x: 16,
@@ -53,6 +58,11 @@ test('hides DOM measurement redlines while spacing affordances drag', async ({
   await page.getByRole('button', { name: 'Measure tool' }).click()
   await expect.poll(() => page.locator('.figma-guide-distance').count())
     .toBeGreaterThan(0)
+  await expect(sideHandle(page, 'top')).toHaveCount(0)
+
+  await page.getByRole('button', { name: 'Measure tool' }).click()
+  await expect(page.locator('.figma-guide-distance')).toHaveCount(0)
+  await expect(sideHandle(page, 'top')).toHaveCount(1)
 
   await startDrag(page, sideHandle(page, 'top'), { x: 0, y: 16 })
   await expect(page.locator('.figma-guide-distance')).toHaveCount(0)

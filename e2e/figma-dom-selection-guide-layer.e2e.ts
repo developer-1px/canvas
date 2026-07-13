@@ -120,10 +120,14 @@ async function expectSelectionIdentity(
     'aria-label',
     /H \d+ (Fill|Fixed|Hug)/,
   )
+  await expect(page.locator('.figma-guide-parent')).toHaveCount(0)
+  await expect(page.locator('.figma-guide-distance')).toHaveCount(0)
+
+  await page.getByRole('button', { name: 'Measure tool' }).click()
   await expect(page.locator('.figma-guide-parent')).toHaveCount(
     selection.parentOutline ? 1 : 0,
   )
-  await expect(page.locator('.figma-guide-distance')).toHaveCount(0)
+  await page.getByRole('button', { name: 'Select tool' }).click()
 }
 
 async function expectOverlayMatchesNode(page: Page, nodeId: string) {

@@ -1,6 +1,8 @@
 import {
+  useCallback,
   useEffect,
   useLayoutEffect,
+  useRef,
   useState,
   type PointerEvent,
   type RefObject,
@@ -30,6 +32,7 @@ import {
   getDomEditGridHoveredTracks,
   getDomEditGridTrackKey,
   getDomEditGridTrackLayout,
+  type DomEditGridLineGuide,
   type DomEditGridTrackGuide,
   type DomEditGridTrackLayout,
 } from './DomEditGridTrackGeometry'
@@ -38,6 +41,7 @@ type GridOverlayRect = DomEditOverlayRect
 type GridGapRect = DomEditOverlayRect & {
   axis: 'column' | 'row'
 }
+type DomEditGridHoverMode = 'gap' | 'track'
 
 export function DomEditGridOverlay<
   TNodeId extends DomEditNodeId,
@@ -78,10 +82,27 @@ export function DomEditGridOverlay<
     useState<DomEditGridTrackLayout | null>(null)
   const [hoveredGridTrackKeys, setHoveredGridTrackKeys] =
     useState<string[]>([])
-  const [trackRects, setTrackRects] = useState<GridOverlayRect[]>([])
-  const [isGapHovered, setIsGapHovered] = useState(false)
+  const [hoveredGapIndex, setHoveredGapIndex] = useState<number | null>(null)
+  const hoveredModeRef = useRef<DomEditGridHoverMode | null>(null)
+  const isGapHovered = hoveredGapIndex !== null
   const context = adapter.getLayoutContext(selectedNodeId)
   const style = adapter.getStyle(state, selectedNodeId)
+  const canTrackGridHover = canTrackDomEditGridHover(
+    baseAffordanceState,
+    activeDragAxis,
+  )
+  const changeHoveredMode = useCallback((mode: DomEditGridHoverMode | null) => {
+    if (hoveredModeRef.current === mode) {
+      return
+    }
+
+    hoveredModeRef.current = mode
+    onAffordanceStateChange(mode === 'gap'
+      ? { mode: 'hover-property', property: 'gap' }
+      : mode === 'track'
+        ? { mode: 'hover-property', property: 'geometry' }
+        : { mode: 'idle' })
+  }, [onAffordanceStateChange])
 
   useLayoutEffect(() => {
     const frame = requestAnimationFrame(() => {
@@ -89,7 +110,7 @@ export function DomEditGridOverlay<
         setGapRects([])
         setGridTrackLayout(null)
         setHoveredGridTrackKeys([])
-        setTrackRects([])
+        setHoveredGapIndex(null)
         return
       }
 
@@ -102,7 +123,6 @@ export function DomEditGridOverlay<
 
       setGapRects(measurement.gaps)
       setGridTrackLayout(measurement.trackLayout)
-      setTrackRects(measurement.tracks)
     })
 
     return () => cancelAnimationFrame(frame)
@@ -120,7 +140,11 @@ export function DomEditGridOverlay<
   ])
 
   useEffect(() => {
-    if (!context.showGridLayout) {
+    if (
+      !context.showGridLayout ||
+      !canTrackGridHover
+    ) {
+      hoveredModeRef.current = null
       return undefined
     }
 
@@ -131,8 +155,11 @@ export function DomEditGridOverlay<
       }
 
       const hoveredTarget = document.elementFromPoint(event.clientX, event.clientY)
-      const nextIsGapHovered = Boolean(hoveredTarget?.closest('.figma-grid-gap'))
-      const nextHoveredTrackKeys = shellRef.current && gridTrackLayout
+      const gapTarget = hoveredTarget?.closest<HTMLElement>(
+        '[data-dom-edit-grid-gap-index]',
+      )
+      const nextHoveredGapIndex = readDomEditGridGapIndex(gapTarget)
+      const nextHoveredTrackKeys = !gapTarget && shellRef.current && gridTrackLayout
         ? getDomEditGridHoveredTracks({
             layout: gridTrackLayout,
             point: getDomEditGridWorldPoint({
@@ -142,13 +169,19 @@ export function DomEditGridOverlay<
             }),
           }).map(getDomEditGridTrackKey)
         : []
+      const nextHoveredMode = nextHoveredGapIndex !== null
+        ? 'gap'
+        : nextHoveredTrackKeys.length > 0
+          ? 'track'
+          : null
 
-      setIsGapHovered((current) =>
-        current === nextIsGapHovered ? current : nextIsGapHovered)
+      setHoveredGapIndex((current) =>
+        current === nextHoveredGapIndex ? current : nextHoveredGapIndex)
       setHoveredGridTrackKeys((current) =>
         areDomEditGridTrackKeysEqual(current, nextHoveredTrackKeys)
           ? current
           : nextHoveredTrackKeys)
+      changeHoveredMode(nextHoveredMode)
     }
 
     window.addEventListener('pointermove', trackGridAffordance)
@@ -158,11 +191,18 @@ export function DomEditGridOverlay<
     }
   }, [
     activeDragAxis,
+    baseAffordanceState,
+    canTrackGridHover,
+    changeHoveredMode,
     context.showGridLayout,
     gridTrackLayout,
     shellRef,
     viewport,
   ])
+
+  useEffect(() => () => {
+    changeHoveredMode(null)
+  }, [changeHoveredMode])
 
   if (!context.showGridLayout) {
     return null
@@ -179,13 +219,22 @@ export function DomEditGridOverlay<
     context,
   })
   const activeGridTrackLayout = context.showGridLayout &&
-    visibility.gridGapHitTargets
+    canTrackGridHover &&
+    affordanceState.mode !== 'xray' &&
+    (
+      Boolean(activeDragAxis) ||
+      isGapHovered ||
+      hoveredGridTrackKeys.length > 0
+    )
     ? gridTrackLayout
     : null
-  const activeGap = gapRects[0]
+  const activeGap = hoveredGapIndex === null
+    ? gapRects.find((gap) => gap.axis === activeDragAxis) ?? gapRects[0] ?? null
+    : gapRects[hoveredGapIndex] ?? null
   const startGapDrag = (
     event: PointerEvent<HTMLButtonElement>,
     gap: GridGapRect,
+    gapIndex: number,
   ) => {
     const start = {
       clientX: event.clientX,
@@ -200,8 +249,9 @@ export function DomEditGridOverlay<
     }) === true
 
     source.setPointerCapture(pointerId)
+    hoveredModeRef.current = null
     setActiveDragAxis(gap.axis)
-    setIsGapHovered(true)
+    setHoveredGapIndex(gapIndex)
     onAffordanceStateChange({ mode: 'drag-property', property: 'gap' })
     event.preventDefault()
     event.stopPropagation()
@@ -236,7 +286,7 @@ export function DomEditGridOverlay<
         }
       }
       setActiveDragAxis(null)
-      setIsGapHovered(false)
+      setHoveredGapIndex(null)
       onAffordanceStateChange({ mode: 'idle' })
       window.removeEventListener('pointermove', handleMove)
       window.removeEventListener('pointercancel', handleEnd)
@@ -252,17 +302,12 @@ export function DomEditGridOverlay<
     <>
       {activeGridTrackLayout ? (
         <DomEditGridTrackGuides
+          activeGap={isGapHovered ? activeGap : null}
           hoveredTrackKeys={hoveredGridTrackKeys}
           layout={activeGridTrackLayout}
+          showAllLines={Boolean(activeDragAxis)}
         />
       ) : null}
-      {visibility.gridGapVisuals ? trackRects.map((track, index) => (
-        <span
-          key={`${index}:${track.x}:${track.y}`}
-          className="figma-grid-track"
-          style={createDomEditOverlayRectStyle(track)}
-        />
-      )) : null}
       {visibility.gridGapHitTargets ? gapRects.map((gap, index) => (
         <button
           key={`${gap.axis}:${index}:${gap.x}:${gap.y}`}
@@ -270,12 +315,15 @@ export function DomEditGridOverlay<
           className={[
             'figma-grid-gap',
             `figma-grid-gap--${gap.axis}`,
-            !visibility.gridGapVisuals ? 'figma-grid-gap--empty' : '',
+            !activeDragAxis && hoveredGapIndex !== index
+              ? 'figma-grid-gap--empty'
+              : '',
           ].filter(Boolean).join(' ')}
+          data-dom-edit-grid-gap-index={index}
           style={createDomEditOverlayRectStyle(gap)}
           title="Grid gap"
           type="button"
-          onPointerDown={(event) => startGapDrag(event, gap)}
+          onPointerDown={(event) => startGapDrag(event, gap, index)}
         />
       )) : null}
       {visibility.gridGapVisuals && activeGap ? (
@@ -294,23 +342,45 @@ export function DomEditGridOverlay<
 }
 
 function DomEditGridTrackGuides({
+  activeGap,
   hoveredTrackKeys,
   layout,
+  showAllLines,
 }: {
+  activeGap: GridGapRect | null
   hoveredTrackKeys: string[]
   layout: DomEditGridTrackLayout
+  showAllLines: boolean
 }) {
   const hoveredTrackKeySet = new Set(hoveredTrackKeys)
-  const lines = [
-    ...layout.columnLines,
-    ...layout.rowLines,
-  ]
   const tracks = [
     ...layout.columnTracks,
     ...layout.rowTracks,
   ]
   const hoveredTracks = tracks.filter((track) =>
     hoveredTrackKeySet.has(getDomEditGridTrackKey(track)))
+  const visibleLineKeys = new Set(hoveredTracks.flatMap((track) => [
+    `${track.axis}:${track.index + 1}`,
+    `${track.axis}:${track.index + 2}`,
+  ]))
+  const allLines = [
+    ...layout.columnLines,
+    ...layout.rowLines,
+  ]
+  const closestGapLine = activeGap
+    ? getDomEditClosestGridGapLine(activeGap, allLines)
+    : null
+
+  if (closestGapLine) {
+    visibleLineKeys.add(
+      `${closestGapLine.axis}:${closestGapLine.lineNumber}`,
+    )
+  }
+
+  const lines = showAllLines
+    ? allLines
+    : allLines.filter((line) =>
+    visibleLineKeys.has(`${line.axis}:${line.lineNumber}`))
 
   return (
     <>
@@ -386,6 +456,52 @@ function DomEditGridTrackSizeLabel({
       {track.label}
     </span>
   )
+}
+
+function getDomEditClosestGridGapLine(
+  gap: GridGapRect,
+  lines: readonly DomEditGridLineGuide[],
+) {
+  const gapCenter = gap.axis === 'column'
+    ? gap.x + gap.w / 2
+    : gap.y + gap.h / 2
+
+  return lines
+    .filter((line) => line.axis === gap.axis)
+    .reduce<DomEditGridLineGuide | null>((closest, line) => {
+      if (!closest) {
+        return line
+      }
+
+      return Math.abs(line.offset - gapCenter) <
+        Math.abs(closest.offset - gapCenter)
+        ? line
+        : closest
+    }, null)
+}
+
+function readDomEditGridGapIndex(target: HTMLElement | null | undefined) {
+  const index = Number.parseInt(
+    target?.dataset.domEditGridGapIndex ?? '',
+    10,
+  )
+
+  return Number.isInteger(index) && index >= 0 ? index : null
+}
+
+function canTrackDomEditGridHover(
+  affordanceState: DomEditAffordanceState,
+  activeDragAxis: GridGapRect['axis'] | null,
+) {
+  return Boolean(activeDragAxis) ||
+    affordanceState.mode === 'idle' ||
+    (
+      affordanceState.mode === 'hover-property' &&
+      (
+        affordanceState.property === 'gap' ||
+        affordanceState.property === 'geometry'
+      )
+    )
 }
 
 function measureDomEditGrid({

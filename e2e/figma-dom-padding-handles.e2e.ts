@@ -1,16 +1,37 @@
 import { expect, test, type Locator, type Page } from '@playwright/test'
 
-test('groups padding side and corner hover states', async ({ page }) => {
+test('targets one padding side on hover and expands affected sides on drag', async ({
+  page,
+}) => {
   await selectHeroPanel(page)
 
+  const cornerCue = await cornerHandle(page, 'top-left').evaluate((element) => {
+    const cue = getComputedStyle(element, '::after')
+
+    return {
+      color: cue.backgroundColor,
+      height: cue.height,
+      width: cue.width,
+    }
+  })
+  expect(cornerCue).toEqual({
+    color: 'rgba(180, 83, 9, 0.72)',
+    height: '4px',
+    width: '4px',
+  })
+
   await sideHandle(page, 'top').hover()
-  await expectActiveSides(page, ['top', 'bottom'])
+  await expectActiveSides(page, ['top'])
 
   await sideHandle(page, 'left').hover()
-  await expectActiveSides(page, ['left', 'right'])
+  await expectActiveSides(page, ['left'])
 
   await cornerHandle(page, 'top-left').hover()
   await expectActiveSides(page, ['top', 'right', 'bottom', 'left'])
+
+  await startDrag(page, sideHandle(page, 'top'), { x: 0, y: 8 })
+  await expectActiveSides(page, ['top', 'bottom'])
+  await page.mouse.up()
 
   await sideHandle(page, 'top').click()
   await expectActiveSides(page, ['top'])
@@ -58,6 +79,15 @@ async function dragHandle(
   handle: Locator,
   delta: { x: number; y: number },
 ) {
+  await startDrag(page, handle, delta)
+  await page.mouse.up()
+}
+
+async function startDrag(
+  page: Page,
+  handle: Locator,
+  delta: { x: number; y: number },
+) {
   const box = await handle.boundingBox()
   expect(box).not.toBeNull()
   const x = box!.x + box!.width / 2
@@ -66,7 +96,6 @@ async function dragHandle(
   await page.mouse.move(x, y)
   await page.mouse.down()
   await page.mouse.move(x + delta.x, y + delta.y, { steps: 4 })
-  await page.mouse.up()
 }
 
 async function expectActiveSides(

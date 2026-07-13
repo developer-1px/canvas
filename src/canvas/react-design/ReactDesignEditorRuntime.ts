@@ -331,7 +331,10 @@ export function useReactDesignEditorRuntime(
       handlePointerPinch,
     )
 
-    element.addEventListener('wheel', handleStageWheel, { passive: false })
+    element.addEventListener('wheel', handleStageWheel, {
+      capture: true,
+      passive: false,
+    })
     element.addEventListener('gesturestart', handleGestureStart)
     element.addEventListener('gesturechange', handleGestureChange)
     element.addEventListener('gestureend', handleGestureEnd)
@@ -341,7 +344,7 @@ export function useReactDesignEditorRuntime(
       { capture: true },
     )
     stageInputCleanupRef.current = () => {
-      element.removeEventListener('wheel', handleStageWheel)
+      element.removeEventListener('wheel', handleStageWheel, { capture: true })
       element.removeEventListener('gesturestart', handleGestureStart)
       element.removeEventListener('gesturechange', handleGestureChange)
       element.removeEventListener('gestureend', handleGestureEnd)

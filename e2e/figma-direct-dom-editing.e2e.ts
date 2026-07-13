@@ -84,7 +84,10 @@ test('measures canonical DOM selection, box, flex, and grid overlays through pro
   )).toBe('column')
 
   await selectLayer(page, 'Content grid', 'workspaceContent')
-  await expect(page.locator('.figma-grid-line')).not.toHaveCount(0)
+  await expect(page.locator('.figma-grid-line')).toHaveCount(0)
+  await expect(page.locator('.figma-grid-gap')).not.toHaveCount(0)
+  await page.locator('.figma-grid-gap').first().hover()
+  await expect(page.locator('.figma-grid-line')).toHaveCount(1)
   await expectOverlayMatchesNode(
     selectionGuide(page),
     designNode(page, 'workspaceContent'),

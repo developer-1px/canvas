@@ -6,11 +6,11 @@ import {
 } from './DomEditAffordanceVisibility'
 
 describe('DomEditAffordanceVisibility', () => {
-  it('keeps idle ownership to selection identity, parent reference, and size modes', () => {
+  it('keeps idle ownership to selection identity and compact controls', () => {
     const visibility = getVisibility({ mode: 'idle' })
 
     expect(visibility.selection).toBe(true)
-    expect(visibility.parentReference).toBe(true)
+    expect(visibility.parentReference).toBe(false)
     expect(visibility.alignGuides).toBe(false)
     expect(visibility.axisGuides).toBe(false)
     expect(visibility.directionControls).toBe(true)
@@ -60,10 +60,13 @@ describe('DomEditAffordanceVisibility', () => {
     expect(measure.measurements).toBe(true)
     expect(measure.axisGuides).toBe(true)
     expect(measure.alignGuides).toBe(false)
-    expect(measure.parentReference).toBe(false)
+    expect(measure.parentReference).toBe(true)
     expect(measure.geometry).toBe(false)
     expect(measure.directionControls).toBe(false)
     expect(measure.flexChildControls).toBe(false)
+    expect(measure.gapHitTargets).toBe(false)
+    expect(measure.gridGapHitTargets).toBe(false)
+    expect(measure.paddingHitTargets).toBe(false)
     expect(measure.sizeModes).toBe(false)
     expect(measure.xray).toBe(false)
 

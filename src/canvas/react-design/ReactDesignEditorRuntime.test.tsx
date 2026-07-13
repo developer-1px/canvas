@@ -247,6 +247,31 @@ describe('ReactDesignEditorRuntime', () => {
     }))).toBe(true)
     expect(runtime!.viewport.read()).toBe(viewportBeforePassthrough)
 
+    const overlayControl = document.createElement('button')
+
+    overlayControl.addEventListener('wheel', (event) => {
+      event.stopPropagation()
+    })
+    stage!.append(overlayControl)
+    const viewportBeforeOverlayWheel = runtime!.viewport.read()
+    let didCancelOverlayWheel = false
+
+    await act(async () => {
+      didCancelOverlayWheel = !overlayControl.dispatchEvent(new WheelEvent(
+        'wheel',
+        {
+          bubbles: true,
+          cancelable: true,
+          deltaY: 12,
+        },
+      ))
+    })
+
+    expect(didCancelOverlayWheel).toBe(true)
+    expect(runtime!.viewport.read()).not.toBe(viewportBeforeOverlayWheel)
+    await act(async () => runtime!.viewport.reset())
+    const viewportBeforeNativeScroll = runtime!.viewport.read()
+
     const authoredScroll = document.createElement('div')
     const authoredScrollChild = document.createElement('span')
 
@@ -264,7 +289,7 @@ describe('ReactDesignEditorRuntime', () => {
       cancelable: true,
       deltaY: 12,
     }))).toBe(true)
-    expect(runtime!.viewport.read()).toBe(viewportBeforePassthrough)
+    expect(runtime!.viewport.read()).toBe(viewportBeforeNativeScroll)
 
     authoredScroll.scrollTop = 200
 
@@ -275,7 +300,7 @@ describe('ReactDesignEditorRuntime', () => {
         deltaY: 12,
       }))).toBe(false)
     })
-    expect(runtime!.viewport.read()).not.toBe(viewportBeforePassthrough)
+    expect(runtime!.viewport.read()).not.toBe(viewportBeforeNativeScroll)
 
     await act(async () => runtime!.viewport.reset())
 

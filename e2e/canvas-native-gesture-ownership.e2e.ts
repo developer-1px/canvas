@@ -136,6 +136,40 @@ for (const target of CANVAS_ROUTES) {
   })
 }
 
+test('Figma overlay controls keep canvas wheel pan and pinch ownership', async ({
+  page,
+}) => {
+  await page.goto('/?demo=figma')
+  await page.getByRole('button', { name: 'Select layer Workspace page' })
+    .click()
+  await page.getByRole('button', { name: 'Select layer Pipeline list' })
+    .click()
+
+  const root = page.locator('.figma-clone')
+  const gap = page.locator('.figma-autolayout-gap').first()
+
+  await expect(gap).toBeVisible()
+  const viewportBeforePan = await readCanvasViewport(root)
+
+  expect(await dispatchWheel(gap, { deltaY: 24 })).toBe(false)
+  await expect.poll(() => readCanvasViewport(root)).not.toEqual(
+    viewportBeforePan,
+  )
+
+  const scaleBeforePinch = await readCanvasScale(root)
+
+  expect(await dispatchWheel(gap, { ctrlKey: true, deltaY: -80 })).toBe(false)
+  await expect.poll(() => readCanvasScale(root)).toBeGreaterThan(
+    scaleBeforePinch,
+  )
+
+  const viewportBeforeLayersWheel = await readCanvasViewport(root)
+  const layers = page.getByRole('complementary', { name: 'Layers' })
+
+  expect(await dispatchWheel(layers, { deltaY: 24 })).toBe(true)
+  expect(await readCanvasViewport(root)).toEqual(viewportBeforeLayersWheel)
+})
+
 test('Figma authored scroll frames keep native scroll before canvas pan', async ({
   page,
 }) => {

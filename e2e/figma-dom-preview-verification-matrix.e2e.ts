@@ -153,11 +153,12 @@ test('verifies grid and out-of-flow affordances in the preview', async ({
   await selectLayer(page, 'Select layer Workspace page', 'workspacePage')
   await selectLayer(page, 'Select layer Content grid', 'workspaceContent')
 
-  await expect(gridLine(page, 'column')).toHaveCount(3)
-  await expect(gridLine(page, 'row')).toHaveCount(2)
+  await expect(gridLine(page, 'column')).toHaveCount(0)
+  await expect(gridLine(page, 'row')).toHaveCount(0)
   await expect.poll(() => page.locator('.figma-grid-gap').count())
     .toBeGreaterThan(0)
-  await expectGridLinesMatchNode(page, 'workspaceContent')
+  await page.locator('.figma-grid-gap').first().hover()
+  await expect(page.locator('.figma-grid-line')).toHaveCount(1)
 
   await selectLayer(page, 'Select layer Pipeline panel', 'workspacePipeline')
   await expect(page.locator('.figma-grid-line')).toHaveCount(0)
@@ -184,11 +185,11 @@ test('verifies selected overlay tracking through pan and zoom', async ({
   await selectLayer(page, 'Select layer Workspace page', 'workspacePage')
   await selectLayer(page, 'Select layer Content grid', 'workspaceContent')
   await expectSelectionMatchesNode(page, 'workspaceContent')
-  await expectGridLinesMatchNode(page, 'workspaceContent')
+  await expect(page.locator('.figma-grid-line')).toHaveCount(0)
 
   await page.getByRole('button', { name: 'Zoom in' }).click()
   await expectSelectionMatchesNode(page, 'workspaceContent')
-  await expectGridLinesMatchNode(page, 'workspaceContent')
+  await expect(page.locator('.figma-grid-line')).toHaveCount(0)
 
   const beforeNode = await getRequiredBox(domNode(page, 'workspaceContent'))
   await page.keyboard.press('h')
@@ -205,7 +206,7 @@ test('verifies selected overlay tracking through pan and zoom', async ({
       Math.abs(afterNode.y - beforeNode.y)
   }).toBeGreaterThan(1)
   await expectSelectionMatchesNode(page, 'workspaceContent')
-  await expectGridLinesMatchNode(page, 'workspaceContent')
+  await expect(page.locator('.figma-grid-line')).toHaveCount(0)
   await page.keyboard.press('v')
   await expect(page.locator('.figma-direct-dom__stage'))
     .toHaveAttribute('data-mode', 'select')
@@ -285,19 +286,6 @@ async function expectOverlayMatchesNode(
   expectClose(overlayBox.y, nodeBox.y)
   expectClose(overlayBox.width, nodeBox.width)
   expectClose(overlayBox.height, nodeBox.height)
-}
-
-async function expectGridLinesMatchNode(page: Page, nodeId: string) {
-  const gridBox = await getRequiredBox(domNode(page, nodeId))
-  const firstColumnLine = await getRequiredBox(gridLine(page, 'column').nth(0))
-  const lastColumnLine = await getRequiredBox(gridLine(page, 'column').nth(2))
-  const firstRowLine = await getRequiredBox(gridLine(page, 'row').nth(0))
-  const lastRowLine = await getRequiredBox(gridLine(page, 'row').nth(1))
-
-  expectClose(centerX(firstColumnLine), gridBox.x)
-  expectClose(centerX(lastColumnLine), right(gridBox))
-  expectClose(centerY(firstRowLine), gridBox.y)
-  expectClose(centerY(lastRowLine), bottom(gridBox))
 }
 
 async function expectDistanceIsMeasureRed(locator: Locator) {
@@ -430,22 +418,6 @@ function sizeOption(page: Page, label: string) {
 function widthModeBadge(page: Page) {
   return page.locator('.figma-size-mode-capsule .figma-size-mode-control')
     .first()
-}
-
-function bottom(box: { height: number; y: number }) {
-  return box.y + box.height
-}
-
-function centerX(box: { width: number; x: number }) {
-  return box.x + box.width / 2
-}
-
-function centerY(box: { height: number; y: number }) {
-  return box.y + box.height / 2
-}
-
-function right(box: { width: number; x: number }) {
-  return box.x + box.width
 }
 
 function expectClose(actual: number, expected: number) {
