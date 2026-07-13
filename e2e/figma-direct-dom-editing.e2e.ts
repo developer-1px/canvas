@@ -348,6 +348,17 @@ test('previews spacing gestures, cancels cleanly, and commits one history entry'
   await expect.poll(() => readComputedNumber(content, 'columnGap'))
     .toBe(initialGridGap)
   await expect(app).toHaveAttribute('data-history-can-undo', 'false')
+
+  await dragHandle(page, gridGapHandle, { x: 20, y: 0 })
+  await page.mouse.up()
+  await expect.poll(() => readComputedNumber(content, 'columnGap'))
+    .toBeGreaterThan(initialGridGap)
+  await expect(app).toHaveAttribute('data-history-can-undo', 'true')
+
+  await page.keyboard.press(`${primaryModifier()}+Z`)
+  await expect.poll(() => readComputedNumber(content, 'columnGap'))
+    .toBe(initialGridGap)
+  await expect(app).toHaveAttribute('data-history-can-undo', 'false')
 })
 
 test('contains editor shortcuts and composition inside the native text editor', async ({

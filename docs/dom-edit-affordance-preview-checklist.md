@@ -13,7 +13,7 @@ Target: `packages/figma-clone`
 | Measure mode | Red distance lines appear only in measure state; X-ray overlays stay hidden while measuring. | `e2e/figma-dom-preview-verification-matrix.e2e.ts` |
 | Box-model X-ray | Selected content, padding, border, and margin bands appear only while X-ray is enabled. | `e2e/figma-dom-preview-verification-matrix.e2e.ts` |
 | Flex child participation | Flex children show Fill/Hug/Fixed in the size badge choices and expose the targeted align-self rail. | `e2e/figma-dom-preview-verification-matrix.e2e.ts` |
-| Grid sample | Grid containers show track lines and gaps; grid children show occupied cell area and four span handles. | `e2e/figma-dom-preview-verification-matrix.e2e.ts` |
+| Grid sample | Only selected `display:grid` containers show track lines and editable gaps; non-grid selections show no grid layout overlay. | `e2e/figma-dom-preview-verification-matrix.e2e.ts` |
 | Out-of-flow geometry | Static DOM nodes do not get transform handles; `Floating note` gets Moveable handles and an absolute context badge. | `e2e/figma-dom-preview-verification-matrix.e2e.ts` |
 | Pan/zoom tracking | Selection and grid overlays continue matching the rendered DOM target within 1px after zoom and pan. | `e2e/figma-dom-preview-verification-matrix.e2e.ts` |
 
@@ -25,7 +25,7 @@ Target: `packages/figma-clone`
 - `e2e/figma-dom-flex-container-controls.e2e.ts`
 - `e2e/figma-dom-flex-child-participation.e2e.ts`
 - `e2e/figma-dom-grid-track-lines.e2e.ts`
-- `e2e/figma-dom-grid-child-area.e2e.ts`
+- `e2e/figma-dom-grid-layout.e2e.ts`
 - `e2e/figma-dom-out-of-flow-geometry.e2e.ts`
 
 ## Command Gates
@@ -51,7 +51,8 @@ DOM edit preview
 |   |-- change Pad: padding band thickness changes
 |   `-- drag padding: gap stays hidden while active
 |-- Select Content grid / Pipeline panel
-|   `-- grid tracks, gaps, cell area, and span handles match DOM geometry
+|   |-- Content grid: grid tracks and editable gaps match DOM geometry
+|   `-- Pipeline panel: no grid layout overlay appears
 |-- Select Floating note
 |   `-- transform handles appear only for this absolute node
 `-- Zoom and pan

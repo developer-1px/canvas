@@ -160,12 +160,8 @@ test('verifies grid and out-of-flow affordances in the preview', async ({
   await expectGridLinesMatchNode(page, 'workspaceContent')
 
   await selectLayer(page, 'Select layer Pipeline panel', 'workspacePipeline')
-  await expect(page.locator('.figma-grid-child-area')).toHaveCount(1)
-  await expect(page.locator('.figma-grid-child-span-handle')).toHaveCount(4)
-  await expectOverlayMatchesNode(
-    page.locator('.figma-grid-child-area'),
-    domNode(page, 'workspacePipeline'),
-  )
+  await expect(page.locator('.figma-grid-line')).toHaveCount(0)
+  await expect(page.locator('.figma-grid-gap')).toHaveCount(0)
 
   await selectLayer(page, 'Select layer Main area', 'workspaceMain')
   await page.keyboard.down(primaryModifier())
