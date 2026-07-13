@@ -32,7 +32,7 @@ import {
   type WheelEvent as ReactWheelEvent,
 } from 'react'
 import {
-  ReactDesignRenderer,
+  ReactDesignEditorRenderer,
   createReactDesignDefinitionRegistry,
   useReactDesignEditorRuntime,
   type DesignJSONValue,
@@ -195,7 +195,6 @@ export function FigJamCloneApp() {
     document: designDocument,
     editor,
     projection,
-    registry,
     snapshot,
     viewport: viewportRuntime,
   } = runtime
@@ -1371,11 +1370,7 @@ export function FigJamCloneApp() {
               transform: `translate(${viewport.x}px, ${viewport.y}px) scale(${viewport.scale})`,
             }}
           >
-            <ReactDesignRenderer
-              projection={projection}
-              read={editor.read}
-              registry={registry}
-            />
+            <ReactDesignEditorRenderer runtime={runtime} />
             {selectedNode?.definition.id ===
             FIGJAM_STICKY_NOTE_DEFINITION_ID ? (
               <FigJamStickyQuickCreate

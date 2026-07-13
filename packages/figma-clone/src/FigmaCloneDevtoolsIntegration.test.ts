@@ -19,7 +19,7 @@ describe('Figma clone editor chrome', () => {
     expect(source).toContain('useReactDesignEditorRuntime')
     expect(source).not.toContain('createEditorEngine')
     expect(source).not.toContain('createDomProjection')
-    expect(source).toContain('<ReactDesignRenderer')
+    expect(source).toContain('<ReactDesignEditorRenderer')
     expect(source).toContain('<DomEditEditorOverlay')
     expect(source).toContain('<FigmaCloneInspector')
     expect(source).not.toContain('stageOverlaySlot.render')

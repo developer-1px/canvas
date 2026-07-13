@@ -27,6 +27,9 @@ import {
   type EditorEngineSnapshot,
 } from '../editor-engine'
 import type { ReactDesignDefinitionRegistry } from '../react-design-renderer'
+import {
+  disposeReactDesignEditorExternalChangeHost,
+} from './ReactDesignEditorExternalChanges'
 
 export type ReactDesignEditorViewportOptions = {
   readonly fitPadding?: number
@@ -206,6 +209,7 @@ export function useReactDesignEditorRuntime(
           current.generation === generation ||
           current.runtime !== runtime
         ) {
+          disposeReactDesignEditorExternalChangeHost(runtime.editor)
           runtime.editor.dispose()
           runtime.projection.dispose()
         }

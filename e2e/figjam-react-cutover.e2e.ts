@@ -194,6 +194,45 @@ test('previews, cancels, commits, and restores direct text edits', async ({
   await expect(sticky).toContainText('Ship the canonical DOM board')
 })
 
+test('keeps a blurred composition preview until its final input commits', async ({
+  page,
+}) => {
+  await page.goto('/figjam')
+
+  const app = figJamApp(page)
+  const sticky = designNode(page, 'figjam-sticky')
+
+  await sticky.dblclick({ force: true })
+  const editor = page.getByRole('textbox', {
+    name: 'Edit sticky note text',
+  })
+
+  await editor.focus()
+  await editor.dispatchEvent('compositionstart', { data: '한' })
+  await editor.evaluate((element) => element.blur())
+
+  await expect(editor).toBeVisible()
+  await expect(app).toHaveAttribute('data-preview-node-id', 'figjam-sticky')
+
+  await editor.evaluate((element) => {
+    element.dispatchEvent(new CompositionEvent('compositionend', {
+      bubbles: true,
+      data: '한',
+    }))
+    const setter = Object.getOwnPropertyDescriptor(
+      HTMLTextAreaElement.prototype,
+      'value',
+    )?.set
+
+    setter?.call(element, '한글 입력')
+    element.dispatchEvent(new Event('input', { bubbles: true }))
+  })
+
+  await expect(editor).toHaveCount(0)
+  await expect(sticky).toContainText('한글 입력')
+  await expect.poll(() => app.getAttribute('data-preview-node-id')).toBeNull()
+})
+
 test('honors widget move and resize capabilities in DOM controls', async ({
   page,
 }) => {

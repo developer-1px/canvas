@@ -16,7 +16,7 @@ import {
 } from 'react'
 import type { EditorEngine } from '@interactive-os/canvas/editor'
 import {
-  ReactDesignRenderer,
+  ReactDesignEditorRenderer,
   createReactDesignDefinitionRegistry,
   useReactDesignEditorRuntime,
   type DesignNodeId,
@@ -78,7 +78,6 @@ export function FigmaCloneApp() {
     document,
     editor,
     projection,
-    registry,
     snapshot: editorSnapshot,
     stage,
     viewport: viewportRuntime,
@@ -382,11 +381,7 @@ export function FigmaCloneApp() {
               transform: `translate(${viewport.x}px, ${viewport.y}px) scale(${viewport.scale})`,
             }}
           >
-            <ReactDesignRenderer
-              projection={projection}
-              read={editor.read}
-              registry={registry}
-            />
+            <ReactDesignEditorRenderer runtime={runtime} />
           </div>
           <DomEditEditorOverlay
             affordanceState={affordanceState}

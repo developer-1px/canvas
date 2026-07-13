@@ -71,6 +71,9 @@ export type {
 } from './ReactDesignWidgetPack'
 
 export {
+  ReactDesignEditorRenderer,
+} from './ReactDesignEditorRenderer'
+export {
   useReactDesignEditorRuntime,
 } from './ReactDesignEditorRuntime'
 export type {
@@ -78,3 +81,17 @@ export type {
   ReactDesignEditorViewportOptions,
   UseReactDesignEditorRuntimeOptions,
 } from './ReactDesignEditorRuntime'
+export type {
+  ReactDesignEditorExternalChangeHost,
+} from './ReactDesignEditorExternalChanges'
+export {
+  getReactDesignEditorExternalChangeHost,
+} from './ReactDesignEditorExternalChanges'
+export {
+  createReactDesignTextSelection,
+} from './ReactDesignTextSelection'
+export type {
+  ReactDesignTextSelection,
+  ReactDesignTextSelectionBookmark,
+  ReactDesignTextSelectionOwnership,
+} from './ReactDesignTextSelection'
