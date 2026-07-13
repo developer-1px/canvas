@@ -18,10 +18,12 @@ const FIGMA_FRAME_PRESETS = [
 export function FigmaCloneInspector({
   editor,
   registry,
+  spacingGridSize,
   snapshot,
 }: {
   readonly editor: EditorEngine
   readonly registry: ReactDesignDefinitionRegistry
+  readonly spacingGridSize?: number
   readonly snapshot: EditorEngineSnapshot
 }) {
   const selectedNodeId = snapshot.selection.primaryNodeId
@@ -41,7 +43,10 @@ export function FigmaCloneInspector({
           frame={selectedNode.frame}
         />
       ) : null}
-      <DomEditEditorInspector editor={editor} />
+      <DomEditEditorInspector
+        editor={editor}
+        spacingGridSize={spacingGridSize}
+      />
       {selectedNode && definition?.renderInspector
         ? definition.renderInspector({
             editor,

@@ -10,8 +10,10 @@ import {
 
 export function DomEditEditorInspector({
   editor,
+  spacingGridSize,
 }: {
   readonly editor: EditorEngine
+  readonly spacingGridSize?: number
 }) {
   const model = useDomEditEditorModel(editor)
 
@@ -21,6 +23,7 @@ export function DomEditEditorInspector({
       canEditText={(nodeId) => editor.read.node(nodeId)?.text !== null}
       getText={(nodeId) => editor.read.node(nodeId)?.text ?? ''}
       selectedNodeId={model.selectedNodeId}
+      spacingGridSize={spacingGridSize}
       state={model.state}
       viewport={{ scale: 1, x: 0, y: 0 }}
       onChange={(nodeId, field, value) => {

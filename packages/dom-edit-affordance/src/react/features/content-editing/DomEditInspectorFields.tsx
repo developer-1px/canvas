@@ -8,6 +8,10 @@ import {
   getDomEditRadioTabIndex,
   handleDomEditRadioGroupKeyDown,
 } from '../../shared/DomEditRadioGroup'
+import {
+  resolveDomEditSpacingGridSize,
+  snapDomEditSpacingValue,
+} from '../../../shared/gesture/DomEditOverlayGesture'
 
 export function DomEditResizeModeFields<TNodeId extends DomEditNodeId>({
   heightMode,
@@ -97,12 +101,14 @@ export function DomEditNumberField<TNodeId extends DomEditNodeId>({
   field,
   label,
   nodeId,
+  spacingGridSize,
   value,
   onChange,
 }: {
   field: DomEditField
   label: string
   nodeId: TNodeId
+  spacingGridSize?: number
   value: number
   onChange: (
     nodeId: TNodeId,
@@ -110,15 +116,30 @@ export function DomEditNumberField<TNodeId extends DomEditNodeId>({
     value: number,
   ) => void
 }) {
+  const normalizedSpacingGridSize = spacingGridSize === undefined
+    ? undefined
+    : resolveDomEditSpacingGridSize({ gridSize: spacingGridSize })
+
   return (
     <label className="figma-number-field">
       <span>{label}</span>
       <input
         aria-label={label}
+        step={normalizedSpacingGridSize}
         type="number"
         value={value}
         onChange={(event) => {
-          onChange(nodeId, field, Number(event.currentTarget.value))
+          const nextValue = Number(event.currentTarget.value)
+
+          onChange(
+            nodeId,
+            field,
+            normalizedSpacingGridSize === undefined
+              ? nextValue
+              : snapDomEditSpacingValue(nextValue, {
+                  gridSize: normalizedSpacingGridSize,
+                }),
+          )
         }}
       />
     </label>

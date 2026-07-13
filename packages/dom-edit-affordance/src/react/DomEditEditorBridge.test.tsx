@@ -57,6 +57,40 @@ describe('DomEditEditor bridge', () => {
     fixture.dispose()
   })
 
+  it('snaps inspector gap and padding values to the configured integer grid', async () => {
+    const fixture = createEditorFixture()
+
+    fixture.editor.commands.execute({
+      nodeId: 'root',
+      type: 'selection.replace',
+    })
+
+    container = document.createElement('div')
+    document.body.append(container)
+    root = createRoot(container)
+
+    await act(async () => root?.render(
+      <DomEditEditorInspector
+        editor={fixture.editor}
+        spacingGridSize={6}
+      />,
+    ))
+
+    const gapInput = requireInput(container, 'Gap')
+    const paddingInput = requireInput(container, 'Pad')
+
+    expect(gapInput.step).toBe('6')
+    expect(paddingInput.step).toBe('6')
+
+    await changeInput(gapInput, '14.1')
+    await changeInput(paddingInput, '17.9')
+
+    expect(fixture.document.read.node('root')?.layout.gap).toBe(12)
+    expect(fixture.document.read.node('root')?.layout.padding).toBe(18)
+
+    fixture.dispose()
+  })
+
   it('measures and edits text through the selected projected node', async () => {
     const fixture = createEditorFixture()
 

@@ -12,6 +12,9 @@ import {
   getDomEditUniformPadding,
 } from '../../../features/box-editing/DomEditPadding'
 import {
+  DEFAULT_DOM_EDIT_SPACING_GRID_SIZE,
+} from '../../../shared/gesture/DomEditOverlayGesture'
+import {
   DomEditNumberField,
   DomEditReadOnlyField,
   DomEditResizeModeFields,
@@ -28,6 +31,7 @@ export function DomEditInspector<
   canEditText,
   getText,
   selectedNodeId,
+  spacingGridSize = DEFAULT_DOM_EDIT_SPACING_GRID_SIZE,
   state,
   viewport,
   onChange,
@@ -38,6 +42,7 @@ export function DomEditInspector<
   canEditText: (nodeId: TNodeId) => boolean
   getText: (nodeId: TNodeId) => string
   selectedNodeId: TNodeId | null
+  spacingGridSize?: number
   state: TState
   viewport: DomEditViewport
   onChange: (
@@ -195,6 +200,7 @@ export function DomEditInspector<
                 field="gap"
                 label="Gap"
                 nodeId={selectedNodeId}
+                spacingGridSize={spacingGridSize}
                 value={style.gap}
                 onChange={onChange}
               />
@@ -225,6 +231,7 @@ export function DomEditInspector<
               field="gap"
               label="Gap"
               nodeId={selectedNodeId}
+              spacingGridSize={spacingGridSize}
               value={style.gap}
               onChange={onChange}
             />
@@ -239,6 +246,7 @@ export function DomEditInspector<
               field="padding"
               label="Pad"
               nodeId={selectedNodeId}
+              spacingGridSize={spacingGridSize}
               value={uniformPadding ?? style.padding}
               onChange={onChange}
             />

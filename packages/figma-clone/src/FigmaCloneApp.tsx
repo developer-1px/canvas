@@ -50,6 +50,9 @@ const FIGMA_INITIAL_VIEWPORT = {
 const FIGMA_FIT_PADDING = 48
 const FIGMA_MIN_SCALE = 0.15
 const FIGMA_MAX_SCALE = 3
+const FIGMA_DOM_EDIT_CONFIG = {
+  spacingGridSize: 4,
+} as const
 
 type FigmaPanSession = {
   readonly clientX: number
@@ -368,6 +371,7 @@ export function FigmaCloneApp() {
             isCanvasPanActive={canvasPanActive}
             selectedNodeId={editableSelectedNodeId}
             shellRef={stageRef}
+            spacingGridSize={FIGMA_DOM_EDIT_CONFIG.spacingGridSize}
             viewport={viewport}
             onAffordanceStateChange={changeAffordanceState}
           />
@@ -382,6 +386,7 @@ export function FigmaCloneApp() {
           <FigmaCloneInspector
             editor={editor}
             registry={registry}
+            spacingGridSize={FIGMA_DOM_EDIT_CONFIG.spacingGridSize}
             snapshot={editorSnapshot}
           />
         </div>

@@ -299,6 +299,8 @@ test('previews spacing gestures, cancels cleanly, and commits one history entry'
 
   await dragHandle(page, gapHandle, { x: 32, y: 0 })
   const previewGap = await readComputedNumber(actions, 'columnGap')
+  expect(Number.isInteger(previewGap)).toBe(true)
+  expect(previewGap % 4).toBe(0)
   await page.mouse.up()
   await expect.poll(() => readNumericAttribute(app, 'data-hero-actions-gap'))
     .toBeCloseTo(previewGap, 4)
@@ -354,8 +356,10 @@ test('previews spacing gestures, cancels cleanly, and commits one history entry'
 
   await dragHandle(page, gridGapHandle, { x: 20, y: 0 })
   await page.mouse.up()
-  await expect.poll(() => readComputedNumber(content, 'columnGap'))
-    .toBeGreaterThan(initialGridGap)
+  const committedGridGap = await readComputedNumber(content, 'columnGap')
+  expect(committedGridGap).toBeGreaterThan(initialGridGap)
+  expect(Number.isInteger(committedGridGap)).toBe(true)
+  expect(committedGridGap % 4).toBe(0)
   await expect(app).toHaveAttribute('data-history-can-undo', 'true')
 
   await page.keyboard.press(`${primaryModifier()}+Z`)

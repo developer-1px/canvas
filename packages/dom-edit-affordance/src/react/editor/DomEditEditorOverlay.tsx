@@ -44,6 +44,7 @@ export function DomEditEditorOverlay({
   selectedNodeId: controlledSelectedNodeId,
   onAffordanceStateChange,
   shellRef,
+  spacingGridSize,
   viewport,
   resizable = true,
 }: {
@@ -56,6 +57,7 @@ export function DomEditEditorOverlay({
   readonly selectedNodeId?: string | null
   readonly onAffordanceStateChange?: (state: DomEditAffordanceState) => void
   readonly shellRef: RefObject<HTMLElement | null>
+  readonly spacingGridSize?: number
   readonly viewport: DomEditViewport
   readonly resizable?: boolean
 }) {
@@ -94,6 +96,7 @@ export function DomEditEditorOverlay({
       selectedNodeId={selectedNodeId}
       resizable={resizable}
       shellRef={shellRef}
+      spacingGridSize={spacingGridSize}
       state={model.state}
       viewport={viewport}
       onAffordanceStateChange={changeAffordanceState}

@@ -49,6 +49,8 @@ test('matches opposite padding side and merges drag history', async ({ page }) =
   })
   const afterDrag = await readHeroPadding(page)
   expect(afterDrag.top).toBeGreaterThan(afterDrag.bottom)
+  expect(Number.isInteger(afterDrag.top)).toBe(true)
+  expect(afterDrag.top % 4).toBe(0)
 
   await sideHandle(page, 'top').dblclick()
   await expect.poll(() => readHeroPadding(page)).toEqual({

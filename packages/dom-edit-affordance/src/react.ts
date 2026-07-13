@@ -59,3 +59,9 @@ export type {
   DomEditState,
   DomEditViewport,
 } from './shared/model/DomEditTypes'
+export {
+  DEFAULT_DOM_EDIT_SPACING_GRID_SIZE,
+  resolveDomEditSpacingGridSize,
+  snapDomEditSpacingValue,
+  type DomEditSpacingGridConfig,
+} from './shared/gesture/DomEditOverlayGesture'

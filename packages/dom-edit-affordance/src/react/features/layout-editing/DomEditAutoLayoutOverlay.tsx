@@ -145,6 +145,7 @@ export function DomEditAutoLayoutOverlay<
   directManipulation,
   rect,
   shellRef,
+  spacingGridSize,
   state,
   target,
   viewport,
@@ -159,6 +160,7 @@ export function DomEditAutoLayoutOverlay<
   directManipulation?: DomEditDirectManipulationLifecycle<TNodeId>
   rect: DomEditAutoLayoutRect & { scale: number }
   shellRef: RefObject<HTMLElement | null>
+  spacingGridSize?: number
   state: TState
   target: HTMLElement
   viewport: DomEditViewport
@@ -565,6 +567,7 @@ export function DomEditAutoLayoutOverlay<
           value: resolveDomEditSpacingDragValue(
             start.gap + delta,
             moveEvent,
+            { gridSize: spacingGridSize },
           ),
         }])
         return
@@ -583,6 +586,7 @@ export function DomEditAutoLayoutOverlay<
           value: resolveDomEditSpacingDragValue(
             start.padding.top + delta,
             moveEvent,
+            { gridSize: spacingGridSize },
           ),
         }])
         return
@@ -594,6 +598,7 @@ export function DomEditAutoLayoutOverlay<
         value: resolveDomEditSpacingDragValue(
           start.padding[side] + delta,
           moveEvent,
+          { gridSize: spacingGridSize },
         ),
       })))
     }

@@ -38,10 +38,14 @@ export {
   type DomEditFlexParticipationDescriptor,
 } from './features/size-editing/DomEditFlexParticipation'
 export {
+  DEFAULT_DOM_EDIT_SPACING_GRID_SIZE,
   constrainDomEditMoveableDrag,
   readDomEditMoveableTuple,
   resolveDomEditResizeSize,
+  resolveDomEditSpacingGridSize,
   resolveDomEditSpacingDragValue,
+  snapDomEditSpacingValue,
+  type DomEditSpacingGridConfig,
 } from './shared/gesture/DomEditOverlayGesture'
 export type {
   DomEditAutoLayout,

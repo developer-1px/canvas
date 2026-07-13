@@ -114,16 +114,17 @@ test('edits figma clone CSS declarations in the inspector', async ({
 
   await expect(inspector).toContainText('CSS')
   await expect(inspector.getByLabel('Pad')).toHaveValue('14')
+  await expect(inspector.getByLabel('Pad')).toHaveAttribute('step', '4')
 
   await inspector.getByLabel('Pad').fill('22')
-  await expect(inspector.getByLabel('Pad')).toHaveValue('22')
+  await expect(inspector.getByLabel('Pad')).toHaveValue('24')
 
   await search.fill('stat card tickets')
   await page.getByRole('button', {
     name: 'Select layer Tickets stat',
   }).click()
 
-  await expect(inspector.getByLabel('Pad')).toHaveValue('22')
+  await expect(inspector.getByLabel('Pad')).toHaveValue('24')
 })
 
 async function readStatCardPadding(page: Page) {

@@ -157,7 +157,9 @@ test('scales padding bands and keeps gap/padding active states exclusive', async
   await selectLayer(page, 'Select layer Main area', 'workspaceMain')
 
   const initialPaddingHeight = await readBoxHeight(sideHandle(page, 'top'))
-  await page.getByRole('spinbutton', { name: 'Pad' }).fill('36')
+  const paddingInput = page.getByRole('spinbutton', { name: 'Pad' })
+  await paddingInput.fill('35.6')
+  await expect(paddingInput).toHaveValue('36')
   await expect.poll(() => readBoxHeight(sideHandle(page, 'top')))
     .toBeGreaterThan(initialPaddingHeight + 2)
 

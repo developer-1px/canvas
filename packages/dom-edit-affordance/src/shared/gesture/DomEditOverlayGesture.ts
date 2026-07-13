@@ -58,9 +58,38 @@ export function resolveDomEditResizeSize({
   ]
 }
 
+export const DEFAULT_DOM_EDIT_SPACING_GRID_SIZE = 4
+
+export type DomEditSpacingGridConfig = {
+  readonly gridSize?: number
+}
+
+export function snapDomEditSpacingValue(
+  value: number,
+  config: DomEditSpacingGridConfig = {},
+) {
+  const gridSize = resolveDomEditSpacingGridSize(config)
+
+  return Math.round(value / gridSize) * gridSize
+}
+
 export function resolveDomEditSpacingDragValue(
   value: number,
   event: globalThis.PointerEvent,
+  config: DomEditSpacingGridConfig = {},
 ) {
-  return event.shiftKey ? Math.round(value / 8) * 8 : value
+  const gridSize = resolveDomEditSpacingGridSize(config)
+  const step = event.shiftKey ? gridSize * 2 : gridSize
+
+  return Math.round(value / step) * step
+}
+
+export function resolveDomEditSpacingGridSize(
+  config: DomEditSpacingGridConfig = {},
+) {
+  const configuredSize = config.gridSize ?? DEFAULT_DOM_EDIT_SPACING_GRID_SIZE
+
+  return Number.isFinite(configuredSize) && configuredSize > 0
+    ? Math.max(1, Math.round(configuredSize))
+    : DEFAULT_DOM_EDIT_SPACING_GRID_SIZE
 }

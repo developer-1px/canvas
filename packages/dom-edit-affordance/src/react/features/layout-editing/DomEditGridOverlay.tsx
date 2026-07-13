@@ -53,6 +53,7 @@ export function DomEditGridOverlay<
   rect,
   selectedNodeId,
   shellRef,
+  spacingGridSize,
   state,
   target,
   viewport,
@@ -65,6 +66,7 @@ export function DomEditGridOverlay<
   rect: GridOverlayRect & { scale: number }
   selectedNodeId: TNodeId
   shellRef: RefObject<HTMLElement | null>
+  spacingGridSize?: number
   state: TState
   target: HTMLElement
   viewport: DomEditViewport
@@ -262,6 +264,7 @@ export function DomEditGridOverlay<
       const value = resolveDomEditGridGapDragValue(
         start.gap + (gap.axis === 'column' ? dx : dy),
         moveEvent,
+        spacingGridSize,
       )
 
       if (ownsPreview) {
@@ -644,8 +647,11 @@ function measureDomEditGridWorldRect({
 function resolveDomEditGridGapDragValue(
   value: number,
   event: globalThis.PointerEvent,
+  spacingGridSize?: number,
 ) {
-  return resolveDomEditSpacingDragValue(value, event)
+  return resolveDomEditSpacingDragValue(value, event, {
+    gridSize: spacingGridSize,
+  })
 }
 
 function readDomEditGridTemplate(

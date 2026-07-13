@@ -96,6 +96,7 @@ export function DomEditSelectionOverlay<
   draggable = true,
   shellRef,
   selectedNodeId,
+  spacingGridSize,
   state,
   viewport,
   affordanceState: appAffordanceState,
@@ -118,6 +119,7 @@ export function DomEditSelectionOverlay<
   overlayLayers?: Partial<DomEditOverlayLayerVisibility> | null
   selectedNodeId: TNodeId | null
   shellRef: RefObject<HTMLElement | null>
+  spacingGridSize?: number
   state: TState
   viewport: DomEditViewport
   onAffordanceStateChange: (state: DomEditAffordanceState) => void
@@ -719,6 +721,7 @@ export function DomEditSelectionOverlay<
             rect={rect}
             selectedNodeId={selectedNodeId}
             shellRef={shellRef}
+            spacingGridSize={spacingGridSize}
             state={state}
             target={target}
             viewport={viewport}
@@ -734,6 +737,7 @@ export function DomEditSelectionOverlay<
             rect={rect}
             selectedNodeId={selectedNodeId}
             shellRef={shellRef}
+            spacingGridSize={spacingGridSize}
             state={state}
             target={target}
             viewport={viewport}
