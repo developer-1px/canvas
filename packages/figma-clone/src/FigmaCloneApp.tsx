@@ -150,25 +150,21 @@ export function FigmaCloneApp() {
   }, [])
 
   useEffect(() => {
-    const rootId = selectedRootId ?? (
-      lastFittedRootIdRef.current === null ? initialRootId : null
-    )
-
     if (
-      !rootId ||
-      lastFittedRootIdRef.current === rootId
+      !initialRootId ||
+      lastFittedRootIdRef.current !== null
     ) {
       return undefined
     }
 
     const frame = window.requestAnimationFrame(() => {
-      if (fitNodeIds([rootId])) {
-        lastFittedRootIdRef.current = rootId
+      if (fitNodeIds([initialRootId])) {
+        lastFittedRootIdRef.current = initialRootId
       }
     })
 
     return () => window.cancelAnimationFrame(frame)
-  }, [fitNodeIds, initialRootId, projectionRevision, selectedRootId])
+  }, [fitNodeIds, initialRootId, projectionRevision])
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {

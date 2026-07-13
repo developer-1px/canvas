@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 
-test('keeps selected Figma DOM nodes fitted inside the canvas work area', async ({
+test('fits the initial Figma root without refitting later layer selections', async ({
   page,
 }) => {
   await page.setViewportSize({ width: 1440, height: 1000 })
@@ -10,12 +10,15 @@ test('keeps selected Figma DOM nodes fitted inside the canvas work area', async 
   await page.getByRole('button', { name: 'Select layer Workspace page' })
     .click()
   await expectSelectedGuideInsideCanvas(page, 'workspacePage')
+  const viewportBeforeSelection = await readViewport(page)
 
   await page.locator('[data-figma-layer-tree-id="section:homePage"]')
     .click()
-  await page.getByRole('button', { name: 'Select layer Editorial homepage' })
-    .click()
-  await expectSelectedGuideInsideCanvas(page, 'homePage')
+  await expect(page.locator('.figma-clone')).toHaveAttribute(
+    'data-selected-node-id',
+    'homePage',
+  )
+  expect(await readViewport(page)).toEqual(viewportBeforeSelection)
 })
 
 test('does not render the generic canvas devtools panel in Figma mode', async ({
@@ -67,6 +70,14 @@ async function expectSelectedGuideInsideCanvas(page: Page, nodeId: string) {
     rightInside: true,
     topInside: true,
   })
+}
+
+async function readViewport(page: Page) {
+  return page.locator('.figma-clone').evaluate((element) => ({
+    scale: element.getAttribute('data-viewport-scale'),
+    x: element.getAttribute('data-viewport-x'),
+    y: element.getAttribute('data-viewport-y'),
+  }))
 }
 
 async function readSelectedGuideFit(page: Page) {

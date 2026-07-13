@@ -253,7 +253,7 @@ test('keeps Figma chrome focused on the CSS inspector', async ({
   await expect(inspector).toContainText('Stat card')
 })
 
-test('focuses selected DOM layers by root and fits the exact selection', async ({
+test('keeps layer selection stable until explicit fit selection', async ({
   page,
 }) => {
   await page.goto('/?demo=figma')
@@ -263,7 +263,6 @@ test('focuses selected DOM layers by root and fits the exact selection', async (
   const viewport = page.getByRole('toolbar', { name: 'Viewport' })
   const stage = page.locator('.figma-direct-dom__stage')
   const world = page.locator('.figma-direct-dom__world')
-  const homePage = page.locator('[data-design-node-id="homePage"]')
   const readingTime = page.locator('[data-design-node-id="homeReadTime"]')
 
   const initialTransform = await readWorldTransform(world)
@@ -282,17 +281,14 @@ test('focuses selected DOM layers by root and fits the exact selection', async (
   await expect(app).toHaveAttribute('data-selected-node-id', 'homeReadTime')
   await expect(app).toHaveAttribute(
     'data-viewport-focus-node-id',
-    'homePage',
+    'workspacePage',
   )
-  await expect.poll(() => readWorldTransform(world)).not.toBe(zoomedTransform)
-  const focusedTransform = await readWorldTransform(world)
-  expect(focusedTransform).not.toBe(zoomedTransform)
-  await expectContained(stage, homePage)
+  expect(await readWorldTransform(world)).toBe(zoomedTransform)
 
   await viewport.getByRole('button', { name: 'Zoom in' }).click()
-  await expect.poll(() => readWorldTransform(world)).not.toBe(focusedTransform)
+  await expect.poll(() => readWorldTransform(world)).not.toBe(zoomedTransform)
   const refocusedZoomTransform = await readWorldTransform(world)
-  expect(refocusedZoomTransform).not.toBe(focusedTransform)
+  expect(refocusedZoomTransform).not.toBe(zoomedTransform)
 
   await viewport.getByRole('button', { name: 'Fit selection' }).click()
   await expect(app).toHaveAttribute(
