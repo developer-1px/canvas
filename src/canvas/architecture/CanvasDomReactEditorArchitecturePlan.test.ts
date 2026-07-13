@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import context from '../../../CONTEXT.md?raw'
 import editorAdr from '../../../docs/adr/0005-canonical-dom-react-editor-runtime.md?raw'
+import coordinationAdr from '../../../docs/adr/0007-dom-input-render-coordination.md?raw'
 
 const normalizedEditorAdr = editorAdr.replace(/\s+/g, ' ')
 
@@ -97,5 +98,28 @@ describe('DOM/React editor architecture plan', () => {
     expect(normalizedEditorAdr).toContain(
       'no mutation, history, persistence, or reverse sync',
     )
+  })
+
+  it('records browser input and render coordination without widening document ownership', () => {
+    expect(coordinationAdr).toContain(
+      '# ADR 0007: DOM Input and Render Coordination',
+    )
+    expect(coordinationAdr).toContain('## Status\n\nProvisional')
+
+    for (const term of [
+      'ReactDesignEditorRenderer',
+      'getReactDesignEditorExternalChangeHost',
+      'DesignDocument.snapshot',
+      'EditorEngineSnapshot',
+      'ReactDesignTextSelection',
+      'ownership generation',
+      'focus generation',
+      'UTF-16',
+    ]) {
+      expect(coordinationAdr).toContain(term)
+    }
+
+    expect(coordinationAdr).toContain('production `src/canvas/**` keeps no')
+    expect(coordinationAdr).toContain('Native IME verification remains required')
   })
 })

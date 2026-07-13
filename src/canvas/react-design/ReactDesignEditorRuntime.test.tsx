@@ -1,14 +1,23 @@
 // @vitest-environment jsdom
 
-import { StrictMode, act } from 'react'
+import { StrictMode, act, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { createDesignDocument } from '../design-document'
+import {
+  createDesignDocument,
+  getDesignDocumentPatchPort,
+} from '../design-document'
 import {
   createReactDesignDefinitionRegistry,
   ReactDesignRenderer,
 } from '../react-design-renderer'
+import { ReactDesignEditorRenderer } from './ReactDesignEditorRenderer'
+import {
+  getReactDesignEditorExternalChangeHost,
+  type ReactDesignEditorExternalChangeHost,
+} from './ReactDesignEditorExternalChanges'
+import { createReactDesignTextSelection } from './ReactDesignTextSelection'
 import {
   useReactDesignEditorRuntime,
   type ReactDesignEditorRuntime,
@@ -16,6 +25,10 @@ import {
 
 ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean })
   .IS_REACT_ACT_ENVIRONMENT = true
+
+type ExternalChangeResult = ReturnType<
+  ReactDesignEditorExternalChangeHost['runReady']
+>
 
 describe('ReactDesignEditorRuntime', () => {
   afterEach(() => {
@@ -208,11 +221,7 @@ describe('ReactDesignEditorRuntime', () => {
 
       return (
         <div ref={current.stage.attach}>
-          <ReactDesignRenderer
-            projection={current.projection}
-            read={current.editor.read}
-            registry={current.registry}
-          />
+          <ReactDesignEditorRenderer runtime={current} />
         </div>
       )
     }
@@ -222,6 +231,10 @@ describe('ReactDesignEditorRuntime', () => {
         <RuntimeHarness />
       </StrictMode>,
     ))
+
+    const externalChanges = getReactDesignEditorExternalChangeHost(runtime!)
+    const onReady = vi.fn()
+    const stopReady = externalChanges.subscribeReady(onReady)
 
     let selectionResult
 
@@ -234,10 +247,24 @@ describe('ReactDesignEditorRuntime', () => {
 
     expect(selectionResult).toEqual({ changed: true, ok: true })
     expect(runtime!.projection.element('page')).not.toBeNull()
+    expect(onReady).toHaveBeenCalledTimes(1)
 
-    await act(async () => root.unmount())
+    onReady.mockClear()
+    act(() => {
+      runtime!.editor.commands.execute({
+        type: 'selection.replace',
+        nodeId: null,
+      })
+    })
+    act(() => root.unmount())
     await Promise.resolve()
 
+    expect(onReady).not.toHaveBeenCalled()
+    expect(externalChanges.runReady({
+      id: 'after-unmount',
+      apply: vi.fn(),
+    })).toMatchObject({ code: 'host_not_ready', ok: false })
+    expect(getReactDesignEditorExternalChangeHost(runtime!)).toBe(externalChanges)
     expect(runtime!.editor.commands.execute({
       type: 'selection.replace',
       nodeId: null,
@@ -246,6 +273,419 @@ describe('ReactDesignEditorRuntime', () => {
       ok: false,
       reason: 'EditorEngine is disposed',
     })
+    stopReady()
+  })
+
+  it('keeps the existing runtime usable for a document without patch coordination', async () => {
+    stubResizeObserver()
+    const container = document.createElement('div')
+    document.body.append(container)
+    const root = createRoot(container)
+    let runtime: ReactDesignEditorRuntime | null = null
+
+    function RuntimeHarness() {
+      const current = useReactDesignEditorRuntime({
+        createDocument: () => ({ ...createRuntimeDocument() }),
+        createRegistry: createRuntimeRegistry,
+        viewport: { initial: { scale: 1, x: 0, y: 0 } },
+      })
+
+      runtime = current
+      return (
+        <ReactDesignRenderer
+          projection={current.projection}
+          read={current.editor.read}
+          registry={current.registry}
+        />
+      )
+    }
+
+    await act(async () => root.render(<RuntimeHarness />))
+
+    expect(runtime!.editor.read.node('page')?.text).toBe('Runtime')
+    expect(container.textContent).toBe('Runtime')
+
+    await act(async () => root.unmount())
+  })
+
+  it('revokes DOM readiness when its renderer unmounts before the runtime', async () => {
+    stubResizeObserver()
+    const container = document.createElement('div')
+    document.body.append(container)
+    const root = createRoot(container)
+    let runtime: ReactDesignEditorRuntime | null = null
+    let setRendererVisible: ((visible: boolean) => void) | null = null
+
+    function RuntimeHarness() {
+      const current = useReactDesignEditorRuntime({
+        createDocument: createRuntimeDocument,
+        createRegistry: createRuntimeRegistry,
+        viewport: { initial: { scale: 1, x: 0, y: 0 } },
+      })
+      const [rendererVisible, setVisible] = useState(true)
+
+      runtime = current
+      setRendererVisible = setVisible
+      return rendererVisible
+        ? <ReactDesignEditorRenderer runtime={current} />
+        : null
+    }
+
+    await act(async () => root.render(<RuntimeHarness />))
+
+    const externalChanges = getReactDesignEditorExternalChangeHost(runtime!)
+
+    expect(externalChanges.runReady({
+      id: 'while-mounted',
+      apply: vi.fn(),
+    })).toEqual({ ok: true })
+
+    await act(async () => setRendererVisible?.(false))
+
+    const applyAfterUnmount = vi.fn()
+
+    expect(externalChanges.runReady({
+      id: 'after-renderer-unmount',
+      apply: applyAfterUnmount,
+    })).toMatchObject({ code: 'host_not_ready', ok: false })
+    expect(applyAfterUnmount).not.toHaveBeenCalled()
+
+    await act(async () => root.unmount())
+  })
+
+  it('fails closed for the runtime lifetime after canonical renderers overlap', async () => {
+    stubResizeObserver()
+    const container = document.createElement('div')
+    document.body.append(container)
+    const root = createRoot(container)
+    let runtime: ReactDesignEditorRuntime | null = null
+    let setRendererKeys: ((keys: string[]) => void) | null = null
+
+    function RuntimeHarness() {
+      const current = useReactDesignEditorRuntime({
+        createDocument: createRuntimeDocument,
+        createRegistry: createRuntimeRegistry,
+        viewport: { initial: { scale: 1, x: 0, y: 0 } },
+      })
+      const [rendererKeys, setKeys] = useState(['first'])
+
+      runtime = current
+      setRendererKeys = setKeys
+      return rendererKeys.map((key) => (
+        <ReactDesignEditorRenderer key={key} runtime={current} />
+      ))
+    }
+
+    await act(async () => root.render(<RuntimeHarness />))
+
+    const externalChanges = getReactDesignEditorExternalChangeHost(runtime!)
+
+    expect(externalChanges.runReady({
+      id: 'one-renderer',
+      apply: vi.fn(),
+    })).toEqual({ ok: true })
+
+    await act(async () => setRendererKeys?.(['first', 'second']))
+
+    expect(externalChanges.runReady({
+      id: 'overlapping-renderers',
+      apply: vi.fn(),
+    })).toMatchObject({ code: 'host_not_ready', ok: false })
+
+    await act(async () => setRendererKeys?.(['first']))
+
+    expect(externalChanges.runReady({
+      id: 'remaining-overlapped-renderer',
+      apply: vi.fn(),
+    })).toMatchObject({ code: 'host_not_ready', ok: false })
+
+    await act(async () => setRendererKeys?.([]))
+    await act(async () => setRendererKeys?.(['fresh']))
+
+    expect(externalChanges.runReady({
+      id: 'fresh-canonical-renderer',
+      apply: vi.fn(),
+    })).toMatchObject({ code: 'host_not_ready', ok: false })
+
+    await act(async () => root.unmount())
+  })
+
+  it('defers listeners subscribed during the current ready notification', async () => {
+    stubResizeObserver()
+    const container = document.createElement('div')
+    document.body.append(container)
+    const root = createRoot(container)
+    let runtime: ReactDesignEditorRuntime | null = null
+
+    function RuntimeHarness() {
+      const current = useReactDesignEditorRuntime({
+        createDocument: createRuntimeDocument,
+        createRegistry: createRuntimeRegistry,
+        viewport: { initial: { scale: 1, x: 0, y: 0 } },
+      })
+
+      runtime = current
+      return <ReactDesignEditorRenderer runtime={current} />
+    }
+
+    await act(async () => root.render(<RuntimeHarness />))
+
+    const externalChanges = getReactDesignEditorExternalChangeHost(runtime!)
+    const lateListener = vi.fn()
+    let stopLateListener: () => void = () => undefined
+    let subscribedLateListener = false
+    const firstListener = vi.fn(() => {
+      if (!subscribedLateListener) {
+        subscribedLateListener = true
+        stopLateListener = externalChanges.subscribeReady(lateListener)
+      }
+    })
+    const stopFirstListener = externalChanges.subscribeReady(firstListener)
+
+    await act(async () => {
+      runtime!.editor.commands.execute({
+        type: 'selection.replace',
+        nodeId: 'page',
+      })
+    })
+
+    expect(firstListener).toHaveBeenCalledTimes(1)
+    expect(lateListener).not.toHaveBeenCalled()
+
+    await act(async () => {
+      runtime!.editor.commands.execute({
+        type: 'selection.replace',
+        nodeId: null,
+      })
+    })
+
+    expect(firstListener).toHaveBeenCalledTimes(2)
+    expect(lateListener).toHaveBeenCalledTimes(1)
+
+    stopFirstListener()
+    stopLateListener()
+    await act(async () => root.unmount())
+  })
+
+  it('runs a ready external change only after the local canonical DOM commits', async () => {
+    stubResizeObserver()
+    const container = document.createElement('div')
+    document.body.append(container)
+    const root = createRoot(container)
+    let runtime: ReactDesignEditorRuntime | null = null
+
+    function RuntimeHarness() {
+      const current = useReactDesignEditorRuntime({
+        createDocument: createRuntimeDocument,
+        createRegistry: createRuntimeRegistry,
+        viewport: { initial: { scale: 1, x: 0, y: 0 } },
+      })
+
+      runtime = current
+      return <ReactDesignEditorRenderer runtime={current} />
+    }
+
+    await act(async () => root.render(<RuntimeHarness />))
+
+    const externalChanges = getReactDesignEditorExternalChangeHost(runtime!)
+
+    const apply = vi.fn(() => {
+      expect(container.textContent).toBe('Local')
+      expect(getDesignDocumentPatchPort(runtime!.document).commit([
+        { op: 'replace', path: '/nodes/0/text', value: 'Remote' },
+      ])).toEqual({ ok: true })
+    })
+    let session: ReturnType<
+      ReactDesignEditorRuntime['editor']['commands']['beginPreview']
+    > = null
+
+    await act(async () => {
+      session = runtime!.editor.commands.beginPreview({
+        label: 'Edit page text',
+        nodeId: 'page',
+      })
+      expect(session?.update([{ target: 'text', value: 'Local' }]))
+        .toEqual({ changed: true, ok: true })
+      expect(externalChanges.runReady({ id: 'remote', apply }))
+        .toMatchObject({ code: 'host_not_ready', ok: false })
+    })
+
+    let beforeRenderCommit: ExternalChangeResult | null = null
+
+    const retries: ExternalChangeResult[] = []
+    let stopRetry: () => void = () => undefined
+
+    stopRetry = externalChanges.subscribeReady(() => {
+      const result = externalChanges.runReady({ id: 'remote', apply })
+
+      retries.push(result)
+      if (result.ok) {
+        stopRetry()
+      }
+    })
+
+    await act(async () => {
+      expect(session?.commit()).toEqual({ changed: true, ok: true })
+      beforeRenderCommit = externalChanges.runReady({
+        id: 'remote',
+        apply,
+      })
+      expect(beforeRenderCommit).toMatchObject({
+        code: 'host_not_ready',
+        ok: false,
+      })
+      expect(apply).not.toHaveBeenCalled()
+    })
+
+    expect(apply).toHaveBeenCalledTimes(1)
+    expect(retries).toEqual([{ ok: true }])
+    expect(container.textContent).toBe('Remote')
+
+    await act(async () => root.unmount())
+  })
+
+  it('retries ready work after a canceled preview DOM commit', async () => {
+    stubResizeObserver()
+    const container = document.createElement('div')
+    document.body.append(container)
+    const root = createRoot(container)
+    let runtime: ReactDesignEditorRuntime | null = null
+
+    function RuntimeHarness() {
+      const current = useReactDesignEditorRuntime({
+        createDocument: createRuntimeDocument,
+        createRegistry: createRuntimeRegistry,
+        viewport: { initial: { scale: 1, x: 0, y: 0 } },
+      })
+
+      runtime = current
+      return <ReactDesignEditorRenderer runtime={current} />
+    }
+
+    await act(async () => root.render(<RuntimeHarness />))
+
+    const externalChanges = getReactDesignEditorExternalChangeHost(runtime!)
+
+    let session: ReturnType<
+      ReactDesignEditorRuntime['editor']['commands']['beginPreview']
+    > = null
+
+    await act(async () => {
+      session = runtime!.editor.commands.beginPreview({
+        label: 'Edit page text',
+        nodeId: 'page',
+      })
+      expect(session?.update([{ target: 'text', value: 'Preview' }]))
+        .toEqual({ changed: true, ok: true })
+    })
+
+    const apply = vi.fn()
+    let beforeRenderCommit: ExternalChangeResult | null = null
+    const results: ExternalChangeResult[] = []
+    const stopRetry = externalChanges.subscribeReady(() => {
+      results.push(externalChanges.runReady({ id: 'remote', apply }))
+    })
+
+    await act(async () => {
+      expect(session?.cancel()).toEqual({ changed: true, ok: true })
+      beforeRenderCommit = externalChanges.runReady({
+        id: 'remote-before-cancel-render',
+        apply,
+      })
+      expect(beforeRenderCommit).toMatchObject({
+        code: 'host_not_ready',
+        ok: false,
+      })
+      expect(apply).not.toHaveBeenCalled()
+    })
+
+    expect(results).toEqual([{ ok: true }])
+    expect(apply).toHaveBeenCalledTimes(1)
+    expect(container.textContent).toBe('Runtime')
+
+    stopRetry()
+    await act(async () => root.unmount())
+  })
+
+  it('restores selection only after the external snapshot remount commits', async () => {
+    stubResizeObserver()
+    const container = document.createElement('div')
+    document.body.append(container)
+    const root = createRoot(container)
+    let runtime: ReactDesignEditorRuntime | null = null
+    let editorElement: HTMLTextAreaElement | null = null
+    const setEditorElement = (element: HTMLTextAreaElement | null) => {
+      editorElement = element
+    }
+
+    function RuntimeHarness() {
+      const current = useReactDesignEditorRuntime({
+        createDocument: createRuntimeDocument,
+        createRegistry: createRuntimeRegistry,
+        viewport: { initial: { scale: 1, x: 0, y: 0 } },
+      })
+
+      runtime = current
+      const text = current.document.snapshot.nodes[0]?.text ?? ''
+
+      return (
+        <>
+          <ReactDesignEditorRenderer runtime={current} />
+          <textarea
+            key={text}
+            ref={setEditorElement}
+            defaultValue={text}
+          />
+        </>
+      )
+    }
+
+    await act(async () => root.render(<RuntimeHarness />))
+
+    const externalChanges = getReactDesignEditorExternalChangeHost(runtime!)
+
+    const selection = createReactDesignTextSelection({ document })
+    const ownership = selection.claim({
+      nodeId: 'page',
+      readElement: () => editorElement,
+    })
+    const initialElement = requireTextArea(editorElement)
+
+    initialElement.focus()
+    initialElement.setSelectionRange(1, 5, 'forward')
+    const bookmark = ownership.capture()
+    const restores: boolean[] = []
+    const stopRestore = externalChanges.subscribeReady(() => {
+      if (bookmark) {
+        restores.push(ownership.restore(bookmark))
+      }
+    })
+
+    await act(async () => {
+      expect(externalChanges.runReady({
+        id: 'remote',
+        apply() {
+          expect(getDesignDocumentPatchPort(runtime!.document).commit([
+            { op: 'replace', path: '/nodes/0/text', value: 'Remote text' },
+          ])).toEqual({ ok: true })
+        },
+      })).toEqual({ ok: true })
+
+      expect(editorElement).toBe(initialElement)
+    })
+
+    expect(editorElement).not.toBe(initialElement)
+    expect(restores).toEqual([true])
+    expect(document.activeElement).toBe(editorElement)
+    const restoredElement = requireTextArea(editorElement)
+
+    expect(restoredElement.selectionStart).toBe(1)
+    expect(restoredElement.selectionEnd).toBe(5)
+
+    stopRestore()
+    ownership.release()
+    selection.dispose()
+    await act(async () => root.unmount())
   })
 })
 
@@ -266,6 +706,14 @@ function createRuntimeDocument() {
       component: null,
     }],
   })
+}
+
+function requireTextArea(element: HTMLTextAreaElement | null) {
+  if (!element) {
+    throw new Error('Expected textarea')
+  }
+
+  return element
 }
 
 function createRuntimeRegistry() {

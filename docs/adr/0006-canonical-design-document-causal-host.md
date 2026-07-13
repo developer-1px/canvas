@@ -77,16 +77,16 @@ validation and widen the public mutation surface.
 
 - Canvas now has the headless seam needed to test delayed stable-id editing
   without exposing the internal JSONDocument or adding a runtime dependency on
-  private labs. A FigJam browser test remains follow-up evidence.
+  private labs. ADR 0007 adds separate browser evidence for React commit,
+  composition blur, DOM remount, and stable text selection restoration.
 - Structural and positional delayed edits need granular DesignDocument command
   patches instead of a root replacement.
 - A concrete remote publication discards pre-remote local undo and redo. A
   future selective-undo design must rebase owned inverses explicitly before it
   can preserve that history safely.
-- DOM caret handoff needs a separate selection adapter plus a render-settle
-  signal; it must not be inferred from the authored graph.
-- FigJam composition/blur behavior and a real ReactDesignRenderer commit must
-  be covered before claiming IME-safe browser coordination.
+- DOM caret handoff now has a text-control selection adapter and explicit React
+  commit acknowledgement. Contenteditable affinity and native cross-browser IME
+  evidence remain follow-up work.
 - Large documents still pay whole-snapshot clone/freeze, validation, and index
   rebuild costs. Incremental validation and indexing remain separate
   performance work.
