@@ -198,6 +198,7 @@ export function FigJamCloneApp() {
     document: designDocument,
     editor,
     projection,
+    registry,
     snapshot,
     viewport: viewportRuntime,
   } = runtime

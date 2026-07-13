@@ -79,6 +79,7 @@ export function FigmaCloneApp() {
     document,
     editor,
     projection,
+    registry,
     snapshot: editorSnapshot,
     stage,
     viewport: viewportRuntime,
