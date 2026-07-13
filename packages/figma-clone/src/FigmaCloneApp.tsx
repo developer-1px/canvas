@@ -14,7 +14,6 @@ import {
   type MouseEvent as ReactMouseEvent,
   type PointerEvent as ReactPointerEvent,
 } from 'react'
-import type { EditorEngine } from '@interactive-os/canvas/editor'
 import {
   ReactDesignEditorRenderer,
   createReactDesignDefinitionRegistry,
@@ -35,7 +34,6 @@ import {
   createFigmaDesignDocument,
 } from './design-document'
 import { FigmaCloneDirectDomLayers } from './direct-dom/FigmaCloneDirectDomLayers'
-import { getFigmaCloneFrameGuides } from './direct-dom/FigmaCloneFrameGuides'
 import { FigmaCloneInspector } from './direct-dom/FigmaCloneInspector'
 import {
   FIGMA_REACT_INTRINSICS,
@@ -96,21 +94,12 @@ export function FigmaCloneApp() {
   const viewportToolbarRovingFocus =
     useCanvasToolbarRovingFocus<HTMLDivElement>()
   const selectedNodeId = editorSnapshot.selection.primaryNodeId
-  const selectedRootId = getFigmaRootId(editor, selectedNodeId)
   const initialRootId = editor.read.roots().find((root) =>
     root.definition.kind !== 'widget')?.id ?? null
-  const selectedRoot = selectedRootId ? editor.read.node(selectedRootId) : null
   const selectedNode = selectedNodeId ? editor.read.node(selectedNodeId) : null
   const editableSelectedNodeId = selectedNode?.definition.kind === 'widget'
     ? null
     : selectedNodeId
-  const frameGuides = selectedRoot?.frame &&
-    selectedRoot.definition.kind !== 'widget'
-    ? getFigmaCloneFrameGuides({
-        frame: selectedRoot.frame,
-        rootId: selectedRoot.id,
-      })
-    : null
   const registeredNodeCount = projection.registeredNodeIds().length
   const workspaceMeasurement = projection.measure('workspacePage')
   const floatingNote = document.read.node('workspaceFloatingNote')
@@ -376,7 +365,6 @@ export function FigmaCloneApp() {
           <DomEditEditorOverlay
             affordanceState={affordanceState}
             editor={editor}
-            frameGuides={frameGuides}
             isCanvasPanActive={canvasPanActive}
             selectedNodeId={editableSelectedNodeId}
             shellRef={stageRef}
@@ -446,13 +434,6 @@ export function FigmaCloneApp() {
       </div>
     </main>
   )
-}
-
-function getFigmaRootId(
-  editor: EditorEngine,
-  nodeId: DesignNodeId | null,
-) {
-  return nodeId ? editor.read.ancestry(nodeId)[0]?.id ?? null : null
 }
 
 function useFigmaDomSelectionMirror({

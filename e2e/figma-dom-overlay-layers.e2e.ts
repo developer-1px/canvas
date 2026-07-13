@@ -27,8 +27,8 @@ test('keeps DOM overlay families available without visible layer toggles', async
   await page.getByRole('button', { name: 'Measure tool' }).click()
   await expect.poll(() => page.locator('.figma-smart-guide').count())
     .toBeGreaterThan(0)
-  await expect.poll(() => page.locator('.figma-frame-guide--ruler').count())
-    .toBeGreaterThan(0)
+  await expect(page.locator('.figma-frame-guide--ruler')).toHaveCount(0)
+  await expect(page.locator('.figma-layout-guide-column')).toHaveCount(0)
 
   await page.getByRole('button', { name: 'Toggle box model X-ray' }).click()
   await expect.poll(() => page.locator('.figma-boxmodel-content').count())
