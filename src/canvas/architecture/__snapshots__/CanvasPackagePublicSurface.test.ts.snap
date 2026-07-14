@@ -743,6 +743,7 @@ exports[`Canvas package public surface > snapshots facade runtime value exports 
     "ReactDesignRenderer",
     "createDesignDocument",
     "createDomProjection",
+    "createReactDesignComponentInstance",
     "createReactDesignDefinitionRegistry",
     "createReactDesignNodeDomProps",
     "createReactDesignTextSelection",

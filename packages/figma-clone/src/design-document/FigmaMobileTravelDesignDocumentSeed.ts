@@ -1,6 +1,7 @@
 import type {
   DesignJSONObject,
   DesignNode,
+  DesignNodeComponentBinding,
 } from '@interactive-os/canvas/react-design'
 import {
   createFigmaDesignNodeLayout,
@@ -633,6 +634,33 @@ const MOBILE_TRAVEL_NODE_SEEDS = [
 export type FigmaMobileTravelDesignNodeId =
   typeof MOBILE_TRAVEL_NODE_SEEDS[number]['id']
 
+export type FigmaMobileTravelComponentDefinitionId =
+  'mobile-travel-featured-stay-card'
+
+export const FIGMA_MOBILE_TRAVEL_COMPONENT_METADATA = [{
+  id: 'mobile-travel-featured-stay-card',
+  label: 'Featured stay card',
+  syncDescription:
+    'Named slots remain selectable while the React component owns their arrangement.',
+  instances: [{
+    id: 'mobileExploreFeaturedCard',
+    label: 'Slow House, Jeju',
+    slots: {
+      root: 'mobileExploreFeaturedCard',
+      image: 'mobileExploreFeaturedImage',
+      tag: 'mobileExploreFeaturedTag',
+      favorite: 'mobileExploreFavorite',
+      content: 'mobileExploreFeaturedInfo',
+      type: 'mobileExploreFeaturedType',
+      title: 'mobileExploreFeaturedTitle',
+      meta: 'mobileExploreFeaturedMeta',
+      priceRow: 'mobileExploreFeaturedPriceRow',
+      price: 'mobileExploreFeaturedPrice',
+      priceNote: 'mobileExploreFeaturedPriceNote',
+    },
+  }],
+}] as const
+
 export const FIGMA_MOBILE_TRAVEL_ROOT_IDS = [
   'mobileExplorePage',
   'mobileStayPage',
@@ -644,6 +672,22 @@ const MOBILE_TRAVEL_FRAME_POSITIONS = {
   mobileStayPage: { x: 3430, y: 76 },
   mobileBookingPage: { x: 3852, y: 76 },
 } as const
+
+const MOBILE_TRAVEL_COMPONENT_BINDING_BY_NODE_ID = new Map<
+  FigmaMobileTravelDesignNodeId,
+  DesignNodeComponentBinding
+>(
+  Object.entries(
+    FIGMA_MOBILE_TRAVEL_COMPONENT_METADATA[0].instances[0].slots,
+  ).map(([slotId, nodeId]) => [
+    nodeId as FigmaMobileTravelDesignNodeId,
+    Object.freeze({
+      definitionId: FIGMA_MOBILE_TRAVEL_COMPONENT_METADATA[0].id,
+      instanceId: FIGMA_MOBILE_TRAVEL_COMPONENT_METADATA[0].instances[0].id,
+      slotId,
+    }) satisfies DesignNodeComponentBinding,
+  ]),
+)
 
 export const FIGMA_MOBILE_TRAVEL_DESIGN_DOCUMENT_NODES =
   createMobileTravelNodes()
@@ -659,11 +703,16 @@ function createMobileTravelNodes(): readonly DesignNode[] {
           nodeSeed.id as keyof typeof MOBILE_TRAVEL_FRAME_POSITIONS
         ]
       : null
+    const component = MOBILE_TRAVEL_COMPONENT_BINDING_BY_NODE_ID.get(
+      nodeSeed.id,
+    ) ?? null
 
     return {
       id: nodeSeed.id,
       label: nodeSeed.label,
-      definition: { kind: 'intrinsic', id: nodeSeed.intrinsic },
+      definition: component?.slotId === 'root'
+        ? { kind: 'component', id: component.definitionId }
+        : { kind: 'intrinsic', id: nodeSeed.intrinsic },
       children: MOBILE_TRAVEL_NODE_SEEDS
         .filter((candidate) => candidate.parentId === nodeSeed.id)
         .map((candidate) => candidate.id),
@@ -682,7 +731,7 @@ function createMobileTravelNodes(): readonly DesignNode[] {
             overflow: 'clip',
           }
         : null,
-      component: null,
+      component,
     }
   })
 }

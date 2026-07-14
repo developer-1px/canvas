@@ -17,6 +17,7 @@ import type { DomProjection } from '../dom-projection'
 import {
   type ReactDesignDefinitionRegistry,
   type ReactDesignRootProps,
+  type ReactDesignSlots,
 } from './ReactDesignDefinitionRegistry'
 import { createReactDesignNodeDomProps } from './ReactDesignNodeDomProps'
 
@@ -62,16 +63,25 @@ function ReactDesignNodeRenderer({
 }) {
   const ref = useDomProjectionRegistration(projection, node.id)
   const resolution = registry.resolve(node.definition)
-  const children: ReactNode = node.text ?? read.children(node.id).map((child) => (
-    <ReactDesignNodeRenderer
-      key={child.id}
-      node={child}
-      parent={node}
-      projection={projection}
-      read={read}
-      registry={registry}
-    />
-  ))
+  const renderedChildren = node.text === null
+    ? read.children(node.id).map((child) => ({
+        node: child,
+        rendered: (
+          <ReactDesignNodeRenderer
+            key={child.id}
+            node={child}
+            parent={node}
+            projection={projection}
+            read={read}
+            registry={registry}
+          />
+        ),
+      }))
+    : []
+  const children: ReactNode = node.text ?? renderedChildren.map(
+    ({ rendered }) => rendered,
+  )
+  const slots = createReactDesignSlots(node, renderedChildren)
   const rootProps = {
     ...createReactDesignNodeDomProps(node, parent),
     ref,
@@ -91,6 +101,7 @@ function ReactDesignNodeRenderer({
         node,
         read,
         rootProps,
+        slots,
       })
 
   return (
@@ -104,6 +115,43 @@ function ReactDesignNodeRenderer({
       {renderedNode}
     </ReactDesignNodeErrorBoundary>
   )
+}
+
+const EMPTY_REACT_DESIGN_SLOTS: ReactDesignSlots = Object.freeze(
+  Object.create(null) as Record<string, ReactNode>,
+)
+
+function createReactDesignSlots(
+  node: DesignNode,
+  children: readonly {
+    readonly node: DesignNode
+    readonly rendered: ReactNode
+  }[],
+): ReactDesignSlots {
+  const rootBinding = node.component
+
+  if (
+    node.definition.kind !== 'component' ||
+    !rootBinding ||
+    rootBinding.slotId !== 'root'
+  ) {
+    return EMPTY_REACT_DESIGN_SLOTS
+  }
+
+  const slots = Object.create(null) as Record<string, ReactNode>
+
+  for (const child of children) {
+    const binding = child.node.component
+
+    if (
+      binding?.definitionId === rootBinding.definitionId &&
+      binding.instanceId === rootBinding.instanceId
+    ) {
+      slots[binding.slotId] = child.rendered
+    }
+  }
+
+  return Object.freeze(slots)
 }
 
 type ReactDesignNodeErrorBoundaryProps = {

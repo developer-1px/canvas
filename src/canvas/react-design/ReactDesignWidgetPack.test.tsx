@@ -54,6 +54,7 @@ describe('ReactDesignWidgetPack', () => {
         node,
         children: null,
         read: createRead(node),
+        slots: {},
         rootProps: {
           ref: () => undefined,
           'data-design-node-id': 'badge-2',
@@ -79,6 +80,7 @@ describe('ReactDesignWidgetPack', () => {
         node: { ...node, props: { tone: 'danger' } },
         children: null,
         read: createRead(node),
+        slots: {},
         rootProps: {
           ref: () => undefined,
           'data-design-node-id': node.id,

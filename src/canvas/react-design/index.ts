@@ -71,7 +71,17 @@ export type {
   ReactRegisteredDesignRenderProps,
   ReactDesignRendererProps,
   ReactDesignRootProps,
+  ReactDesignSlots,
 } from '../react-design-renderer'
+
+export {
+  createReactDesignComponentInstance,
+} from './ReactDesignComponentInstance'
+export type {
+  CreateReactDesignComponentInstanceInput,
+  ReactDesignComponentInstance,
+  ReactDesignComponentInstanceTreeNode,
+} from './ReactDesignComponentInstance'
 
 export {
   createReactDesignWidgetPack,

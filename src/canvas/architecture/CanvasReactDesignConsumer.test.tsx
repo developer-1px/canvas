@@ -10,6 +10,7 @@ import {
   createDesignDocument,
   createDomProjection,
   createReactDesignDefinitionRegistry,
+  createReactDesignComponentInstance,
   createReactDesignWidgetPack,
   defineReactDesignDefinition,
   defineReactDesignWidget,
@@ -295,6 +296,56 @@ describe('React design public facade consumer', () => {
     expect(markup).toContain('Count: 0')
     expect(markup).toContain('data-counter-fallback="counter props are invalid"')
     expect(markup).not.toContain('>valid<')
+  })
+
+  it('creates editable component slot trees through the public facade', () => {
+    const instance = createReactDesignComponentInstance({
+      instanceId: 'external-card-1',
+      label: 'Insert external card',
+      parentId: null,
+      index: 0,
+      root: {
+        node: {
+          id: 'external-card',
+          label: 'External card',
+          definition: { kind: 'component', id: 'external.card' },
+          props: {},
+          text: null,
+          layout: {},
+          style: {},
+          frame: null,
+        },
+        slotId: 'root',
+        children: [{
+          node: {
+            id: 'external-card-title',
+            label: 'External card title',
+            definition: { kind: 'intrinsic', id: 'h2' },
+            props: {},
+            text: 'Inspectable title',
+            layout: {},
+            style: {},
+            frame: null,
+          },
+          slotId: 'title',
+        }],
+      },
+    })
+    const document = createDesignDocument({
+      schemaVersion: 1,
+      roots: [],
+      nodes: [],
+    })
+
+    expect(document.execute(instance.command)).toEqual({
+      changed: true,
+      ok: true,
+    })
+    expect(document.read.node('external-card-title')?.component).toEqual({
+      definitionId: 'external.card',
+      instanceId: 'external-card-1',
+      slotId: 'title',
+    })
   })
 })
 

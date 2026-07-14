@@ -31,7 +31,13 @@ export function FigmaCloneInspector({
     ? editor.read.node(selectedNodeId)
     : null
   const definition = selectedNode
-    ? registry.resolveRegistered(selectedNode.definition)
+    ? registry.resolveRegistered(selectedNode.definition) ??
+      (selectedNode.component
+        ? registry.resolveRegistered({
+            kind: 'component',
+            id: selectedNode.component.definitionId,
+          })
+        : null)
     : null
 
   return (

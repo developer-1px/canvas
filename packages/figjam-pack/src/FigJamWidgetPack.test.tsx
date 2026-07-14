@@ -344,6 +344,7 @@ function renderWidget(node: DesignNode) {
     node,
     children: null,
     read: document.read,
+    slots: {},
     rootProps: {
       ref: () => undefined,
       'data-design-node-id': node.id,

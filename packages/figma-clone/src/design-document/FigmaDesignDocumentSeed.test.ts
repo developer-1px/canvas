@@ -4,6 +4,7 @@ import {
   createFigmaDesignDocument,
   FIGMA_DESIGN_DOCUMENT_SNAPSHOT,
   FIGMA_HOME_COMPONENT_METADATA,
+  FIGMA_MOBILE_TRAVEL_COMPONENT_METADATA,
   FIGMA_MOBILE_TRAVEL_DESIGN_DOCUMENT_NODES,
   FIGMA_MOBILE_TRAVEL_ROOT_IDS,
   FIGMA_WIDGET_DEFINITION_ID,
@@ -114,6 +115,29 @@ describe('Figma canonical product document', () => {
         )
       }
     }
+  })
+
+  it('binds the featured mobile stay as an editable React component tree', () => {
+    const document = createFigmaDesignDocument()
+
+    expect(FIGMA_MOBILE_TRAVEL_COMPONENT_METADATA).toHaveLength(1)
+    expect(document.read.node('mobileExploreFeaturedCard')).toMatchObject({
+      definition: {
+        kind: 'component',
+        id: 'mobile-travel-featured-stay-card',
+      },
+      component: {
+        definitionId: 'mobile-travel-featured-stay-card',
+        instanceId: 'mobileExploreFeaturedCard',
+        slotId: 'root',
+      },
+    })
+    expect(document.read.node('mobileExploreFeaturedImage')?.component)
+      .toMatchObject({ slotId: 'image' })
+    expect(document.read.node('mobileExploreFeaturedInfo')?.component)
+      .toMatchObject({ slotId: 'content' })
+    expect(document.read.node('mobileExploreFeaturedTitle')?.component)
+      .toMatchObject({ slotId: 'title' })
   })
 
   it('owns the existing workspace, homepage, and widget frame positions', () => {

@@ -84,3 +84,42 @@ test('renders three realistic editable mobile travel website frames', async ({
   await expect(booking.locator('.figma-dom-mobile__primary-action'))
     .toHaveText('Confirm · ₩504k')
 })
+
+test('selects and edits an exact slot inside the mobile React stay card', async ({
+  page,
+}) => {
+  await page.goto('/figma')
+
+  const layers = page.getByRole('complementary', { name: 'Layers' })
+  const inspector = page.getByRole('complementary', {
+    name: 'CSS Inspector',
+  })
+  const card = page.locator(
+    '[data-design-node-id="mobileExploreFeaturedCard"]',
+  )
+  const title = page.locator(
+    '[data-design-node-id="mobileExploreFeaturedTitle"]',
+  )
+
+  await expect(card).toHaveAttribute(
+    'data-react-component',
+    'mobile-featured-stay-card',
+  )
+  await layers.getByRole('searchbox', { name: 'Search layers' })
+    .fill('featured stay title')
+  await page.getByRole('button', {
+    name: 'Select layer Featured stay title',
+  }).click()
+
+  await expect(page.locator('.figma-clone')).toHaveAttribute(
+    'data-selected-node-id',
+    'mobileExploreFeaturedTitle',
+  )
+  await expect(inspector).toContainText('Featured stay card')
+  await expect(inspector).toContainText('Slow House, Jeju')
+  await expect(inspector).toContainText('title')
+  await expect(inspector.getByLabel('Text')).toHaveValue('Slow House, Jeju')
+
+  await inspector.getByLabel('Text').fill('Forest House, Jeju')
+  await expect(title).toHaveText('Forest House, Jeju')
+})

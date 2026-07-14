@@ -85,6 +85,87 @@ describe('ReactDesignRenderer', () => {
     expect(markup).toContain('Canonical title</h1></article>')
   })
 
+  it('renders named component slots as inspectable document nodes', async () => {
+    const instance = {
+      definitionId: 'sales-card',
+      instanceId: 'sales-card-1',
+    }
+    const document = createDesignDocument({
+      schemaVersion: 1,
+      roots: ['page'],
+      nodes: [
+        {
+          ...createNode({
+            id: 'page',
+            definitionId: 'sales-card',
+            children: ['title', 'action'],
+            props: { className: 'page' },
+          }),
+          definition: { kind: 'component', id: 'sales-card' },
+          component: { ...instance, slotId: 'root' },
+        },
+        {
+          ...createNode({
+            id: 'title',
+            definitionId: 'h1',
+            text: 'Canonical title',
+          }),
+          component: { ...instance, slotId: 'title' },
+        },
+        {
+          ...createNode({
+            id: 'action',
+            definitionId: 'button',
+            text: 'Open report',
+          }),
+          component: { ...instance, slotId: 'action' },
+        },
+      ],
+    })
+    const registry = createReactDesignDefinitionRegistry({
+      intrinsics: ['button', 'h1'],
+      definitions: [createRegisteredDefinition(
+        'sales-card',
+        ({ rootProps, slots }) => (
+          <article {...rootProps} data-component="sales-card">
+            <div data-slot="action">{slots.action}</div>
+            <header data-slot="title">{slots.title}</header>
+          </article>
+        ),
+      )],
+    })
+    const projection = createProjection()
+    const renderer = (
+      <ReactDesignRenderer
+        projection={projection}
+        read={document.read}
+        registry={registry}
+      />
+    )
+    const markup = renderToStaticMarkup(renderer)
+
+    expect(markup.indexOf('data-design-node-id="action"')).toBeLessThan(
+      markup.indexOf('data-design-node-id="title"'),
+    )
+    expect(markup).toContain(
+      '<button data-design-node-id="action" data-design-definition-id="button">' +
+      'Open report</button>',
+    )
+    expect(markup).toContain(
+      '<h1 data-design-node-id="title" data-design-definition-id="h1">' +
+      'Canonical title</h1>',
+    )
+
+    const container = documentElement()
+    const root = createRoot(container)
+
+    await act(async () => root.render(renderer))
+    expect(projection.registeredNodeIds()).toEqual(['action', 'page', 'title'])
+
+    await act(async () => root.unmount())
+    container.remove()
+  })
+
   it('moves registrations to a replacement projection and cleans up on unmount', async () => {
     const document = createDesignDocument(createSnapshot())
     const registry = createReactDesignDefinitionRegistry({

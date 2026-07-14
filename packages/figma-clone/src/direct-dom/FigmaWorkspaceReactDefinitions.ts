@@ -23,7 +23,11 @@ import {
   FIGMA_WIDGET_DEFINITION_ID,
 } from '../design-document/FigmaWidgetDesignDocumentSeed'
 import {
+  FIGMA_MOBILE_TRAVEL_COMPONENT_METADATA,
+} from '../design-document/FigmaMobileTravelDesignDocumentSeed'
+import {
   FigmaHomeMetaCard,
+  FigmaMobileFeaturedStayCard,
   FigmaReactWidget,
   FigmaWorkspaceDealRow,
   FigmaWorkspaceFailingDefinition,
@@ -68,6 +72,10 @@ export const FIGMA_REACT_DEFINITIONS = [
   createFigmaComponentDefinition({
     metadata: FIGMA_HOME_COMPONENT_METADATA[0],
     renderer: FigmaHomeMetaCard,
+  }),
+  createFigmaComponentDefinition({
+    metadata: FIGMA_MOBILE_TRAVEL_COMPONENT_METADATA[0],
+    renderer: FigmaMobileFeaturedStayCard,
   }),
   defineReactDesignDefinition({
     definition: defineRegisteredDesignDefinition({

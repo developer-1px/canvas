@@ -34,11 +34,14 @@ export type ReactDesignRootProps = Omit<
   readonly 'data-canvas-wheel-passthrough'?: 'scroll' | 'true'
 }
 
+export type ReactDesignSlots = Readonly<Record<string, ReactNode>>
+
 export type ReactDesignDefinitionRenderProps = {
   readonly node: DesignNode
   readonly children: ReactNode
   readonly read: DesignDocumentRead
   readonly rootProps: ReactDesignRootProps
+  readonly slots: ReactDesignSlots
 }
 
 export type ReactRegisteredDesignRenderProps<
