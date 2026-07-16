@@ -68,11 +68,13 @@ test('renders three realistic editable mobile travel website frames', async ({
       backgroundColor: style.backgroundColor,
       display: style.display,
       fontFamily: style.fontFamily,
+      opacity: style.opacity,
     }
   })).toEqual({
     backgroundColor: 'rgb(247, 246, 242)',
     display: 'flex',
     fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif',
+    opacity: '1',
   })
   await expect.poll(() => page.locator(
     '[data-design-node-id="mobileExploreFeaturedImage"]',

@@ -29,7 +29,7 @@ const EMPTY_STATE: FigmaDesignNodeState = {
   h: 0,
   heightMode: 'fixed',
   margin: 0,
-  opacity: 1,
+  opacity: 100,
   order: 0,
   padding: 0,
   paddingBottom: 0,
