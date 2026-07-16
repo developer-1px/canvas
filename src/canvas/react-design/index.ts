@@ -5,15 +5,19 @@ export {
 } from '../design-document'
 
 export {
+  createRegisteredDesignDefinitionCatalog,
   defineRegisteredDesignDefinition,
 } from '../editor-engine'
 export type {
   RegisteredDesignCapabilities,
   RegisteredDesignCreateInput,
   RegisteredDesignDefinition,
+  RegisteredDesignDefinitionCatalog,
+  RegisteredDesignDefinitionCatalogSnapshot,
   RegisteredDesignDefinitionInput,
   RegisteredDesignDefinitionKind,
   RegisteredDesignDefinitionResolver,
+  RegisteredDesignDefinitionSource,
   RegisteredDesignJSONProps,
   RegisteredDesignPropsContract,
   RegisteredDesignPropsParseResult,
@@ -24,6 +28,8 @@ export type {
   DesignDocumentChange,
   DesignDocumentCommand,
   DesignDocumentCommandResult,
+  DesignComponentInstance,
+  DesignComponentSlot,
   DesignDocumentHistoryStatus,
   DesignDocumentPatchPort,
   DesignDocumentPublication,
@@ -42,10 +48,13 @@ export type {
 
 export {
   createDomProjection,
+  createIframeDomProjectionAdapter,
 } from '../dom-projection'
 export type {
+  CreateIframeDomProjectionAdapterOptions,
   CreateDomProjectionOptions,
   DomProjection,
+  DomProjectionElementAdapter,
   DomProjectionMeasurement,
 } from '../dom-projection'
 

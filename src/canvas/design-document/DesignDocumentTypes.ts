@@ -34,6 +34,17 @@ export type DesignNodeComponentBinding = {
   readonly slotId: string
 }
 
+export type DesignComponentSlot = {
+  readonly node: DesignNode
+  readonly slotId: string
+}
+
+export type DesignComponentInstance = {
+  readonly definitionId: string
+  readonly instanceId: string
+  readonly slots: readonly DesignComponentSlot[]
+}
+
 export type DesignNode = {
   readonly id: DesignNodeId
   readonly label: string
@@ -59,6 +70,7 @@ export type DesignDocumentRead = {
   children(nodeId: DesignNodeId): readonly DesignNode[]
   ancestry(nodeId: DesignNodeId): readonly DesignNode[]
   componentPeers(nodeId: DesignNodeId): readonly DesignNode[]
+  componentInstances(definitionId: string): readonly DesignComponentInstance[]
 }
 
 export type DesignNodeUpdateValues = Partial<Pick<

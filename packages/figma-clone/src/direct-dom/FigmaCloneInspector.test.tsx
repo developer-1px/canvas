@@ -49,6 +49,32 @@ describe('FigmaCloneInspector React component context', () => {
     expect(markup).toContain('<dd>Featured stay card</dd>')
     expect(markup).toContain('<dd>Slow House, Jeju</dd>')
     expect(markup).toContain('<dd>title</dd>')
+    expect(markup).toContain('<h2>Component edit</h2>')
+    expect(markup).toMatch(/aria-pressed="true"[^>]*>Instance<\/button>/)
+
+    editor.commands.execute({
+      type: 'selection.replace',
+      nodeId: 'workspaceStatRevenueValue',
+    })
+    const linkedMarkup = renderToStaticMarkup(
+      <FigmaCloneInspector
+        componentEditScope="definition"
+        editor={editor}
+        registry={registry}
+        snapshot={editor.snapshot()}
+        spacingGridSize={4}
+      />,
+    )
+
+    expect(linkedMarkup).toContain(
+      'aria-label="Stat card synced instances"',
+    )
+    expect(linkedMarkup).toContain('>Revenue</button>')
+    expect(linkedMarkup).toContain('>Conversion</button>')
+    expect(linkedMarkup).toContain('>Tickets</button>')
+    expect(linkedMarkup).toMatch(
+      /aria-pressed="true"[^>]*>Definition<\/button>/,
+    )
 
     editor.dispose()
     projection.dispose()

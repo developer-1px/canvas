@@ -1,6 +1,7 @@
 import type {
   EditorEngine,
   EditorEngineNodeEdit,
+  EditorEngineNodeEditScope,
   EditorEnginePreviewSession,
 } from '@interactive-os/canvas/editor'
 import {
@@ -38,6 +39,7 @@ export function DomEditEditorOverlay({
   affordanceState: controlledAffordanceState,
   canvasSelection = true,
   draggable = true,
+  editScope,
   editor,
   frameGuides,
   isCanvasPanActive,
@@ -51,6 +53,7 @@ export function DomEditEditorOverlay({
   readonly affordanceState?: DomEditAffordanceState
   readonly canvasSelection?: boolean
   readonly draggable?: boolean
+  readonly editScope?: EditorEngineNodeEditScope
   readonly editor: EditorEngine
   readonly frameGuides?: DomEditFrameGuideConfig<string> | null
   readonly isCanvasPanActive: boolean
@@ -76,7 +79,10 @@ export function DomEditEditorOverlay({
 
     onAffordanceStateChange?.(state)
   }, [isAffordanceStateControlled, onAffordanceStateChange])
-  const directManipulation = useDomEditEditorDirectManipulation(editor)
+  const directManipulation = useDomEditEditorDirectManipulation(
+    editor,
+    editScope,
+  )
 
   useDomEditEditorCanvasSelection({
     editor,
@@ -101,7 +107,7 @@ export function DomEditEditorOverlay({
       viewport={viewport}
       onAffordanceStateChange={changeAffordanceState}
       onChange={(nodeId, field, value) => {
-        executeDomEditEditorField(editor, nodeId, field, value)
+        executeDomEditEditorField(editor, nodeId, field, value, editScope)
       }}
       onChangeAutoLayout={(nodeId, field, value) => {
         executeDomEditEditorAutoLayoutField(
@@ -109,15 +115,17 @@ export function DomEditEditorOverlay({
           nodeId,
           field,
           value,
+          editScope,
         )
       }}
-      onCommand={(action) => runDomEditEditorCommand(editor, action)}
+      onCommand={(action) => runDomEditEditorCommand(editor, action, editScope)}
     />
   )
 }
 
 function useDomEditEditorDirectManipulation(
   editor: EditorEngine,
+  editScope?: EditorEngineNodeEditScope,
 ): DomEditDirectManipulationLifecycle<string> {
   const sessionRef = useRef<EditorEnginePreviewSession | null>(null)
   const editsRef = useRef(new Map<string, EditorEngineNodeEdit>())
@@ -145,6 +153,7 @@ function useDomEditEditorDirectManipulation(
         const session = editor.commands.beginPreview({
           label: readDomEditPreviewLabel(kind),
           nodeId,
+          scope: editScope,
         })
 
         sessionRef.current = session
@@ -182,7 +191,7 @@ function useDomEditEditorDirectManipulation(
         return true
       },
     }
-  }, [editor])
+  }, [editScope, editor])
 }
 
 function readDomEditPreviewLabel(
@@ -261,6 +270,7 @@ function isDomEditEditorControlTarget(target: EventTarget | null) {
 function runDomEditEditorCommand(
   editor: EditorEngine,
   action: DomEditInteractionAction,
+  editScope?: EditorEngineNodeEditScope,
 ) {
   if (action.type === 'dom-edit.command.undo') {
     return editor.commands.execute({ type: 'history.undo' }).ok
@@ -275,7 +285,7 @@ function runDomEditEditorCommand(
   }
 
   if (action.type === 'dom-edit.command.nudge') {
-    return nudgeDomEditEditorSelection(editor, action.params).ok
+    return nudgeDomEditEditorSelection(editor, action.params, editScope).ok
   }
 
   return false
@@ -284,6 +294,7 @@ function runDomEditEditorCommand(
 function nudgeDomEditEditorSelection(
   editor: EditorEngine,
   delta: { readonly dx: number; readonly dy: number },
+  editScope?: EditorEngineNodeEditScope,
 ) {
   const nodeId = editor.snapshot().selection.primaryNodeId
   const node = nodeId ? editor.read.node(nodeId) : null
@@ -309,6 +320,7 @@ function nudgeDomEditEditorSelection(
     edits: edits.map(toEditorEngineNodeEdit),
     label: 'Nudge node',
     nodeId,
+    scope: editScope,
     type: 'node.edit',
   })
 }

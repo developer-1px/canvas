@@ -537,6 +537,58 @@ describe('EditorEngine', () => {
     projection.dispose()
   })
 
+  it('keeps layout edits local when the caller selects instance scope', () => {
+    const document = createDesignDocument(createComponentEditorSnapshot())
+    const projection = createDomProjection({
+      getStageElement: () => null,
+      getViewport: () => ({ scale: 1, x: 0, y: 0 }),
+    })
+    const engine = createEditorEngine({ document, projection })
+
+    expect(engine.commands.execute({
+      type: 'node.edit',
+      nodeId: 'card-a',
+      label: 'Edit card instance padding',
+      scope: 'instance',
+      edits: [{ target: 'layout', field: 'padding', value: 24 }],
+    })).toEqual({ ok: true, changed: true })
+    expect(engine.read.node('card-a')?.layout.padding).toBe(24)
+    expect(engine.read.node('card-b')?.layout.padding).toBe(12)
+
+    engine.dispose()
+    projection.dispose()
+  })
+
+  it('projects definition-scoped previews through linked component instances', () => {
+    const document = createDesignDocument(createComponentEditorSnapshot())
+    const projection = createDomProjection({
+      getStageElement: () => null,
+      getViewport: () => ({ scale: 1, x: 0, y: 0 }),
+    })
+    const engine = createEditorEngine({ document, projection })
+    const session = engine.commands.beginPreview({
+      label: 'Preview card definition copy',
+      nodeId: 'card-a',
+      scope: 'definition',
+    })
+
+    expect(session?.update([{
+      target: 'text',
+      value: 'Preview card',
+    }])).toEqual({ ok: true, changed: true })
+    expect(engine.read.componentInstances('card').map((instance) =>
+      instance.slots[0]?.node.text)).toEqual([
+      'Preview card',
+      'Preview card',
+    ])
+    expect(document.read.node('card-a')?.text).toBe('Card A')
+    expect(document.read.node('card-b')?.text).toBe('Card B')
+    expect(session?.cancel()).toEqual({ ok: true, changed: true })
+
+    engine.dispose()
+    projection.dispose()
+  })
+
   it('previews effective node edits without changing document history and cancels safely', () => {
     const document = createDesignDocument(createEditorSnapshot())
     const projection = createDomProjection({
@@ -1013,6 +1065,33 @@ describe('EditorEngine', () => {
     expect(engine.read.node('card-b')?.props).toEqual({
       className: 'card-b',
     })
+
+    engine.dispose()
+    projection.dispose()
+  })
+
+  it('applies definition-scoped content edits to every linked instance atomically', () => {
+    const document = createDesignDocument(createComponentEditorSnapshot())
+    const projection = createDomProjection({
+      getStageElement: () => null,
+      getViewport: () => ({ scale: 1, x: 0, y: 0 }),
+    })
+    const engine = createEditorEngine({ document, projection })
+
+    expect(engine.commands.execute({
+      type: 'node.edit',
+      nodeId: 'card-a',
+      label: 'Edit card definition copy',
+      scope: 'definition',
+      edits: [{ target: 'text', value: 'Shared card' }],
+    })).toEqual({ ok: true, changed: true })
+    expect(engine.read.node('card-a')?.text).toBe('Shared card')
+    expect(engine.read.node('card-b')?.text).toBe('Shared card')
+
+    expect(engine.commands.execute({ type: 'history.undo' }))
+      .toEqual({ ok: true, changed: true })
+    expect(engine.read.node('card-a')?.text).toBe('Card A')
+    expect(engine.read.node('card-b')?.text).toBe('Card B')
 
     engine.dispose()
     projection.dispose()

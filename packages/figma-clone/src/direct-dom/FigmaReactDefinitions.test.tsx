@@ -18,12 +18,15 @@ import {
   FIGMA_REACT_INTRINSICS,
   createFigmaReactDefinitions,
 } from './FigmaWorkspaceReactDefinitions'
+import {
+  createFigmaCanvasStoryDefinitionSource,
+} from './FigmaCanvasComponentStories'
 
 describe('Figma canonical React definitions', () => {
   it('resolves workspace, homepage component, and widget definitions', () => {
     const registry = createReactDesignDefinitionRegistry({
-      definitions: createFigmaReactDefinitions(),
       intrinsics: FIGMA_REACT_INTRINSICS,
+      sources: [createFigmaCanvasStoryDefinitionSource()],
     })
 
     expect(registry.resolve({

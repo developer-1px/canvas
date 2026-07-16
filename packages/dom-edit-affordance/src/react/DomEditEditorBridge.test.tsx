@@ -91,6 +91,32 @@ describe('DomEditEditor bridge', () => {
     fixture.dispose()
   })
 
+  it('honors instance edit scope when changing a linked component layout', async () => {
+    const fixture = createEditorFixture()
+
+    fixture.editor.commands.execute({
+      nodeId: 'root',
+      type: 'selection.replace',
+    })
+    container = document.createElement('div')
+    document.body.append(container)
+    root = createRoot(container)
+
+    await act(async () => root?.render(
+      <DomEditEditorInspector
+        editScope="instance"
+        editor={fixture.editor}
+      />,
+    ))
+
+    await changeInput(requireInput(container, 'Gap'), '24')
+
+    expect(fixture.document.read.node('root')?.layout.gap).toBe(24)
+    expect(fixture.document.read.node('root-peer')?.layout.gap).toBe(8)
+
+    fixture.dispose()
+  })
+
   it('measures and edits text through the selected projected node', async () => {
     const fixture = createEditorFixture()
 
@@ -410,6 +436,11 @@ const EDITOR_FIXTURE_SNAPSHOT = {
   nodes: [
     createNode({
       children: ['copy'],
+      component: {
+        definitionId: 'layout-card',
+        instanceId: 'first',
+        slotId: 'root',
+      },
       id: 'root',
       label: 'Root',
       props: { display: 'flex' },
@@ -419,19 +450,35 @@ const EDITOR_FIXTURE_SNAPSHOT = {
       label: 'Copy',
       text: 'Hello',
     }),
+    createNode({
+      component: {
+        definitionId: 'layout-card',
+        instanceId: 'second',
+        slotId: 'root',
+      },
+      id: 'root-peer',
+      label: 'Root peer',
+      props: { display: 'flex' },
+    }),
   ],
-  roots: ['root'],
+  roots: ['root', 'root-peer'],
   schemaVersion: 1,
 } satisfies DesignDocumentSnapshot
 
 function createNode({
   children = [],
+  component = null,
   id,
   label,
   props = {},
   text = null,
 }: {
   children?: readonly string[]
+  component?: {
+    readonly definitionId: string
+    readonly instanceId: string
+    readonly slotId: string
+  } | null
   id: string
   label: string
   props?: Record<string, string>
@@ -439,7 +486,7 @@ function createNode({
 }) {
   return {
     children,
-    component: null,
+    component,
     definition: { id: 'div', kind: 'intrinsic' as const },
     frame: null,
     id,

@@ -1,5 +1,6 @@
 import type {
   EditorEngine,
+  EditorEngineNodeEditScope,
   EditorEngineSnapshot,
 } from '@interactive-os/canvas/editor'
 import type {
@@ -15,13 +16,22 @@ const FIGMA_FRAME_PRESETS = [
   { id: 'mobile', label: 'Mobile', width: 390, height: 844 },
 ] as const
 
+export type FigmaComponentEditScope = Exclude<
+  EditorEngineNodeEditScope,
+  'auto'
+>
+
 export function FigmaCloneInspector({
+  componentEditScope = 'instance',
   editor,
+  onComponentEditScopeChange,
   registry,
   spacingGridSize,
   snapshot,
 }: {
+  readonly componentEditScope?: FigmaComponentEditScope
   readonly editor: EditorEngine
+  readonly onComponentEditScopeChange?: (scope: FigmaComponentEditScope) => void
   readonly registry: ReactDesignDefinitionRegistry
   readonly spacingGridSize?: number
   readonly snapshot: EditorEngineSnapshot
@@ -30,6 +40,9 @@ export function FigmaCloneInspector({
   const selectedNode = selectedNodeId
     ? editor.read.node(selectedNodeId)
     : null
+  const nodeEditScope = selectedNode?.component
+    ? componentEditScope
+    : undefined
   const definition = selectedNode
     ? registry.resolveRegistered(selectedNode.definition) ??
       (selectedNode.component
@@ -49,7 +62,32 @@ export function FigmaCloneInspector({
           frame={selectedNode.frame}
         />
       ) : null}
+      {selectedNode?.component ? (
+        <section className="figma-panel-section">
+          <h2>Component edit</h2>
+          <div className="figma-segmented-field">
+            <span>Scope</span>
+            <div className="figma-segmented-control">
+              <button
+                aria-pressed={componentEditScope === 'instance'}
+                type="button"
+                onClick={() => onComponentEditScopeChange?.('instance')}
+              >
+                Instance
+              </button>
+              <button
+                aria-pressed={componentEditScope === 'definition'}
+                type="button"
+                onClick={() => onComponentEditScopeChange?.('definition')}
+              >
+                Definition
+              </button>
+            </div>
+          </div>
+        </section>
+      ) : null}
       <DomEditEditorInspector
+        editScope={nodeEditScope}
         editor={editor}
         spacingGridSize={spacingGridSize}
       />
@@ -62,6 +100,7 @@ export function FigmaCloneInspector({
                 edits: [{ field, target: 'props', value }],
                 label,
                 nodeId: selectedNode.id,
+                scope: nodeEditScope,
                 type: 'node.edit',
               })
             },

@@ -52,6 +52,28 @@ describe('FigmaCloneApp', () => {
     expect(getButton(container, 'Fit selection')).not.toBeNull()
     expect(getButton(container, 'Fit all')).not.toBeNull()
 
+    const statValue = container.querySelector<HTMLElement>(
+      '[data-design-node-id="workspaceStatRevenueValue"]',
+    )
+
+    expect(statValue).not.toBeNull()
+    await act(async () => statValue?.dispatchEvent(new MouseEvent('click', {
+      bubbles: true,
+      button: 0,
+      ctrlKey: true,
+    })))
+
+    const instanceScope = getButtonByText(container, 'Instance')
+    const definitionScope = getButtonByText(container, 'Definition')
+
+    expect(instanceScope?.getAttribute('aria-pressed')).toBe('true')
+    expect(definitionScope?.getAttribute('aria-pressed')).toBe('false')
+
+    await act(async () => definitionScope?.click())
+
+    expect(instanceScope?.getAttribute('aria-pressed')).toBe('false')
+    expect(definitionScope?.getAttribute('aria-pressed')).toBe('true')
+
     await act(async () => root.unmount())
   })
 })
@@ -59,6 +81,12 @@ describe('FigmaCloneApp', () => {
 function getButton(container: HTMLElement, label: string) {
   return container.querySelector<HTMLButtonElement>(
     `button[aria-label="${label}"]`,
+  )
+}
+
+function getButtonByText(container: HTMLElement, text: string) {
+  return [...container.querySelectorAll('button')].find(
+    (button) => button.textContent?.trim() === text,
   )
 }
 

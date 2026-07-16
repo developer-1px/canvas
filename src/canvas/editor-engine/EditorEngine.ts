@@ -68,6 +68,8 @@ export type EditorEngineNodeEdit =
       readonly value: string
     }
 
+export type EditorEngineNodeEditScope = 'auto' | 'definition' | 'instance'
+
 export type EditorEngineCommand =
   | {
       readonly exactTarget?: boolean
@@ -99,6 +101,7 @@ export type EditorEngineCommand =
       readonly edits: readonly EditorEngineNodeEdit[]
       readonly label: string
       readonly nodeId: DesignNodeId
+      readonly scope?: EditorEngineNodeEditScope
       readonly type: 'node.edit'
     }
   | {
@@ -124,6 +127,7 @@ export type EditorEngineCommandResult =
 export type EditorEnginePreviewInput = {
   readonly label: string
   readonly nodeId: DesignNodeId
+  readonly scope?: EditorEngineNodeEditScope
 }
 
 export type EditorEnginePreviewSession = {
@@ -196,6 +200,14 @@ export function createEditorEngine({
       mapEffectiveNodes(document.read.children(nodeId))),
     componentPeers: (nodeId) => readSynchronized(() =>
       mapEffectiveNodes(document.read.componentPeers(nodeId))),
+    componentInstances: (definitionId) => readSynchronized(() =>
+      document.read.componentInstances(definitionId).map((instance) => ({
+        ...instance,
+        slots: instance.slots.map((slot) => ({
+          ...slot,
+          node: effectiveNode(slot.node) ?? slot.node,
+        })),
+      }))),
     node: (nodeId) => readSynchronized(() =>
       effectiveNode(document.read.node(nodeId))),
     roots: () => readSynchronized(() =>
@@ -523,6 +535,7 @@ export function createEditorEngine({
       edits: nextEdits,
       label: preview.preview.input.label,
       nodeId: preview.preview.input.nodeId,
+      scope: preview.preview.input.scope,
     })
 
     if (!plan.ok) {
@@ -593,6 +606,7 @@ export function createEditorEngine({
       edits: preview.preview.edits,
       label: preview.preview.input.label,
       nodeId: preview.preview.input.nodeId,
+      scope: preview.preview.input.scope,
     }
     const plan = planNodeEdit(command)
 
@@ -698,13 +712,39 @@ export function createEditorEngine({
       }
     }
 
+    const scope = command.scope ?? 'auto'
+
+    if (scope !== 'auto' && scope !== 'definition' && scope !== 'instance') {
+      return {
+        ok: false,
+        result: failure('invalid-command', `Unknown node edit scope: ${scope}`),
+      }
+    }
+
     const sharedEdits = command.edits.filter((edit) =>
       edit.target === 'layout' || edit.target === 'style')
-    const peers = sharedEdits.length > 0
-      ? document.read.componentPeers(command.nodeId).filter((peer) =>
-        peer.id !== node.id)
-      : []
-    const targets = [node, ...peers]
+    let targets: readonly DesignNode[]
+
+    if (scope === 'instance') {
+      targets = [node]
+    } else if (scope === 'definition') {
+      if (!node.component) {
+        return {
+          ok: false,
+          result: unavailable(
+            'Definition-scoped edits require a component instance',
+          ),
+        }
+      }
+
+      targets = document.read.componentPeers(command.nodeId)
+    } else {
+      const peers = sharedEdits.length > 0
+        ? document.read.componentPeers(command.nodeId).filter((peer) =>
+          peer.id !== node.id)
+        : []
+      targets = [node, ...peers]
+    }
     const changes: {
       nodeId: DesignNodeId
       type: 'update'
@@ -712,7 +752,9 @@ export function createEditorEngine({
     }[] = []
 
     for (const target of targets) {
-      const targetEdits = target.id === node.id ? command.edits : sharedEdits
+      const targetEdits = scope === 'auto' && target.id !== node.id
+        ? sharedEdits
+        : command.edits
       const values = applyNodeEdits(target, targetEdits)
 
       if (!values.ok) {

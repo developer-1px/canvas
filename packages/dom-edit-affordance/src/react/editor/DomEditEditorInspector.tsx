@@ -1,4 +1,7 @@
-import type { EditorEngine } from '@interactive-os/canvas/editor'
+import type {
+  EditorEngine,
+  EditorEngineNodeEditScope,
+} from '@interactive-os/canvas/editor'
 
 import { DomEditInspector } from '../features/content-editing/DomEditInspector'
 import {
@@ -9,9 +12,11 @@ import {
 } from './DomEditEditorModel'
 
 export function DomEditEditorInspector({
+  editScope,
   editor,
   spacingGridSize,
 }: {
+  readonly editScope?: EditorEngineNodeEditScope
   readonly editor: EditorEngine
   readonly spacingGridSize?: number
 }) {
@@ -27,7 +32,7 @@ export function DomEditEditorInspector({
       state={model.state}
       viewport={{ scale: 1, x: 0, y: 0 }}
       onChange={(nodeId, field, value) => {
-        executeDomEditEditorField(editor, nodeId, field, value)
+        executeDomEditEditorField(editor, nodeId, field, value, editScope)
       }}
       onChangeAutoLayout={(nodeId, field, value) => {
         executeDomEditEditorAutoLayoutField(
@@ -35,10 +40,11 @@ export function DomEditEditorInspector({
           nodeId,
           field,
           value,
+          editScope,
         )
       }}
       onChangeText={(nodeId, value) => {
-        executeDomEditEditorText(editor, nodeId, value)
+        executeDomEditEditorText(editor, nodeId, value, editScope)
       }}
     />
   )

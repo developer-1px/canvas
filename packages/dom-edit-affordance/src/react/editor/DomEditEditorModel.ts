@@ -1,6 +1,7 @@
 import type {
   EditorEngine,
   EditorEngineNodeEdit,
+  EditorEngineNodeEditScope,
 } from '@interactive-os/canvas/editor'
 import { useSyncExternalStore } from 'react'
 
@@ -46,12 +47,14 @@ export function executeDomEditEditorField(
   nodeId: string,
   field: DomEditField,
   value: number,
+  scope?: EditorEngineNodeEditScope,
 ) {
   return executeDomEditEditorNodeEdits(
     editor,
     nodeId,
     `Update ${field}`,
     [toEditorEngineNodeEdit({ field, value })],
+    scope,
   )
 }
 
@@ -60,23 +63,25 @@ export function executeDomEditEditorAutoLayoutField(
   nodeId: string,
   field: DomEditAutoLayoutField,
   value: DomEditNodeState[DomEditAutoLayoutField],
+  scope?: EditorEngineNodeEditScope,
 ) {
   return executeDomEditEditorNodeEdits(editor, nodeId, `Update ${field}`, [{
     field,
     target: 'layout',
     value,
-  }])
+  }], scope)
 }
 
 export function executeDomEditEditorText(
   editor: EditorEngine,
   nodeId: string,
   value: string,
+  scope?: EditorEngineNodeEditScope,
 ) {
   return executeDomEditEditorNodeEdits(editor, nodeId, 'Update text', [{
     target: 'text',
     value,
-  }])
+  }], scope)
 }
 
 export function toEditorEngineNodeEdit(
@@ -107,11 +112,13 @@ function executeDomEditEditorNodeEdits(
   nodeId: string,
   label: string,
   edits: readonly EditorEngineNodeEdit[],
+  scope?: EditorEngineNodeEditScope,
 ) {
   return editor.commands.execute({
     edits,
     label,
     nodeId,
+    scope,
     type: 'node.edit',
   })
 }

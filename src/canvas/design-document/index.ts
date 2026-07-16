@@ -13,6 +13,8 @@ export type {
   DesignDocumentChange,
   DesignDocumentCommand,
   DesignDocumentCommandResult,
+  DesignComponentInstance,
+  DesignComponentSlot,
   DesignDocumentHistoryStatus,
   DesignDocumentRead,
   DesignDocumentSnapshot,

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   defineRegisteredDesignDefinition,
+  type RegisteredDesignDefinitionSource,
 } from '../editor-engine'
 import {
   createReactDesignDefinitionRegistry,
@@ -93,6 +94,41 @@ describe('ReactDesignDefinitionRegistry', () => {
     expect(() => createReactDesignDefinitionRegistry({
       intrinsics: ['canvas' as 'section'],
     })).toThrow('React design intrinsic is not supported: canvas')
+  })
+
+  it('resolves live definitions supplied through a reusable definition source', () => {
+    const first = createDefinition('customer-card', 'component')
+    const second = createDefinition('customer-hero', 'component')
+    let definitions = [first]
+    let publish: () => void = () => undefined
+    const source: RegisteredDesignDefinitionSource<typeof first> = {
+      read: () => definitions,
+      subscribe(listener) {
+        publish = listener
+        return () => undefined
+      },
+    }
+    const registry = createReactDesignDefinitionRegistry({
+      intrinsics: [],
+      sources: [source],
+    })
+
+    expect(registry.resolve({ kind: 'component', id: first.id }))
+      .toEqual({ kind: 'registered', definition: first })
+
+    definitions = [second]
+    publish()
+
+    expect(registry.resolve({ kind: 'component', id: first.id })).toBeNull()
+    expect(registry.resolve({ kind: 'component', id: second.id }))
+      .toEqual({ kind: 'registered', definition: second })
+    expect(registry.snapshot()).toMatchObject({
+      definitions: [second],
+      failure: null,
+      revision: 1,
+    })
+
+    registry.dispose()
   })
 })
 

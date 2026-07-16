@@ -188,6 +188,32 @@ export function createDesignDocument(
         node.component?.definitionId === binding.definitionId &&
         node.component.slotId === binding.slotId)
     },
+    componentInstances(definitionId) {
+      const instances = new Map<string, {
+        readonly definitionId: string
+        readonly instanceId: string
+        readonly slots: { readonly node: DesignNode; readonly slotId: string }[]
+      }>()
+
+      for (const node of snapshot.nodes) {
+        const binding = node.component
+
+        if (binding?.definitionId !== definitionId) {
+          continue
+        }
+
+        const instance = instances.get(binding.instanceId) ?? {
+          definitionId,
+          instanceId: binding.instanceId,
+          slots: [],
+        }
+
+        instance.slots.push({ node, slotId: binding.slotId })
+        instances.set(binding.instanceId, instance)
+      }
+
+      return [...instances.values()]
+    },
   }
 
   const document: DesignDocument = {

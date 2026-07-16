@@ -15,8 +15,11 @@ import type {
 import type {
   EditorEngine,
   RegisteredDesignDefinition,
+  RegisteredDesignDefinitionCatalogSnapshot,
   RegisteredDesignDefinitionKind,
+  RegisteredDesignDefinitionSource,
 } from '../editor-engine'
+import { createRegisteredDesignDefinitionCatalog } from '../editor-engine'
 
 export type ReactDesignIntrinsicTag = Exclude<
   Extract<keyof React.JSX.IntrinsicElements, keyof HTMLElementTagNameMap>,
@@ -128,12 +131,17 @@ export type ReactDesignDefinitionResolution =
     }
 
 export type ReactDesignDefinitionRegistry = {
+  dispose(): void
   resolveRegistered(
     reference: DesignNodeDefinition,
   ): ReactDesignDefinitionRegistration | null
   resolve(
     reference: DesignNodeDefinition,
   ): ReactDesignDefinitionResolution | null
+  snapshot(): RegisteredDesignDefinitionCatalogSnapshot<
+    ReactDesignDefinitionRegistration
+  >
+  subscribe(listener: () => void): () => void
 }
 
 export function defineReactDesignDefinition<
@@ -193,12 +201,16 @@ export function defineReactDesignDefinition<
 export function createReactDesignDefinitionRegistry({
   definitions = [],
   intrinsics,
+  sources = [],
 }: {
   readonly definitions?: readonly ReactDesignDefinitionRegistration[]
   readonly intrinsics: readonly ReactDesignIntrinsicTag[]
+  readonly sources?: readonly RegisteredDesignDefinitionSource<
+    ReactDesignDefinitionRegistration
+  >[]
 }): ReactDesignDefinitionRegistry {
   const intrinsicTags = new Set<ReactDesignIntrinsicTag>()
-  const registeredDefinitions = new Map<string, ReactDesignDefinitionRegistration>()
+  const registeredDefinitionKeys = new Set<string>()
 
   for (const tag of intrinsics) {
     assertDefinitionId(tag)
@@ -220,24 +232,26 @@ export function createReactDesignDefinitionRegistry({
     assertDefinitionId(definition.id)
     const key = getRegisteredDefinitionKey(definition)
 
-    if (registeredDefinitions.has(key)) {
+    if (registeredDefinitionKeys.has(key)) {
       throw new Error(
         `Duplicate React design definition: ${definition.kind}:${definition.id}`,
       )
     }
 
-    registeredDefinitions.set(key, Object.freeze({ ...definition }))
+    registeredDefinitionKeys.add(key)
   }
 
-  return {
-    resolveRegistered(reference) {
-      if (reference.kind !== 'component' && reference.kind !== 'widget') {
-        return null
-      }
+  const catalog = createRegisteredDesignDefinitionCatalog<
+    ReactDesignDefinitionRegistration
+  >({
+    definitions,
+    sources,
+  })
 
-      return registeredDefinitions.get(
-        getRegisteredDefinitionKey({ id: reference.id, kind: reference.kind }),
-      ) ?? null
+  return {
+    dispose: catalog.dispose,
+    resolveRegistered(reference) {
+      return catalog.resolveRegistered(reference)
     },
     resolve(reference) {
       if (reference.kind === 'intrinsic') {
@@ -253,12 +267,12 @@ export function createReactDesignDefinitionRegistry({
         return null
       }
 
-      const definition = registeredDefinitions.get(
-        getRegisteredDefinitionKey({ id: reference.id, kind: reference.kind }),
-      )
+      const definition = catalog.resolveRegistered(reference)
 
       return definition ? { kind: 'registered', definition } : null
     },
+    snapshot: catalog.snapshot,
+    subscribe: catalog.subscribe,
   }
 }
 

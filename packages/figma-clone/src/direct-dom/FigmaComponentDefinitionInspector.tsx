@@ -28,7 +28,14 @@ export function createFigmaComponentDefinitionInspector(
 
     const instance = metadata.instances.find((candidate) =>
       candidate.id === binding.instanceId)
-    const peers = editor.read.componentPeers(node.id)
+    const linkedInstances = editor.read.componentInstances(
+      binding.definitionId,
+    ).flatMap((candidate) => {
+      const slot = candidate.slots.find((candidateSlot) =>
+        candidateSlot.slotId === binding.slotId)
+
+      return slot ? [{ instance: candidate, node: slot.node }] : []
+    })
 
     return (
       <section className="figma-panel-section figma-panel-section--component">
@@ -51,17 +58,19 @@ export function createFigmaComponentDefinitionInspector(
           aria-label={`${metadata.label} synced instances`}
           className="figma-component-instances"
         >
-          {peers.map((peer) => (
+          {linkedInstances.map(({ instance: linkedInstance, node: peer }) => (
             <button
-              aria-pressed={peer.id === node.id}
-              key={peer.id}
+              aria-pressed={linkedInstance.instanceId === binding.instanceId}
+              key={linkedInstance.instanceId}
               type="button"
               onClick={() => editor.commands.execute({
                 type: 'selection.replace',
                 nodeId: peer.id,
               })}
             >
-              {peer.label}
+              {metadata.instances.find((candidate) =>
+                candidate.id === linkedInstance.instanceId)?.label ??
+                peer.label}
             </button>
           ))}
         </div>

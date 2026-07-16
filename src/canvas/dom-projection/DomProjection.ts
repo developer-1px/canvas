@@ -16,8 +16,16 @@ export type DomProjectionMeasurement = {
   readonly worldBounds: Bounds
 }
 
+export type DomProjectionElementAdapter = {
+  getClientBounds(element: HTMLElement): Bounds | null
+}
+
 export type DomProjection = {
-  register(nodeId: DesignNodeId, element: HTMLElement): () => void
+  register(
+    nodeId: DesignNodeId,
+    element: HTMLElement,
+    adapter?: DomProjectionElementAdapter,
+  ): () => void
   element(nodeId: DesignNodeId): HTMLElement | null
   registeredNodeIds(): readonly DesignNodeId[]
   revision(): number
@@ -34,7 +42,10 @@ export type DomProjection = {
 export function createDomProjection(
   options: CreateDomProjectionOptions,
 ): DomProjection {
-  const registrations = new Map<DesignNodeId, { element: HTMLElement }>()
+  const registrations = new Map<DesignNodeId, {
+    readonly adapter?: DomProjectionElementAdapter
+    readonly element: HTMLElement
+  }>()
   let nodeIdsByElement = new WeakMap<object, DesignNodeId>()
   const listeners = new Set<() => void>()
   let currentRevision = 0
@@ -102,7 +113,8 @@ export function createDomProjection(
         return false
       }
 
-      const element = registrations.get(nodeId)?.element
+      const registration = registrations.get(nodeId)
+      const element = registration?.element
 
       if (!element) {
         return false
@@ -116,7 +128,8 @@ export function createDomProjection(
         return null
       }
 
-      const element = registrations.get(nodeId)?.element
+      const registration = registrations.get(nodeId)
+      const element = registration?.element
 
       if (!element) {
         return null
@@ -128,8 +141,14 @@ export function createDomProjection(
         return null
       }
 
-      const rect = element.getBoundingClientRect()
-      const clientBounds = toBounds(rect)
+      const clientBounds = registration.adapter
+        ? registration.adapter.getClientBounds(element)
+        : toBounds(element.getBoundingClientRect())
+
+      if (!clientBounds) {
+        return null
+      }
+
       const worldPoint = projectClientPointToWorld(clientBounds, context)
 
       return {
@@ -142,7 +161,11 @@ export function createDomProjection(
         },
       }
     },
-    register(nodeId: DesignNodeId, element: HTMLElement) {
+    register(
+      nodeId: DesignNodeId,
+      element: HTMLElement,
+      adapter?: DomProjectionElementAdapter,
+    ) {
       if (disposed) {
         throw new Error('DomProjection is disposed')
       }
@@ -160,7 +183,7 @@ export function createDomProjection(
         registrations.delete(previousNodeId)
       }
 
-      const registration = { element }
+      const registration = { adapter, element }
 
       registrations.set(nodeId, registration)
       nodeIdsByElement.set(element, nodeId)

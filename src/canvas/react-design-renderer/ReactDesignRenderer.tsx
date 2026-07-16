@@ -5,6 +5,7 @@ import {
   useCallback,
   useEffect,
   useRef,
+  useSyncExternalStore,
   type ReactNode,
 } from 'react'
 
@@ -32,6 +33,8 @@ export function ReactDesignRenderer({
   read,
   registry,
 }: ReactDesignRendererProps) {
+  useSyncExternalStore(registry.subscribe, registry.snapshot, registry.snapshot)
+
   return (
     <Fragment>
       {read.roots().map((node) => (

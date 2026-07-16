@@ -48,6 +48,57 @@ export function BasicCanvas() {
 }
 ```
 
+### Component-driven DOM editor
+
+Component stories stay in the host application. The canvas only consumes a
+definition source, the serializable `DesignDocument`, and DOM projection:
+
+```tsx
+import {
+  createReactDesignDefinitionRegistry,
+  type ReactDesignDefinitionRegistration,
+  type RegisteredDesignDefinitionSource,
+} from '@interactive-os/canvas/react-design'
+
+const componentStories = [
+  { id: 'cards/stat', definition: statCardDefinition },
+  { id: 'rows/deal', definition: dealRowDefinition },
+]
+
+const storySource = {
+  read: () => componentStories.map((story) => story.definition),
+} satisfies RegisteredDesignDefinitionSource<ReactDesignDefinitionRegistration>
+
+const registry = createReactDesignDefinitionRegistry({
+  intrinsics: ['article', 'div', 'span'],
+  sources: [storySource],
+})
+```
+
+A host can add `subscribe(listener)` to the source for HMR or a remote story
+catalog. Invalid live updates keep the last valid catalog and expose the error
+through `registry.snapshot().failure`.
+
+Linked component slots are queryable through
+`editor.read.componentInstances(definitionId)`. Edits choose their propagation
+boundary explicitly:
+
+```ts
+editor.commands.execute({
+  type: 'node.edit',
+  nodeId: 'revenue-card-title',
+  label: 'Rename every stat card title',
+  scope: 'definition', // use 'instance' for only the selected instance
+  edits: [{ target: 'text', value: 'Revenue' }],
+})
+```
+
+For same-origin iframe content, register inner elements with
+`createIframeDomProjectionAdapter(...)` so measurements and overlays use host
+client coordinates. The host remains responsible for forwarding iframe input.
+The engine remains independent of CSF, Vite, routing, provider setup, and
+product inspector UI.
+
 ### Feature packs and a custom item
 
 ```tsx
