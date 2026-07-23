@@ -21,7 +21,7 @@ describe('Canvas verification config', () => {
 
   it('makes the full verification contract and existing e2e suite PR gates', () => {
     expect(workflow).toContain('pnpm install --no-frozen-lockfile')
-    expect(workflow).toContain('--config.link-workspace-packages=false')
+    expect(workflow).not.toContain('link-workspace-packages=false')
     expect(workflow).not.toContain('--frozen-lockfile')
     expect(workflow).toContain('run: pnpm verify')
     expect(workflow).toContain(
