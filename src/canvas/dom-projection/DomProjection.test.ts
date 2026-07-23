@@ -6,7 +6,10 @@ import {
   vi,
 } from 'vitest'
 
-import { createDomProjection } from './index'
+import {
+  createDomProjection,
+  createIframeDomProjectionAdapter,
+} from './index'
 
 describe('DomProjection', () => {
   afterEach(() => {
@@ -108,6 +111,41 @@ describe('DomProjection', () => {
 
     expect(projection.measure('hero')?.clientBounds)
       .toEqual({ h: 60, w: 120, x: 180, y: 150 })
+  })
+
+  it('projects an iframe DOM element into the host client coordinate space', () => {
+    const stage = createElement({ height: 700, left: 10, top: 20, width: 900 })
+    const frame = createElement({
+      height: 300,
+      left: 110,
+      top: 80,
+      width: 400,
+    }) as HTMLIFrameElement
+    const innerElement = createElement({
+      height: 40,
+      left: 20,
+      top: 30,
+      width: 100,
+    })
+    const projection = createDomProjection({
+      getStageElement: () => stage,
+      getViewport: () => ({ scale: 1, x: 0, y: 0 }),
+    })
+
+    projection.register(
+      'iframe-card',
+      innerElement,
+      createIframeDomProjectionAdapter({
+        getFrameElement: () => frame,
+        getViewportSize: () => ({ height: 600, width: 800 }),
+      }),
+    )
+
+    expect(projection.measure('iframe-card')).toEqual({
+      nodeId: 'iframe-card',
+      clientBounds: { h: 20, w: 50, x: 120, y: 95 },
+      worldBounds: { h: 20, w: 50, x: 110, y: 75 },
+    })
   })
 
   it('returns null when projection context is unavailable or invalid', () => {

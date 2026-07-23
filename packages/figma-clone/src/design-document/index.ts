@@ -15,6 +15,15 @@ export type {
   FigmaHomeDesignNodeId,
 } from './FigmaHomeDesignDocumentSeed'
 export {
+  FIGMA_MOBILE_TRAVEL_COMPONENT_METADATA,
+  FIGMA_MOBILE_TRAVEL_DESIGN_DOCUMENT_NODES,
+  FIGMA_MOBILE_TRAVEL_ROOT_IDS,
+} from './FigmaMobileTravelDesignDocumentSeed'
+export type {
+  FigmaMobileTravelComponentDefinitionId,
+  FigmaMobileTravelDesignNodeId,
+} from './FigmaMobileTravelDesignDocumentSeed'
+export {
   FIGMA_WIDGET_DEFINITION_ID,
   FIGMA_WIDGET_NODE_ID,
 } from './FigmaWidgetDesignDocumentSeed'

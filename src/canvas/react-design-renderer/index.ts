@@ -16,6 +16,7 @@ export type {
   ReactRegisteredDesignInspectorRuntimeProps,
   ReactRegisteredDesignRenderProps,
   ReactDesignRootProps,
+  ReactDesignSlots,
 } from './ReactDesignDefinitionRegistry'
 export {
   createReactDesignNodeDomProps,

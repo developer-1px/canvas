@@ -11,7 +11,10 @@ import {
   type DesignDocumentSnapshot,
 } from '../design-document'
 import { createDomProjection } from '../dom-projection'
-import { defineRegisteredDesignDefinition } from '../editor-engine'
+import {
+  defineRegisteredDesignDefinition,
+  type RegisteredDesignDefinitionSource,
+} from '../editor-engine'
 import {
   createReactDesignDefinitionRegistry,
   defineReactDesignDefinition,
@@ -83,6 +86,143 @@ describe('ReactDesignRenderer', () => {
       'data-related-title="Canonical title">',
     )
     expect(markup).toContain('Canonical title</h1></article>')
+  })
+
+  it('rerenders when a subscribed definition source registers the component', async () => {
+    const snapshot = createSnapshot()
+    const document = createDesignDocument({
+      ...snapshot,
+      nodes: snapshot.nodes.map((node) => node.id === 'page'
+        ? {
+            ...node,
+            definition: { kind: 'component' as const, id: 'live-card' },
+          }
+        : node),
+    })
+    const definition = createRegisteredDefinition(
+      'live-card',
+      ({ children, rootProps }) => (
+        <article {...rootProps} data-component="live-card">{children}</article>
+      ),
+    )
+    let definitions: typeof definition[] = []
+    let publish: () => void = () => undefined
+    const source: RegisteredDesignDefinitionSource<typeof definition> = {
+      read: () => definitions,
+      subscribe(listener) {
+        publish = listener
+        return () => undefined
+      },
+    }
+    const registry = createReactDesignDefinitionRegistry({
+      intrinsics: ['h1'],
+      sources: [source],
+    })
+    const container = documentElement()
+    const root = createRoot(container)
+
+    await act(async () => root.render(
+      <ReactDesignRenderer
+        projection={createProjection()}
+        read={document.read}
+        registry={registry}
+      />,
+    ))
+    expect(container.querySelector('[data-design-render-error="unknown-definition"]'))
+      .not.toBeNull()
+
+    await act(async () => {
+      definitions = [definition]
+      publish()
+    })
+
+    expect(container.querySelector('[data-component="live-card"]')).not.toBeNull()
+    expect(container.querySelector('[data-design-render-error]')).toBeNull()
+
+    await act(async () => root.unmount())
+    registry.dispose()
+    container.remove()
+  })
+
+  it('renders named component slots as inspectable document nodes', async () => {
+    const instance = {
+      definitionId: 'sales-card',
+      instanceId: 'sales-card-1',
+    }
+    const document = createDesignDocument({
+      schemaVersion: 1,
+      roots: ['page'],
+      nodes: [
+        {
+          ...createNode({
+            id: 'page',
+            definitionId: 'sales-card',
+            children: ['title', 'action'],
+            props: { className: 'page' },
+          }),
+          definition: { kind: 'component', id: 'sales-card' },
+          component: { ...instance, slotId: 'root' },
+        },
+        {
+          ...createNode({
+            id: 'title',
+            definitionId: 'h1',
+            text: 'Canonical title',
+          }),
+          component: { ...instance, slotId: 'title' },
+        },
+        {
+          ...createNode({
+            id: 'action',
+            definitionId: 'button',
+            text: 'Open report',
+          }),
+          component: { ...instance, slotId: 'action' },
+        },
+      ],
+    })
+    const registry = createReactDesignDefinitionRegistry({
+      intrinsics: ['button', 'h1'],
+      definitions: [createRegisteredDefinition(
+        'sales-card',
+        ({ rootProps, slots }) => (
+          <article {...rootProps} data-component="sales-card">
+            <div data-slot="action">{slots.action}</div>
+            <header data-slot="title">{slots.title}</header>
+          </article>
+        ),
+      )],
+    })
+    const projection = createProjection()
+    const renderer = (
+      <ReactDesignRenderer
+        projection={projection}
+        read={document.read}
+        registry={registry}
+      />
+    )
+    const markup = renderToStaticMarkup(renderer)
+
+    expect(markup.indexOf('data-design-node-id="action"')).toBeLessThan(
+      markup.indexOf('data-design-node-id="title"'),
+    )
+    expect(markup).toContain(
+      '<button data-design-node-id="action" data-design-definition-id="button">' +
+      'Open report</button>',
+    )
+    expect(markup).toContain(
+      '<h1 data-design-node-id="title" data-design-definition-id="h1">' +
+      'Canonical title</h1>',
+    )
+
+    const container = documentElement()
+    const root = createRoot(container)
+
+    await act(async () => root.render(renderer))
+    expect(projection.registeredNodeIds()).toEqual(['action', 'page', 'title'])
+
+    await act(async () => root.unmount())
+    container.remove()
   })
 
   it('moves registrations to a replacement projection and cleans up on unmount', async () => {

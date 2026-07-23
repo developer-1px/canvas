@@ -19,6 +19,11 @@ import {
   type FigmaHomeDesignNodeId,
 } from './FigmaHomeDesignDocumentSeed'
 import {
+  FIGMA_MOBILE_TRAVEL_DESIGN_DOCUMENT_NODES,
+  FIGMA_MOBILE_TRAVEL_ROOT_IDS,
+  type FigmaMobileTravelDesignNodeId,
+} from './FigmaMobileTravelDesignDocumentSeed'
+import {
   FIGMA_WIDGET_DESIGN_DOCUMENT_NODE,
   type FigmaWidgetDesignNodeId,
 } from './FigmaWidgetDesignDocumentSeed'
@@ -26,6 +31,7 @@ import {
 export type FigmaDesignNodeId =
   | FigmaWorkspaceDesignNodeId
   | FigmaHomeDesignNodeId
+  | FigmaMobileTravelDesignNodeId
   | FigmaWidgetDesignNodeId
 
 type FigmaWorkspaceNodeSeed = {
@@ -1084,11 +1090,13 @@ export const FIGMA_DESIGN_DOCUMENT_SNAPSHOT = deepFreeze({
     FIGMA_WIDGET_DESIGN_DOCUMENT_NODE.id,
     'workspacePage',
     'homePage',
+    ...FIGMA_MOBILE_TRAVEL_ROOT_IDS,
   ],
   nodes: [
     FIGMA_WIDGET_DESIGN_DOCUMENT_NODE,
     ...FIGMA_WORKSPACE_DESIGN_DOCUMENT_SNAPSHOT.nodes,
     ...FIGMA_HOME_DESIGN_DOCUMENT_NODES,
+    ...FIGMA_MOBILE_TRAVEL_DESIGN_DOCUMENT_NODES,
   ],
 } satisfies DesignDocumentSnapshot)
 

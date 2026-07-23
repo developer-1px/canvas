@@ -4,6 +4,9 @@ import {
   createFigmaDesignDocument,
   FIGMA_DESIGN_DOCUMENT_SNAPSHOT,
   FIGMA_HOME_COMPONENT_METADATA,
+  FIGMA_MOBILE_TRAVEL_COMPONENT_METADATA,
+  FIGMA_MOBILE_TRAVEL_DESIGN_DOCUMENT_NODES,
+  FIGMA_MOBILE_TRAVEL_ROOT_IDS,
   FIGMA_WIDGET_DEFINITION_ID,
   FIGMA_WIDGET_NODE_ID,
   FIGMA_WORKSPACE_DESIGN_DOCUMENT_SNAPSHOT,
@@ -12,6 +15,7 @@ import {
 const canonicalSeedModules = import.meta.glob([
   './FigmaDesignDocumentSeedTypes.ts',
   './FigmaHomeDesignDocumentSeed.ts',
+  './FigmaMobileTravelDesignDocumentSeed.ts',
   './FigmaWidgetDesignDocumentSeed.ts',
   './FigmaWorkspaceComponentMetadata.ts',
   './FigmaWorkspaceDesignDocumentSeed.ts',
@@ -32,15 +36,108 @@ describe('Figma canonical product document', () => {
       FIGMA_WIDGET_NODE_ID,
       'workspacePage',
       'homePage',
+      ...FIGMA_MOBILE_TRAVEL_ROOT_IDS,
     ])
-    expect(snapshot.nodes).toHaveLength(144)
+    expect(snapshot.nodes).toHaveLength(
+      144 + FIGMA_MOBILE_TRAVEL_DESIGN_DOCUMENT_NODES.length,
+    )
     expect(new Set(nodeIds).size).toBe(snapshot.nodes.length)
     expect(snapshot.nodes.filter((node) => node.id.startsWith('workspace')))
       .toHaveLength(FIGMA_WORKSPACE_DESIGN_DOCUMENT_SNAPSHOT.nodes.length)
     expect(snapshot.nodes.filter((node) => node.id.startsWith('home')))
       .toHaveLength(78)
+    expect(snapshot.nodes.filter((node) => node.id.startsWith('mobile')))
+      .toHaveLength(FIGMA_MOBILE_TRAVEL_DESIGN_DOCUMENT_NODES.length)
     expect(Object.isFrozen(snapshot)).toBe(true)
     expect(Object.isFrozen(snapshot.nodes)).toBe(true)
+  })
+
+  it('adds three editable mobile travel website frames', () => {
+    const document = createFigmaDesignDocument()
+
+    expect(FIGMA_MOBILE_TRAVEL_ROOT_IDS).toEqual([
+      'mobileExplorePage',
+      'mobileStayPage',
+      'mobileBookingPage',
+    ])
+    expect(document.read.node('mobileExplorePage')).toMatchObject({
+      label: 'Mobile travel explore',
+      definition: { kind: 'intrinsic', id: 'section' },
+      props: {
+        className: 'figma-dom-mobile figma-dom-mobile--explore',
+      },
+      frame: {
+        x: 3008,
+        y: 76,
+        width: 390,
+        height: 844,
+        widthMode: 'fixed',
+        heightMode: 'fixed',
+        overflow: 'clip',
+      },
+    })
+    expect(document.read.node('mobileStayPage')?.frame).toMatchObject({
+      x: 3430,
+      y: 76,
+      width: 390,
+      height: 844,
+    })
+    expect(document.read.node('mobileBookingPage')?.frame).toMatchObject({
+      x: 3852,
+      y: 76,
+      width: 390,
+      height: 844,
+    })
+    expect(document.read.node('mobileExploreTitle')?.text)
+      .toBe('Stay somewhere worth remembering')
+    expect(document.read.node('mobileStayTitle')?.text)
+      .toBe('Slow House, Jeju')
+    expect(document.read.node('mobileBookingTotalValue')?.text)
+      .toBe('₩504,000')
+  })
+
+  it('keeps mobile travel spacing on the configurable four-point grid', () => {
+    for (const node of FIGMA_MOBILE_TRAVEL_DESIGN_DOCUMENT_NODES) {
+      for (const property of [
+        'gap',
+        'padding',
+        'paddingBottom',
+        'paddingLeft',
+        'paddingRight',
+        'paddingTop',
+      ] as const) {
+        const value = node.layout[property]
+
+        expect(value, `${node.id}.${property}`).toSatisfy(
+          (spacing) => typeof spacing === 'number' &&
+            Number.isInteger(spacing) &&
+            spacing % 4 === 0,
+        )
+      }
+    }
+  })
+
+  it('binds the featured mobile stay as an editable React component tree', () => {
+    const document = createFigmaDesignDocument()
+
+    expect(FIGMA_MOBILE_TRAVEL_COMPONENT_METADATA).toHaveLength(1)
+    expect(document.read.node('mobileExploreFeaturedCard')).toMatchObject({
+      definition: {
+        kind: 'component',
+        id: 'mobile-travel-featured-stay-card',
+      },
+      component: {
+        definitionId: 'mobile-travel-featured-stay-card',
+        instanceId: 'mobileExploreFeaturedCard',
+        slotId: 'root',
+      },
+    })
+    expect(document.read.node('mobileExploreFeaturedImage')?.component)
+      .toMatchObject({ slotId: 'image' })
+    expect(document.read.node('mobileExploreFeaturedInfo')?.component)
+      .toMatchObject({ slotId: 'content' })
+    expect(document.read.node('mobileExploreFeaturedTitle')?.component)
+      .toMatchObject({ slotId: 'title' })
   })
 
   it('owns the existing workspace, homepage, and widget frame positions', () => {
@@ -150,7 +247,7 @@ describe('Figma canonical product document', () => {
   it('keeps canonical seed and React definitions off the legacy runtime', () => {
     const source = Object.values(canonicalSeedModules).join('\n')
 
-    expect(Object.keys(canonicalSeedModules)).toHaveLength(7)
+    expect(Object.keys(canonicalSeedModules)).toHaveLength(8)
     expect(source).not.toContain('FigmaCloneDomEditModel')
     expect(source).not.toContain('/dom-edit/')
     expect(source).not.toMatch(/\bCanvasItem\b/)

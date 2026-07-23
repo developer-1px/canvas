@@ -21,6 +21,7 @@ import {
   type DesignNodeId,
   type DomProjection,
 } from '@interactive-os/canvas/react-design'
+import type { EditorEngineNodeEditScope } from '@interactive-os/canvas/editor'
 import {
   DomEditEditorOverlay,
   type DomEditAffordanceState,
@@ -37,8 +38,10 @@ import { FigmaCloneDirectDomLayers } from './direct-dom/FigmaCloneDirectDomLayer
 import { FigmaCloneInspector } from './direct-dom/FigmaCloneInspector'
 import {
   FIGMA_REACT_INTRINSICS,
-  createFigmaReactDefinitions,
 } from './direct-dom/FigmaWorkspaceReactDefinitions'
+import {
+  createFigmaCanvasStoryDefinitionSource,
+} from './direct-dom/FigmaCanvasComponentStories'
 import './FigmaCloneApp.css'
 
 const FIGMA_INITIAL_VIEWPORT = {
@@ -91,6 +94,9 @@ export function FigmaCloneApp() {
   const [affordanceState, setAffordanceState] =
     useState<DomEditAffordanceState>({ mode: 'idle' })
   const [panning, setPanning] = useState(false)
+  const [componentEditScope, setComponentEditScope] = useState<
+    Exclude<EditorEngineNodeEditScope, 'auto'>
+  >('instance')
   const [temporaryPan, setTemporaryPan] = useState(false)
   const [viewportFocusNodeId, setViewportFocusNodeId] =
     useState<DesignNodeId | null>(null)
@@ -368,6 +374,9 @@ export function FigmaCloneApp() {
           </div>
           <DomEditEditorOverlay
             affordanceState={affordanceState}
+            editScope={selectedNode?.component
+              ? componentEditScope
+              : undefined}
             editor={editor}
             isCanvasPanActive={canvasPanActive}
             selectedNodeId={editableSelectedNodeId}
@@ -385,7 +394,9 @@ export function FigmaCloneApp() {
         </header>
         <div className="figma-inspector-body">
           <FigmaCloneInspector
+            componentEditScope={componentEditScope}
             editor={editor}
+            onComponentEditScopeChange={setComponentEditScope}
             registry={registry}
             spacingGridSize={FIGMA_DOM_EDIT_CONFIG.spacingGridSize}
             snapshot={editorSnapshot}
@@ -474,8 +485,8 @@ function useFigmaDomSelectionMirror({
 
 function createFigmaReactDesignRegistry() {
   return createReactDesignDefinitionRegistry({
-    definitions: createFigmaReactDefinitions(),
     intrinsics: FIGMA_REACT_INTRINSICS,
+    sources: [createFigmaCanvasStoryDefinitionSource()],
   })
 }
 

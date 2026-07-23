@@ -37,6 +37,7 @@ test('syncs figma clone component edits across instances', async ({
 
   await search.fill('stat card revenue')
   await page.getByRole('button', { name: 'Select layer Revenue stat' }).click()
+  await inspector.getByRole('button', { name: 'Definition' }).click()
 
   await expect(inspector).toContainText('Stat card')
   await expect(inspector).toContainText(
@@ -111,6 +112,7 @@ test('edits figma clone CSS declarations in the inspector', async ({
 
   await search.fill('stat card revenue')
   await page.getByRole('button', { name: 'Select layer Revenue stat' }).click()
+  await inspector.getByRole('button', { name: 'Definition' }).click()
 
   await expect(inspector).toContainText('CSS')
   await expect(inspector.getByLabel('Pad')).toHaveValue('14')

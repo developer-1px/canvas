@@ -388,6 +388,7 @@ export function useReactDesignEditorRuntime(
           disposeReactDesignEditorExternalChangeHost(runtime.editor)
           runtime.editor.dispose()
           runtime.projection.dispose()
+          runtime.registry.dispose()
         }
       })
     }

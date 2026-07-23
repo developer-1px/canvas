@@ -28,6 +28,20 @@ describe('DesignDocument', () => {
       restored.read.componentPeers('workspaceStatRevenue')
         .map((node) => node.id),
     ).toEqual(['workspaceStatRevenue', 'workspaceStatConversion'])
+    expect(
+      restored.read.componentInstances('workspace-stat-card').map(
+        (instance) => ({
+          instanceId: instance.instanceId,
+          slots: instance.slots.map(({ node, slotId }) => [slotId, node.id]),
+        }),
+      ),
+    ).toEqual([
+      { instanceId: 'revenue', slots: [['root', 'workspaceStatRevenue']] },
+      {
+        instanceId: 'conversion',
+        slots: [['root', 'workspaceStatConversion']],
+      },
+    ])
   })
 
   it('fully validates a serialized snapshot before restoring it', () => {

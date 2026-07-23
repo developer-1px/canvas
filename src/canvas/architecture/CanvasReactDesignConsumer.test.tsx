@@ -10,10 +10,13 @@ import {
   createDesignDocument,
   createDomProjection,
   createReactDesignDefinitionRegistry,
+  createReactDesignComponentInstance,
   createReactDesignWidgetPack,
   defineReactDesignDefinition,
   defineReactDesignWidget,
+  type ReactDesignDefinitionRegistration,
   type ReactDesignWidgetInspectorProps,
+  type RegisteredDesignDefinitionSource,
 } from '@interactive-os/canvas/react-design'
 
 interface CounterProps {
@@ -296,7 +299,167 @@ describe('React design public facade consumer', () => {
     expect(markup).toContain('data-counter-fallback="counter props are invalid"')
     expect(markup).not.toContain('>valid<')
   })
+
+  it('creates editable component slot trees through the public facade', () => {
+    const instance = createReactDesignComponentInstance({
+      instanceId: 'external-card-1',
+      label: 'Insert external card',
+      parentId: null,
+      index: 0,
+      root: {
+        node: {
+          id: 'external-card',
+          label: 'External card',
+          definition: { kind: 'component', id: 'external.card' },
+          props: {},
+          text: null,
+          layout: {},
+          style: {},
+          frame: null,
+        },
+        slotId: 'root',
+        children: [{
+          node: {
+            id: 'external-card-title',
+            label: 'External card title',
+            definition: { kind: 'intrinsic', id: 'h2' },
+            props: {},
+            text: 'Inspectable title',
+            layout: {},
+            style: {},
+            frame: null,
+          },
+          slotId: 'title',
+        }],
+      },
+    })
+    const document = createDesignDocument({
+      schemaVersion: 1,
+      roots: [],
+      nodes: [],
+    })
+
+    expect(document.execute(instance.command)).toEqual({
+      changed: true,
+      ok: true,
+    })
+    expect(document.read.node('external-card-title')?.component).toEqual({
+      definitionId: 'external.card',
+      instanceId: 'external-card-1',
+      slotId: 'title',
+    })
+  })
+
+  it('registers story-like definitions and edits linked instances through public seams', () => {
+    const definition = defineReactDesignDefinition({
+      definition: defineRegisteredDesignDefinition({
+        id: 'external.story-card',
+        kind: 'component',
+        props: {
+          defaults: {},
+          safeParse: (value) => typeof value === 'object' && value !== null
+            ? { ok: true as const, value: {} }
+            : { ok: false as const, reason: 'invalid props' },
+        },
+        create: ({ nodeId, x, y }) => ({
+          ...createDefinitionNode(
+            'external.story-card',
+            nodeId,
+            x,
+            y,
+            'component',
+          ),
+          props: {},
+        }),
+        capabilities: {
+          textEdit: false,
+          transform: { move: true, resize: true },
+        },
+      }),
+      renderer: ({ children, rootProps }) => (
+        <article {...rootProps}>{children}</article>
+      ),
+      fallback: ({ children, rootProps }) => (
+        <article {...rootProps}>{children}</article>
+      ),
+    })
+    const source: RegisteredDesignDefinitionSource<
+      ReactDesignDefinitionRegistration
+    > = { read: () => [definition] }
+    const registry = createReactDesignDefinitionRegistry({
+      intrinsics: ['h2'],
+      sources: [source],
+    })
+    const first = createStoryCardInstance('first', 0)
+    const second = createStoryCardInstance('second', 1)
+    const document = createDesignDocument({
+      schemaVersion: 1,
+      roots: [],
+      nodes: [],
+    })
+
+    document.execute(first.command)
+    document.execute(second.command)
+
+    const projection = createProjection()
+    const editor = createEditorEngine({
+      definitionResolver: registry,
+      document,
+      projection,
+    })
+
+    expect(editor.read.componentInstances('external.story-card'))
+      .toHaveLength(2)
+    expect(editor.commands.execute({
+      type: 'node.edit',
+      edits: [{ target: 'text', value: 'Shared title' }],
+      label: 'Edit story card definition',
+      nodeId: 'first-title',
+      scope: 'definition',
+    })).toEqual({ changed: true, ok: true })
+    expect(editor.read.node('first-title')?.text).toBe('Shared title')
+    expect(editor.read.node('second-title')?.text).toBe('Shared title')
+
+    editor.dispose()
+    projection.dispose()
+    registry.dispose()
+  })
 })
+
+function createStoryCardInstance(instanceId: string, index: number) {
+  return createReactDesignComponentInstance({
+    index,
+    instanceId,
+    label: `Insert ${instanceId} story card`,
+    parentId: null,
+    root: {
+      node: {
+        id: `${instanceId}-card`,
+        label: `${instanceId} card`,
+        definition: { kind: 'component', id: 'external.story-card' },
+        props: {},
+        text: null,
+        layout: {},
+        style: {},
+        frame: null,
+      },
+      slotId: 'root',
+      children: [{
+        node: {
+          id: `${instanceId}-title`,
+          label: `${instanceId} title`,
+          definition: { kind: 'intrinsic', id: 'h2' },
+          props: {},
+          text: `${instanceId} title`,
+          layout: {},
+          style: {},
+          frame: null,
+        },
+        slotId: 'title',
+      }],
+    },
+  })
+}
 
 function CounterInspector({
   props,

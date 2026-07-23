@@ -815,6 +815,451 @@
   font-size: var(--demo-type-3);
 }
 
+.figma-dom-mobile,
+.figma-dom-mobile * {
+  box-sizing: border-box;
+}
+
+.figma-dom-mobile {
+  display: flex;
+  overflow: hidden;
+  background: #f7f6f2;
+  color: #20251f;
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  font-size: var(--demo-type-3);
+  line-height: 1.35;
+}
+
+.figma-dom-mobile__layout {
+  display: flex;
+  min-width: 0;
+}
+
+.figma-dom-mobile button {
+  border: 0;
+  color: inherit;
+  font: inherit;
+  cursor: default;
+}
+
+.figma-dom-mobile h1,
+.figma-dom-mobile h2,
+.figma-dom-mobile p {
+  margin: 0;
+}
+
+.figma-dom-mobile h1 {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: calc(var(--demo-type-4) + var(--demo-space-2));
+  font-weight: 650;
+  letter-spacing: -0.5px;
+  line-height: 1.04;
+}
+
+.figma-dom-mobile h2 {
+  font-size: var(--demo-type-3);
+  font-weight: 750;
+  line-height: 1.25;
+}
+
+.figma-dom-mobile__header {
+  background: rgba(247, 246, 242, 0.96);
+}
+
+.figma-dom-mobile__brand strong {
+  align-self: center;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: var(--demo-type-4);
+  letter-spacing: -0.3px;
+}
+
+.figma-dom-mobile__brand-mark,
+.figma-dom-mobile__host-avatar {
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #294c3b;
+  color: #ffffff;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: var(--demo-type-3);
+  font-weight: 700;
+}
+
+.figma-dom-mobile__round-button,
+.figma-dom-mobile__plain-button {
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #ebe9e1;
+  font-size: var(--demo-type-1);
+  font-weight: 750;
+}
+
+.figma-dom-mobile__main {
+  overflow: hidden;
+}
+
+.figma-dom-mobile__eyebrow {
+  color: #718077;
+  font-size: var(--demo-type-1);
+  font-weight: 750;
+  letter-spacing: 0.7px;
+}
+
+.figma-dom-mobile__muted {
+  color: #6e756f;
+  font-size: var(--demo-type-2);
+}
+
+.figma-dom-mobile__search {
+  background: #ffffff;
+  box-shadow: 0 8px 22px rgba(42, 51, 44, 0.08);
+  text-align: left;
+}
+
+.figma-dom-mobile__search > span {
+  display: grid;
+  place-items: center;
+  color: #294c3b;
+  font-size: calc(var(--demo-type-4) + var(--demo-space-1));
+  line-height: 1;
+}
+
+.figma-dom-mobile__search-copy strong {
+  font-size: var(--demo-type-2);
+}
+
+.figma-dom-mobile__search-copy span {
+  color: #777d78;
+  font-size: var(--demo-type-1);
+}
+
+.figma-dom-mobile__chips {
+  overflow: hidden;
+}
+
+.figma-dom-mobile__chip {
+  border-radius: 16px;
+  background: #eae9e3;
+  color: #59625c;
+  font-size: var(--demo-type-1);
+  font-weight: 650;
+}
+
+.figma-dom-mobile__chip--active {
+  background: #294c3b;
+  color: #ffffff;
+}
+
+.figma-dom-mobile__section-heading {
+  font-size: var(--demo-type-1);
+}
+
+.figma-dom-mobile__section-heading > span {
+  color: #858b86;
+  text-align: right;
+}
+
+.figma-dom-mobile__stay-card,
+.figma-dom-mobile__mini-card,
+.figma-dom-mobile__host-card,
+.figma-dom-mobile__review-card,
+.figma-dom-mobile__checkout-stay,
+.figma-dom-mobile__detail-row,
+.figma-dom-mobile__payment-card {
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.figma-dom-mobile__stay-card {
+  box-shadow: 0 12px 28px rgba(45, 52, 47, 0.09);
+}
+
+.figma-dom-mobile__stay-image,
+.figma-dom-mobile__mini-image,
+.figma-dom-mobile__detail-hero,
+.figma-dom-mobile__checkout-image {
+  overflow: hidden;
+  background-position: center;
+  background-size: cover;
+}
+
+.figma-dom-mobile__stay-image--jeju,
+.figma-dom-mobile__detail-hero,
+.figma-dom-mobile__checkout-image {
+  background-image:
+    linear-gradient(180deg, rgba(16, 25, 20, 0.04), rgba(16, 25, 20, 0.2)),
+    url('https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=1000&q=84');
+}
+
+.figma-dom-mobile__image-tag,
+.figma-dom-mobile__gallery-count {
+  display: grid;
+  place-items: center;
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.9);
+  color: #324139;
+  font-size: var(--demo-type-1);
+  font-weight: 750;
+  backdrop-filter: blur(6px);
+}
+
+.figma-dom-mobile__image-action {
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  color: #26342d;
+  font-size: var(--demo-type-4);
+  backdrop-filter: blur(6px);
+}
+
+.figma-dom-mobile__stay-info > strong {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: var(--demo-type-4);
+  line-height: 1.1;
+}
+
+.figma-dom-mobile__price-row strong {
+  font-size: var(--demo-type-2);
+}
+
+.figma-dom-mobile__text-action {
+  background: transparent;
+  color: #315946;
+  font-size: var(--demo-type-1);
+  font-weight: 750;
+  text-align: right;
+}
+
+.figma-dom-mobile__popular-row {
+  overflow: hidden;
+}
+
+.figma-dom-mobile__mini-card {
+  box-shadow: 0 4px 16px rgba(42, 50, 44, 0.05);
+}
+
+.figma-dom-mobile__mini-image {
+  flex: none;
+  border-radius: 10px;
+}
+
+.figma-dom-mobile__mini-image--stone {
+  background-image: url('https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?auto=format&fit=crop&w=500&q=80');
+}
+
+.figma-dom-mobile__mini-image--seoul {
+  background-image: url('https://images.unsplash.com/photo-1600607688969-a5bfcd646154?auto=format&fit=crop&w=500&q=80');
+}
+
+.figma-dom-mobile__mini-copy strong {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: var(--demo-type-2);
+  line-height: 1.25;
+  white-space: pre-line;
+}
+
+.figma-dom-mobile__mini-copy span {
+  color: #58645e;
+  font-size: var(--demo-type-1);
+  font-weight: 700;
+}
+
+.figma-dom-mobile__bottom-nav,
+.figma-dom-mobile__booking-bar {
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 -8px 24px rgba(42, 50, 44, 0.07);
+}
+
+.figma-dom-mobile__nav-item {
+  background: transparent;
+  color: #8a908c;
+  font-size: var(--demo-type-1);
+  font-weight: 650;
+}
+
+.figma-dom-mobile__nav-item--active {
+  color: #294c3b;
+  font-weight: 800;
+}
+
+.figma-dom-mobile__detail-hero {
+  color: #20251f;
+}
+
+.figma-dom-mobile__gallery-count {
+  align-self: end;
+}
+
+.figma-dom-mobile--stay h1 {
+  font-size: calc(var(--demo-type-4) + var(--demo-space-2));
+}
+
+.figma-dom-mobile__tag-row {
+  color: #38433d;
+  font-size: var(--demo-type-1);
+}
+
+.figma-dom-mobile__soft-tag {
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: #e4ece7;
+  color: #315946;
+  font-size: var(--demo-type-1);
+  font-weight: 750;
+}
+
+.figma-dom-mobile__highlights {
+  background: #ecebe5;
+}
+
+.figma-dom-mobile__highlights span {
+  color: #59635d;
+  font-size: var(--demo-type-1);
+  line-height: 1.45;
+  text-align: center;
+  white-space: pre-line;
+}
+
+.figma-dom-mobile__copy-section h2 {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: var(--demo-type-4);
+  line-height: 1.1;
+}
+
+.figma-dom-mobile__body-copy {
+  color: #59625c;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: var(--demo-type-2);
+  line-height: 1.45;
+}
+
+.figma-dom-mobile__host-card,
+.figma-dom-mobile__review-card {
+  box-shadow: 0 4px 18px rgba(42, 50, 44, 0.05);
+}
+
+.figma-dom-mobile__host-copy strong,
+.figma-dom-mobile__review-top strong {
+  font-size: var(--demo-type-2);
+}
+
+.figma-dom-mobile__review-top span {
+  color: #315946;
+  font-size: var(--demo-type-1);
+  font-weight: 750;
+  text-align: right;
+}
+
+.figma-dom-mobile__booking-price strong {
+  font-size: var(--demo-type-2);
+}
+
+.figma-dom-mobile__booking-price span {
+  font-size: var(--demo-type-1);
+}
+
+.figma-dom-mobile__primary-action {
+  border-radius: 14px;
+  background: #294c3b;
+  color: #ffffff !important;
+  font-size: var(--demo-type-2) !important;
+  font-weight: 750 !important;
+}
+
+.figma-dom-mobile__checkout-header {
+  background: #ffffff;
+}
+
+.figma-dom-mobile__checkout-header > strong {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: var(--demo-type-3);
+  line-height: 1.2;
+  text-align: center;
+}
+
+.figma-dom-mobile__secure {
+  display: grid;
+  align-items: center;
+  color: #52705f;
+  font-size: var(--demo-type-1);
+  font-weight: 750;
+  text-align: right;
+}
+
+.figma-dom-mobile__checkout-stay {
+  box-shadow: 0 8px 22px rgba(42, 50, 44, 0.06);
+}
+
+.figma-dom-mobile__checkout-image {
+  flex: none;
+  border-radius: 12px;
+}
+
+.figma-dom-mobile__checkout-copy > strong {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: var(--demo-type-3);
+}
+
+.figma-dom-mobile__checkout-main > h2 {
+}
+
+.figma-dom-mobile__detail-row,
+.figma-dom-mobile__payment-card {
+  box-shadow: 0 2px 12px rgba(42, 50, 44, 0.04);
+}
+
+.figma-dom-mobile__detail-copy strong,
+.figma-dom-mobile__payment-copy strong {
+  font-size: var(--demo-type-2);
+}
+
+.figma-dom-mobile__detail-copy strong,
+.figma-dom-mobile__detail-copy span {
+  line-height: 1.15;
+}
+
+.figma-dom-mobile__cost-row {
+  color: #545d57;
+  font-size: var(--demo-type-2);
+}
+
+.figma-dom-mobile__cost-row span:last-child,
+.figma-dom-mobile__total-row strong:last-child {
+  text-align: right;
+}
+
+.figma-dom-mobile__total-row {
+  align-items: center;
+  border-top: 1px solid #d8dad6;
+  font-size: var(--demo-type-3);
+}
+
+.figma-dom-mobile__card-icon {
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: #192b5f;
+  color: #ffffff;
+  font-size: var(--demo-type-1);
+  font-weight: 800;
+  letter-spacing: 0.4px;
+}
+
+.figma-dom-mobile__booking-note {
+  color: #6e756f;
+  font-size: var(--demo-type-1);
+  line-height: 1.45;
+}
+
+.figma-dom-mobile--booking .figma-dom-mobile__booking-bar > span {
+  align-self: center;
+  font-size: var(--demo-type-1);
+  line-height: 1.35;
+}
+
 .figma-panel-section {
   display: grid;
   gap: var(--demo-space-3);

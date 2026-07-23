@@ -26,7 +26,7 @@ test('exposes figma clone layers as a keyboard treeview', async ({
   ).toHaveAttribute('aria-posinset', '1')
   await expect(workspaceSection).toHaveAttribute('aria-level', '1')
   await expect(workspaceSection).toHaveAttribute('aria-posinset', '2')
-  await expect(workspaceSection).toHaveAttribute('aria-setsize', '3')
+  await expect(workspaceSection).toHaveAttribute('aria-setsize', '6')
   await expect(workspaceSection).toHaveAttribute('aria-expanded', 'true')
   await expect(workspaceSection).toHaveAttribute('aria-selected', 'true')
   await expect(workspaceNode).toHaveAttribute('aria-level', '2')

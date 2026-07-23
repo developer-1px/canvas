@@ -31,6 +31,23 @@ export function FigmaHomeMetaCard({
   return <article {...rootProps}>{children}</article>
 }
 
+export function FigmaMobileFeaturedStayCard({
+  children,
+  rootProps,
+  slots,
+}: ReactRegisteredDesignRenderProps<DesignJSONObject>) {
+  const hasNamedSlots = slots.image !== undefined &&
+    slots.content !== undefined
+
+  return (
+    <article {...rootProps} data-react-component="mobile-featured-stay-card">
+      {hasNamedSlots
+        ? <>{slots.image}{slots.content}</>
+        : children}
+    </article>
+  )
+}
+
 export function FigmaReactWidget({
   props,
   rootProps,
