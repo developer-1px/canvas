@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 import viteConfig from '../../../vite.config'
 import playwrightConfig from '../../../playwright.config'
@@ -28,6 +29,7 @@ type CanvasViteConfig = {
 }
 
 const config = viteConfig as CanvasViteConfig
+const root = fileURLToPath(new URL('../../..', import.meta.url))
 const e2eConfig = playwrightConfig as {
   webServer?: {
     command?: string
@@ -91,9 +93,7 @@ describe('Canvas build config', () => {
   it('keeps the local dev server port deterministic across loopback hosts', () => {
     expect(config.server).toMatchObject({
       fs: {
-        allow: [
-          expect.stringContaining('@interactive-os/canvas'),
-        ],
+        allow: [root],
       },
       host: '::',
       port: 53175,
