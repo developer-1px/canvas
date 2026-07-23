@@ -67,6 +67,8 @@ test('marks margin-derived equal spacing without adding margin handles', async (
   await page.goto('/?demo=figma')
   await selectLayer(page, 'Select layer Workspace page', 'workspacePage')
   await selectLayer(page, 'Select layer Deal row 1', 'workspaceDealOne')
+  await page.getByRole('complementary', { name: 'CSS Inspector' })
+    .getByRole('button', { name: 'Definition' }).click()
   await page.getByRole('spinbutton', { name: 'Mar' }).fill('10')
   await page.getByRole('button', { name: 'Measure tool' }).click()
 
